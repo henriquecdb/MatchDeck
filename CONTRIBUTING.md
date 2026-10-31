@@ -1,17 +1,5 @@
 # Desenvolvimento
 
-## Identidade dos commits
-
-Configure sua identidade antes de criar commits. Neste repositório, a identidade inicial solicitada pelo proprietário é:
-
-```powershell
-git config user.name "Henrique Junqueira"
-git config user.email "henriquecamposj@gmail.com"
-git config user.useConfigOnly true
-```
-
-Os commits desta entrega usam essa identidade como autor e committer, sem trailers de coautoria. Os workflows não criam commits.
-
 ## Conventional Commits
 
 Use `tipo(escopo opcional): descrição`, por exemplo:
