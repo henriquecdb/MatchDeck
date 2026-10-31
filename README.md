@@ -1,0 +1,110 @@
+# MatchDeck
+
+Aplicativo modular de overlays para jogos. Primeira integração: Age of Empires II: Definitive Edition. Nome provisório, sem pesquisa de marca.
+
+## Instalar no Windows
+
+Baixe o instalador **MatchDeck_0.1.0_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, abra o MatchDeck, identifique seu perfil e ative a detecção com o AoE2 em janela sem bordas.
+
+Veja o [changelog da versão](CHANGELOG.md). O aplicativo verifica novas versões ao abrir e mostra as notas e o progresso da atualização. A instalação automática é opcional e exige que a detecção esteja desligada e não haja partida de demonstração ativa. Pacotes de atualização são verificados por assinatura. O executável ainda não possui certificado Authenticode de editor Windows.
+
+Para contribuir, consulte [CONTRIBUTING.md](CONTRIBUTING.md). Para publicar versões, consulte [docs/releases.md](docs/releases.md).
+
+## Estado atual
+
+Protótipo com detecção real de multiplayer e partidas simuladas para testar posicionamento, opacidade e passagem de cliques. Ranqueadas e partidas rápidas são detectadas quando publicadas pela fonte. Lobbies convencionais dependem da cobertura da fonte. Skirmish offline continua disponível somente na demonstração; campanhas estão fora do escopo.
+
+No navegador há uma prévia simulada. No Tauri há uma janela transparente, sempre no topo, arrastável e com passagem de cliques. Ctrl+Shift+O alterna a trava quando disponível; conflitos com outros aplicativos são informados no painel e não impedem a inicialização. O painel também permite destravar. Fechar o painel encerra o aplicativo e o overlay.
+
+Estatísticas e rating vêm da fila correspondente à partida, sem substituir por rating ranqueado de outra modalidade. Dados não disponíveis aparecem como “—”. O catálogo inclui imagens transparentes de unidades únicas de 56 civilizações, distribuídas localmente. Os nomes das unidades estão em inglês. Bordas e rating usam a cor informada para cada jogador na partida. Origem das imagens em `public/units/NOTICE.md`.
+
+## Demonstração com dados sincronizados
+
+Desative a detecção real e clique em **Iniciar demonstração**. O app usa a última fotografia sincronizada, preservando modalidade, mapa, jogadores, cores e estatísticas. A cópia aparece como **REPLAY DE TESTE**, com a data da sincronização, e não altera o registro original. A última fotografia é salva em `last-match.json` e continua disponível após reiniciar o app.
+
+## Layout e variação de rating
+
+Em **Overlay → Modo de exibição**, escolha **Completo** (padrão) ou **Compacto**. A configuração persiste entre execuções. O compacto reduz a largura de 480 para 400 pixels lógicos e usa cards menores, mantendo unidade, nome, civilização, rating, vitórias, derrotas e porcentagem. O nome da unidade fica disponível no texto alternativo da imagem.
+
+Durante partidas 1v1 de filas reconhecidas, o card apresenta uma projeção orientativa de vitória e derrota (`~+X` / `~−Y`). É um modelo Elo genérico com K=32 e divisor 400; não é o cálculo oficial do jogo. Partidas rápidas, calibração e regras específicas de fila podem produzir valores muito diferentes. Equipes, filas desconhecidas ou ratings ausentes exibem “—”. O card e o rodapé identificam a projeção como não oficial.
+
+Quando a API confirma o término, o resultado efetivo (`ratingDiff`) é salvo na última fotografia sincronizada sem substituir o rating registrado no início. O overlay se esconde normalmente no final; na demonstração de uma partida concluída aparece **Resultado … confirmado**. Para arquivos antigos sem informações de fila/resultado, use **Atualizar últimos dados**.
+
+Se ainda não houver fotografia salva, mas existir um perfil configurado, o primeiro teste busca a última partida disponível para criar a cópia local. Sem perfil ou dados salvos, a demonstração usa jogadores fictícios. **Atualizar últimos dados** permite buscar uma fotografia mais recente antes de iniciar o teste. Nos próximos testes, iniciar a demonstração reutiliza o arquivo local sem novas consultas. A prévia de navegador continua usando dados fictícios e não acessa o arquivo de configuração do desktop.
+
+## Executar a prévia
+
+Requer Node.js 22.12 ou superior.
+
+```powershell
+npm ci
+npm run dev
+```
+
+Acesse http://127.0.0.1:1420. Inicie uma demonstração, ajuste a opacidade e encerre a partida. X/Y e passagem de cliques são funções da janela desktop; não reposicionam a prévia.
+
+## Executar no Windows
+
+Além do Node, instale Rust com toolchain MSVC, Visual Studio Build Tools com a carga de trabalho “Desktop development with C++” e o WebView2 Runtime. Consulte https://v2.tauri.app/start/prerequisites/.
+
+```powershell
+npm ci
+npm run desktop
+```
+
+No painel, clique em **Identificar perfil local** e depois em **Ativar detecção**. Também é possível informar um Profile ID do AoE2 ou Steam ID numérico de 17 dígitos. O nome retornado permite verificar a conta selecionada. Inicie uma partida multiplayer no jogo em janela sem bordas e aguarde a publicação pela API. Consulte [detalhes e limitações da detecção](docs/real-detection.md).
+
+Se o terminal não encontrar Cargo após instalar Rust, reabra o terminal ou execute `$env:Path = "$env:USERPROFILE\.cargo\bin;$env:Path"` antes de iniciar.
+
+Para gerar o instalador por usuário:
+
+```powershell
+npm run desktop:build
+```
+
+O instalador NSIS será gerado em `src-tauri/target/release/bundle/nsis/`. Para gerar os artefatos assinados de atualização, configure a chave conforme [docs/releases.md](docs/releases.md). A assinatura de atualização é distinta de assinatura de código Windows.
+
+## Organização
+
+```text
+src/
+  domain/          Modelos e regras independentes de interface
+  application/     Contrato de runtime e sincronização do estado
+  games/aoe2/      Dados de demonstração da integração AoE2
+  infrastructure/ Adaptadores de navegador e Tauri
+  features/
+    detection/    Configuração e status da detecção real
+    overlay/      Exibição da partida
+    settings/     Painel de controle
+src-tauri/src/
+  detection/      Monitoramento, decisões de ciclo e tentativas
+  games/aoe2/     Provedor HTTP, respostas e catálogo local
+  model.rs        Contratos serializáveis
+  commands.rs     Operações de início, fim e configuração
+  overlay.rs      Controle da janela e publicação do estado
+  storage.rs      Persistência de preferências
+  main.rs         Composição e eventos nativos
+```
+
+O frontend depende de `OverlayRuntime`; o adaptador do navegador permite experimentar sem compilação nativa. O backend mantém uma fotografia da partida e ignora novos dados com o mesmo identificador. O monitoramento usa uma tarefa assíncrona cancelável, sem loop de renderização. Preferências persistem em localStorage na prévia e em `settings.json` no diretório de configuração do aplicativo no desktop. Perfil e ativação persistem em `detection.json`. A última fotografia sincronizada persiste em `last-match.json` apenas para replay de teste; ela não é restaurada como partida em andamento.
+
+## Validação
+
+```powershell
+npm test
+npm run build
+cargo test --manifest-path src-tauri/Cargo.toml
+cargo build --manifest-path src-tauri/Cargo.toml
+```
+
+Testes cobrem imutabilidade da fotografia, eventos duplicados, cálculo de vitórias, preferências inválidas, seleção de partidas em andamento, confirmação do encerramento e intervalo de tentativas. A compilação web não verifica o código Rust. O teste de API real é opt-in: `cargo test --manifest-path src-tauri/Cargo.toml live_api_smoke_test -- --ignored`.
+
+Teste manual desktop: iniciar uma partida; mover a janela; ajustar opacidade; travar e clicar no aplicativo atrás; destravar com Ctrl+Shift+O; encerrar a partida; reiniciar e verificar preferências. Comece com o jogo em janela sem bordas. Tela cheia exclusiva ainda precisa de validação. As coordenadas são pixels físicos do desktop; use valores negativos para monitores à esquerda e “Restaurar posição” se a janela ficar fora da tela.
+
+## Próximas etapas
+
+1. Validar o comportamento da janela sobre o AoE2 e medir CPU/memória em build release.
+2. Validar a detecção de início/fim em partidas do usuário, medir o atraso da fonte e ampliar a cobertura de lobbies.
+3. Implementar um detector local separado para skirmish offline.
+4. Ampliar o catálogo para civilizações de outros conjuntos e traduzir nomes de unidades.
+5. Validar o layout com oito jogadores e adicionar seleção de monitor.

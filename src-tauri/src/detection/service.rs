@@ -1,0 +1,251 @@
+use super::model::{retry_delay, DetectionConfig};
+use crate::{
+    commands::SharedState,
+    games::aoe2::{
+        provider::{now, Aoe2Provider},
+        response::{self, MatchFeed, RemoteMatch},
+    },
+    model::MatchSource,
+    overlay, storage,
+};
+use std::time::Duration;
+use tauri::{Emitter, Manager};
+use tokio::sync::watch;
+
+pub struct DetectionController {
+    pub provider: Aoe2Provider,
+    pub updates: watch::Sender<DetectionConfig>,
+}
+
+pub enum MatchAction<'a> {
+    Start(&'a RemoteMatch),
+    Finish,
+    Keep,
+}
+
+pub fn decide<'a>(
+    feed: &'a MatchFeed,
+    profile_id: u64,
+    current_id: Option<&str>,
+    time: chrono::DateTime<chrono::Utc>,
+) -> MatchAction<'a> {
+    if let Some(candidate) = response::ongoing(feed, profile_id, time) {
+        if current_id != Some(format!("aoe2-{}", candidate.match_id).as_str()) {
+            return MatchAction::Start(candidate);
+        }
+        return MatchAction::Keep;
+    }
+    let confirmed_end = current_id.is_some_and(|current_id| {
+        feed.matches.iter().any(|candidate| {
+            candidate.includes(profile_id)
+                && format!("aoe2-{}", candidate.match_id) == current_id
+                && candidate.is_finished()
+        })
+    });
+    if confirmed_end {
+        MatchAction::Finish
+    } else {
+        MatchAction::Keep
+    }
+}
+
+fn update(
+    app: &tauri::AppHandle,
+    config: &DetectionConfig,
+    phase: &str,
+    message: String,
+) -> Result<(), String> {
+    let shared = app.state::<SharedState>();
+    let mut state = shared.lock().map_err(|error| error.to_string())?;
+    if state.detection.config != *config {
+        return Ok(());
+    }
+    state.detection.phase = phase.into();
+    state.detection.message = message;
+    app.emit("state-changed", &*state)
+        .map_err(|error| error.to_string())
+}
+
+async fn cycle(
+    app: &tauri::AppHandle,
+    provider: &Aoe2Provider,
+    config: &DetectionConfig,
+) -> Result<(), String> {
+    let profile = config.profile.as_ref().ok_or("Selecione um perfil AoE2")?;
+    let feed = provider.matches(profile.profile_id).await?;
+    let current_id = {
+        let shared = app.state::<SharedState>();
+        let state = shared.lock().map_err(|error| error.to_string())?;
+        state
+            .current_match
+            .as_ref()
+            .filter(|current| matches!(current.source, MatchSource::Live))
+            .map(|current| current.id.clone())
+    };
+    let action = decide(&feed, profile.profile_id, current_id.as_deref(), now());
+    let new_match = if let MatchAction::Start(remote) = &action {
+        let player_count: usize = remote.teams.iter().map(|team| team.players.len()).sum();
+        if !(1..=8).contains(&player_count) {
+            return Err("A fonte retornou uma quantidade inválida de jogadores".into());
+        }
+        update(
+            app,
+            config,
+            "loading",
+            "Partida encontrada; carregando os dados dos jogadores".into(),
+        )?;
+        let mut snapshot = provider.snapshot(remote).await;
+        for _ in 0..2 {
+            if snapshot.warnings.is_empty() {
+                break;
+            }
+            tokio::time::sleep(Duration::from_secs(5)).await;
+            snapshot = provider.snapshot(remote).await;
+        }
+        Some(snapshot)
+    } else {
+        None
+    };
+    let changed = new_match.is_some() || matches!(action, MatchAction::Finish);
+    let snapshot = {
+        let shared = app.state::<SharedState>();
+        let mut state = shared.lock().map_err(|error| error.to_string())?;
+        if state.detection.config != *config {
+            return Ok(());
+        }
+        if let Some(mut new_match) = new_match {
+            if let Err(error) = storage::save_last_match(app, &new_match) {
+                new_match.warnings.push(format!(
+                    "Não foi possível salvar a partida para demonstração: {error}"
+                ));
+            }
+            state.last_synced = Some(new_match.clone());
+            state.current_match = Some(new_match);
+        }
+        if matches!(action, MatchAction::Finish) {
+            if let Some(current) = &state.current_match {
+                if let Some(remote) = feed
+                    .matches
+                    .iter()
+                    .find(|candidate| format!("aoe2-{}", candidate.match_id) == current.id)
+                {
+                    let mut result = crate::games::aoe2::outcome::record_outcome(current, remote);
+                    if let Err(error) = storage::save_last_match(app, &result) {
+                        result
+                            .warnings
+                            .push(format!("Não foi possível salvar o resultado: {error}"));
+                    }
+                    state.last_synced = Some(result);
+                }
+            }
+            state.current_match = None;
+        }
+        state.detection.last_checked = Some(now().to_rfc3339());
+        let active = state.current_match.is_some();
+        state.detection.phase = if active { "in-match" } else { "waiting" }.into();
+        state.detection.message = if active {
+            "Partida em andamento · dados fixos; aguardando confirmação de término".into()
+        } else {
+            "Aguardando partida multiplayer publicada pela fonte AoE2".into()
+        };
+        state.clone()
+    };
+    if changed {
+        overlay::synchronize(app, &snapshot, true)
+    } else {
+        app.emit("state-changed", snapshot)
+            .map_err(|error| error.to_string())
+    }
+}
+
+pub async fn run(
+    app: tauri::AppHandle,
+    provider: Aoe2Provider,
+    mut updates: watch::Receiver<DetectionConfig>,
+) {
+    let mut failures = 0;
+    loop {
+        let config = updates.borrow_and_update().clone();
+        if !config.enabled {
+            if updates.changed().await.is_err() {
+                break;
+            }
+            failures = 0;
+            continue;
+        }
+        tokio::select! {
+            changed = updates.changed() => {
+                if changed.is_err() { break; }
+                failures = 0;
+                continue;
+            }
+            result = cycle(&app, &provider, &config) => {
+                match result {
+                    Ok(()) => failures = 0,
+                    Err(error) => {
+                        failures += 1;
+                        let message = format!("{error}. Nova tentativa em {} s. O overlay atual será mantido.", retry_delay(failures));
+                        if let Err(error) = update(&app, &config, "error", message) { eprintln!("{error}"); }
+                    }
+                }
+            }
+        }
+        tokio::select! {
+            changed = updates.changed() => {
+                if changed.is_err() { break; }
+                failures = 0;
+            }
+            _ = tokio::time::sleep(Duration::from_secs(retry_delay(failures))) => {}
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    fn feed(finished: serde_json::Value) -> MatchFeed {
+        serde_json::from_value(json!({ "matches": [{
+            "matchId": 10, "started": "2026-10-31T02:00:00Z", "finished": finished,
+            "gameMode": "random_map", "teams": [{"players": [{"profileId": 42, "name": "Player"}]}]
+        }]}))
+        .unwrap()
+    }
+
+    #[test]
+    fn duplicate_events_do_not_recapture_statistics() {
+        let feed = feed(json!(null));
+        let time = "2026-10-31T02:10:00Z".parse().unwrap();
+        assert!(matches!(
+            decide(&feed, 42, None, time),
+            MatchAction::Start(_)
+        ));
+        assert!(matches!(
+            decide(&feed, 42, Some("aoe2-10"), time),
+            MatchAction::Keep
+        ));
+    }
+
+    #[test]
+    fn only_positive_confirmation_finishes_a_match() {
+        let time = "2026-10-31T02:10:00Z".parse().unwrap();
+        assert!(matches!(
+            decide(&MatchFeed { matches: vec![] }, 42, Some("aoe2-10"), time),
+            MatchAction::Keep
+        ));
+        assert!(matches!(
+            decide(
+                &feed(json!("2026-10-31T02:08:00Z")),
+                42,
+                Some("aoe2-10"),
+                time
+            ),
+            MatchAction::Finish
+        ));
+        assert!(matches!(
+            decide(&feed(json!("2026-10-31T02:08:00Z")), 42, None, time),
+            MatchAction::Keep
+        ));
+    }
+}

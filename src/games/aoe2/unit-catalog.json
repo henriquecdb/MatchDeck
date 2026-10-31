@@ -1,0 +1,422 @@
+{
+  "danes": {
+    "name": "Danes",
+    "units": [
+      "Jomsviking"
+    ],
+    "image": "/units/Jomsviking.png"
+  },
+  "saxons": {
+    "name": "Saxons",
+    "units": [
+      "Hearth Troop"
+    ],
+    "image": "/units/HearthTroop.png"
+  },
+  "varangians": {
+    "name": "Varangians",
+    "units": [
+      "Jarl"
+    ],
+    "image": "/units/Jarl.png"
+  },
+  "mapuche": {
+    "name": "Mapuche",
+    "units": [
+      "Kona",
+      "Bolas Rider"
+    ],
+    "image": "/units/Kona.png"
+  },
+  "muisca": {
+    "name": "Muisca",
+    "units": [
+      "Guecha Warrior",
+      "Temple Guard"
+    ],
+    "image": "/units/GuechaWarrior.png"
+  },
+  "tupi": {
+    "name": "Tupi",
+    "units": [
+      "Blackwood Archer",
+      "Ibirapema Warrior"
+    ],
+    "image": "/units/BlackwoodArcher.png"
+  },
+  "armenians": {
+    "name": "Armenians",
+    "units": [
+      "Composite Bowman",
+      "Warrior Priest"
+    ],
+    "image": "/units/CompositeBowman.png"
+  },
+  "aztecs": {
+    "name": "Aztecs",
+    "units": [
+      "Jaguar Warrior"
+    ],
+    "image": "/units/JaguarWarrior.png"
+  },
+  "bengalis": {
+    "name": "Bengalis",
+    "units": [
+      "Ratha"
+    ],
+    "image": "/units/Ratha.png"
+  },
+  "dravidians": {
+    "name": "Dravidians",
+    "units": [
+      "Urumi Swordsman",
+      "Thirisadai"
+    ],
+    "image": "/units/UrumiSwordsman.png"
+  },
+  "gurjaras": {
+    "name": "Gurjaras",
+    "units": [
+      "Chakram Thrower",
+      "Shrivamsha Rider",
+      "Camel Scout"
+    ],
+    "image": "/units/ChakramThrower.png"
+  },
+  "berbers": {
+    "name": "Berbers",
+    "units": [
+      "Camel Archer",
+      "Genitour"
+    ],
+    "image": "/units/CamelArcher.png"
+  },
+  "bohemians": {
+    "name": "Bohemians",
+    "units": [
+      "Hussite Wagon",
+      "Houfnice"
+    ],
+    "image": "/units/HussiteWagon.png"
+  },
+  "britons": {
+    "name": "Britons",
+    "units": [
+      "Longbowman"
+    ],
+    "image": "/units/Longbowman.png"
+  },
+  "bulgarians": {
+    "name": "Bulgarians",
+    "units": [
+      "Konnik"
+    ],
+    "image": "/units/Konnik.png"
+  },
+  "burgundians": {
+    "name": "Burgundians",
+    "units": [
+      "Coustillier",
+      "Flemish Militia"
+    ],
+    "image": "/units/Coustillier.png"
+  },
+  "burmese": {
+    "name": "Burmese",
+    "units": [
+      "Arambai"
+    ],
+    "image": "/units/Arambai.png"
+  },
+  "byzantines": {
+    "name": "Byzantines",
+    "units": [
+      "Cataphract"
+    ],
+    "image": "/units/Cataphract.png"
+  },
+  "celts": {
+    "name": "Celts",
+    "units": [
+      "Woad Raider"
+    ],
+    "image": "/units/WoadRaider.png"
+  },
+  "chinese": {
+    "name": "Chinese",
+    "units": [
+      "Chu Ko Nu",
+      "Dragon Ship"
+    ],
+    "image": "/units/ChuKoNu.png"
+  },
+  "cumans": {
+    "name": "Cumans",
+    "units": [
+      "Kipchak"
+    ],
+    "image": "/units/Kipchak.png"
+  },
+  "ethiopians": {
+    "name": "Ethiopians",
+    "units": [
+      "Shotel Warrior"
+    ],
+    "image": "/units/ShotelWarrior.png"
+  },
+  "franks": {
+    "name": "Franks",
+    "units": [
+      "Throwing Axeman"
+    ],
+    "image": "/units/ThrowingAxeman.png"
+  },
+  "georgians": {
+    "name": "Georgians",
+    "units": [
+      "Monaspa"
+    ],
+    "image": "/units/Monaspa.png"
+  },
+  "goths": {
+    "name": "Goths",
+    "units": [
+      "Huskarl"
+    ],
+    "image": "/units/Huskarl.png"
+  },
+  "huns": {
+    "name": "Huns",
+    "units": [
+      "Tarkan"
+    ],
+    "image": "/units/Tarkan.png"
+  },
+  "incas": {
+    "name": "Incas",
+    "units": [
+      "Kamayuk",
+      "Slinger"
+    ],
+    "image": "/units/Kamayuk.png"
+  },
+  "hindustanis": {
+    "name": "Hindustanis",
+    "units": [
+      "Ghulam",
+      "Imperial Camel Rider"
+    ],
+    "image": "/units/Ghulam.png"
+  },
+  "italians": {
+    "name": "Italians",
+    "units": [
+      "Genoese Crossbowman",
+      "Condottiero"
+    ],
+    "image": "/units/GenoeseCrossbowman.png"
+  },
+  "japanese": {
+    "name": "Japanese",
+    "units": [
+      "Samurai"
+    ],
+    "image": "/units/Samurai.png"
+  },
+  "jurchens": {
+    "name": "Jurchens",
+    "units": [
+      "Iron Pagoda",
+      "Grenadier"
+    ],
+    "image": "/units/IronPagoda.png"
+  },
+  "khitans": {
+    "name": "Khitans",
+    "units": [
+      "Liao Dao",
+      "Mounted Trebuchet"
+    ],
+    "image": "/units/LiaoDao.png"
+  },
+  "shu": {
+    "name": "Shu",
+    "units": [
+      "White Feather Guard",
+      "War Chariot",
+      "Liu Bei"
+    ],
+    "image": "/units/WhiteFeatherGuard.png"
+  },
+  "wei": {
+    "name": "Wei",
+    "units": [
+      "Tiger Cavalry",
+      "Xianbei Raider",
+      "Cao Cao"
+    ],
+    "image": "/units/TigerCavalry.png"
+  },
+  "wu": {
+    "name": "Wu",
+    "units": [
+      "Fire Archer",
+      "Jian Swordsman",
+      "Sun Jian"
+    ],
+    "image": "/units/FireArcher.png"
+  },
+  "khmer": {
+    "name": "Khmer",
+    "units": [
+      "Ballista Elephant"
+    ],
+    "image": "/units/BallistaElephant.png"
+  },
+  "koreans": {
+    "name": "Koreans",
+    "units": [
+      "War Wagon",
+      "Turtle Ship"
+    ],
+    "image": "/units/WarWagon.png"
+  },
+  "lithuanians": {
+    "name": "Lithuanians",
+    "units": [
+      "Leitis"
+    ],
+    "image": "/units/Leitis.png"
+  },
+  "magyars": {
+    "name": "Magyars",
+    "units": [
+      "Magyar Huszar"
+    ],
+    "image": "/units/MagyarHuszar.png"
+  },
+  "malay": {
+    "name": "Malay",
+    "units": [
+      "Karambit Warrior"
+    ],
+    "image": "/units/KarambitWarrior.png"
+  },
+  "malians": {
+    "name": "Malians",
+    "units": [
+      "Gbeto"
+    ],
+    "image": "/units/Gbeto.png"
+  },
+  "mayans": {
+    "name": "Mayans",
+    "units": [
+      "Plumed Archer"
+    ],
+    "image": "/units/PlumedArcher.png"
+  },
+  "mongols": {
+    "name": "Mongols",
+    "units": [
+      "Mangudai"
+    ],
+    "image": "/units/Mangudai.png"
+  },
+  "persians": {
+    "name": "Persians",
+    "units": [
+      "War Elephant"
+    ],
+    "image": "/units/WarElephant.png"
+  },
+  "poles": {
+    "name": "Poles",
+    "units": [
+      "Obuch",
+      "Winged Hussar"
+    ],
+    "image": "/units/Obuch.png"
+  },
+  "portuguese": {
+    "name": "Portuguese",
+    "units": [
+      "Organ Gun",
+      "Caravel"
+    ],
+    "image": "/units/OrganGun.png"
+  },
+  "romans": {
+    "name": "Romans",
+    "units": [
+      "Centurion",
+      "Legionary"
+    ],
+    "image": "/units/Centurion.png"
+  },
+  "saracens": {
+    "name": "Saracens",
+    "units": [
+      "Mameluke"
+    ],
+    "image": "/units/Mameluke.png"
+  },
+  "sicilians": {
+    "name": "Sicilians",
+    "units": [
+      "Serjeant"
+    ],
+    "image": "/units/Serjeant.png"
+  },
+  "slavs": {
+    "name": "Slavs",
+    "units": [
+      "Boyar"
+    ],
+    "image": "/units/Boyar.png"
+  },
+  "spanish": {
+    "name": "Spanish",
+    "units": [
+      "Conquistador",
+      "Missionary"
+    ],
+    "image": "/units/Conquistador.png"
+  },
+  "tatars": {
+    "name": "Tatars",
+    "units": [
+      "Keshik",
+      "Flaming Camel"
+    ],
+    "image": "/units/Keshik.png"
+  },
+  "teutons": {
+    "name": "Teutons",
+    "units": [
+      "Teutonic Knight"
+    ],
+    "image": "/units/TeutonicKnight.png"
+  },
+  "turks": {
+    "name": "Turks",
+    "units": [
+      "Janissary"
+    ],
+    "image": "/units/Janissary.png"
+  },
+  "vietnamese": {
+    "name": "Vietnamese",
+    "units": [
+      "Rattan Archer"
+    ],
+    "image": "/units/RattanArcher.png"
+  },
+  "vikings": {
+    "name": "Vikings",
+    "units": [
+      "Berserk"
+    ],
+    "image": "/units/Berserk.png"
+  }
+}
