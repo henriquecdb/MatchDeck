@@ -1,0 +1,43 @@
+name: Commit messages
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+permissions:
+  contents: read
+jobs:
+  commitlint:
+    name: Conventional Commits
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Validate every commit in the change
+        shell: bash
+        env:
+          COMMIT_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          COMMIT_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          if [[ -z "$COMMIT_BASE" || "$COMMIT_BASE" =~ ^0+$ ]]; then
+            commits=$(git rev-list --reverse "$COMMIT_HEAD")
+          else
+            commits=$(git rev-list --reverse "$COMMIT_BASE..$COMMIT_HEAD")
+          fi
+          while IFS= read -r commit; do
+            [[ -z "$commit" ]] && continue
+            echo "Checking $commit"
+            git log -1 --format=%B "$commit" | npx --no -- commitlint --verbose
+          done <<< "$commits"
+      - name: Validate pull request title for squash merges
+        if: github.event_name == 'pull_request'
+        shell: bash
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: printf '%s\n' "$PR_TITLE" | npx --no -- commitlint --verbose

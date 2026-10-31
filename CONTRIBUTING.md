@@ -15,6 +15,8 @@ Tipos aceitos incluem `feat`, `fix`, `docs`, `refactor`, `perf`, `test`, `build`
 
 `npm ci` instala um hook de `commit-msg` que valida o padrão com commitlint. Para um fluxo guiado semelhante ao Commitizen, execute `npm run commit`.
 
+No GitHub, o check obrigatório **Conventional Commits** valida todos os commits do PR e o título do PR, usado no squash merge. A validação também roda nos pushes de `main`. Mensagens inválidas bloqueiam a integração; ignorar o hook local não ignora o GitHub Actions. Abra uma branch e um PR para contribuir.
+
 ## Verificações
 
 ```powershell
