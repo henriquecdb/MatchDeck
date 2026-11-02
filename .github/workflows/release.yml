@@ -29,6 +29,7 @@ jobs:
           components: rustfmt, clippy
       - uses: swatinem/rust-cache@v2
         with:
+          shared-key: windows-cargo
           workspaces: src-tauri -> target
       - run: npm ci
       - run: npm test
