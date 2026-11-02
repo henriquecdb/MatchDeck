@@ -50,7 +50,7 @@ input[type=number] { width: 110px; }
 .win-rate { display: grid; place-items: center; width: 51px; height: 51px; margin: 5px 0 4px; border-radius: 50%; background: conic-gradient(#5bdfa0 var(--win-angle), #323f50 0); }
 .win-rate span { display: grid; place-items: center; width: 45px; height: 45px; border-radius: 50%; background: #171e2a; font-size: 11px; font-weight: 700; }
 .replay-caption { color: #93a1b6; font-size: 9px; padding: 9px 2px 0; }
-.overlay-window { background: transparent; overflow: hidden; user-select: none; }
+.overlay-window { background: transparent; overflow: auto; user-select: none; scrollbar-width: thin; scrollbar-color: #536b88 transparent; }
 .overlay-window .match-overlay { cursor: move; }
 .rating-impact { display: flex; align-items: baseline; gap: 5px; font-size: 10px; margin-top: 5px; white-space: nowrap; }
 .rating-impact > span { color: #9aa9be; }

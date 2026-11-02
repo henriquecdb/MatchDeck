@@ -1,6 +1,7 @@
 import { beforeEach, expect, it, vi } from 'vitest';
 import { BrowserRuntime } from './browser-runtime';
 import { createDemoMatch } from '../games/aoe2/demo';
+import { defaultSettings } from '../domain/settings';
 
 beforeEach(() => {
   const values = new Map<string, string>();
@@ -29,11 +30,26 @@ it('publishes start and finish while preserving the original snapshot', async ()
 
 it('persists preferences without restoring an ended or previous match', async () => {
   const runtime = new BrowserRuntime();
-  await runtime.configure({ x: -500, y: 120, opacity: 0.5, locked: true, layout: 'compact', autoUpdate: false });
+  await runtime.configure({ ...defaultSettings, x: -500, y: 120, opacity: 0.5, locked: true, layout: 'compact' });
   await runtime.start(createDemoMatch('quick'));
   const restored = await new BrowserRuntime().read();
-  expect(restored.settings).toEqual({ x: -500, y: 120, opacity: 0.5, locked: true, layout: 'compact', autoUpdate: false });
+  expect(restored.settings).toEqual({ ...defaultSettings, x: -500, y: 120, opacity: 0.5, locked: true, layout: 'compact' });
   expect(restored.match).toBeNull();
+});
+
+it('hides only the current match without stopping it or changing detection', async () => {
+  const runtime = new BrowserRuntime();
+  const match = createDemoMatch('ranked');
+  await runtime.start(match);
+  await runtime.toggleVisibility();
+  expect(await runtime.read()).toMatchObject({ match: { id: match.id }, hiddenMatchId: match.id, detection: { config: { enabled: false } } });
+  await runtime.start(createDemoMatch('quick'));
+  const next = await runtime.read();
+  expect(next.hiddenMatchId).not.toBe(next.match?.id);
+  await runtime.toggleVisibility();
+  expect((await runtime.read()).hiddenMatchId).toBe(next.match?.id);
+  await runtime.toggleVisibility();
+  expect((await runtime.read()).hiddenMatchId).toBeNull();
 });
 
 it('recovers from corrupted persisted preferences', async () => {

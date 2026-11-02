@@ -11,6 +11,44 @@ pub struct OverlaySettings {
     pub layout: OverlayLayout,
     #[serde(default)]
     pub auto_update: bool,
+    #[serde(default = "default_scale")]
+    pub scale: f64,
+    #[serde(default = "enabled")]
+    pub focus_only: bool,
+    #[serde(default = "enabled")]
+    pub show_projection: bool,
+    #[serde(default)]
+    pub monitor_id: Option<String>,
+    #[serde(default)]
+    pub anchor: Anchor,
+    #[serde(default = "default_margin")]
+    pub margin: u32,
+}
+
+fn default_scale() -> f64 {
+    1.0
+}
+fn default_margin() -> u32 {
+    16
+}
+fn enabled() -> bool {
+    true
+}
+
+#[derive(Clone, Default, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+pub enum Anchor {
+    #[default]
+    Manual,
+    TopLeft,
+    TopCenter,
+    TopRight,
+    CenterLeft,
+    Center,
+    CenterRight,
+    BottomLeft,
+    BottomCenter,
+    BottomRight,
 }
 
 #[derive(Clone, Default, Serialize, Deserialize)]
@@ -30,6 +68,12 @@ impl Default for OverlaySettings {
             locked: false,
             layout: OverlayLayout::Detailed,
             auto_update: false,
+            scale: 1.0,
+            focus_only: true,
+            show_projection: true,
+            monitor_id: None,
+            anchor: Anchor::Manual,
+            margin: 16,
         }
     }
 }
@@ -43,6 +87,12 @@ impl OverlaySettings {
         };
         self.x = self.x.clamp(-32000, 32000);
         self.y = self.y.clamp(-32000, 32000);
+        self.scale = if self.scale.is_finite() {
+            self.scale.clamp(0.5, 1.5)
+        } else {
+            1.0
+        };
+        self.margin = self.margin.min(200);
         self
     }
 }
@@ -127,12 +177,32 @@ pub struct AppState {
     pub detection: crate::detection::model::DetectionStatus,
     pub shortcut_available: bool,
     pub last_synced: Option<MatchSnapshot>,
+    pub visibility_shortcut_available: bool,
+    pub hidden_match_id: Option<String>,
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn old_settings_gain_safe_defaults_and_new_values_are_normalized() {
+        let settings: OverlaySettings =
+            serde_json::from_value(json!({"opacity":0.8,"x":-500,"y":80,"locked":true})).unwrap();
+        assert_eq!(settings.scale, 1.0);
+        assert!(settings.focus_only && settings.show_projection);
+        assert!(settings.monitor_id.is_none());
+        assert!(settings.anchor == Anchor::Manual);
+        let settings = OverlaySettings {
+            scale: 9.0,
+            margin: 999,
+            ..settings
+        }
+        .normalize();
+        assert_eq!(settings.scale, 1.5);
+        assert_eq!(settings.margin, 200);
+    }
 
     #[test]
     fn cached_snapshot_round_trips_and_replays_without_changing_live_data() {

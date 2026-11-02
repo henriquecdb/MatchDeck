@@ -8,7 +8,11 @@ export interface AppState {
   detection: DetectionStatus;
   shortcutAvailable: boolean;
   lastSynced: MatchSnapshot | null;
+  visibilityShortcutAvailable: boolean;
+  hiddenMatchId: string | null;
 }
+
+export interface DisplayMonitor { id: string; name: string; width: number; height: number; scaleFactor: number; }
 
 export interface OverlayRuntime {
   read(): Promise<AppState>;
@@ -18,5 +22,7 @@ export interface OverlayRuntime {
   identifyLocalProfile(): Promise<PlayerProfile>;
   configureDetection(enabled: boolean, profileInput: string): Promise<void>;
   syncLatest(): Promise<void>;
+  listMonitors(): Promise<DisplayMonitor[]>;
+  toggleVisibility(): Promise<void>;
   subscribe(listener: (state: AppState) => void): Promise<() => void>;
 }

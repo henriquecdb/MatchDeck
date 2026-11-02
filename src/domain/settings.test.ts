@@ -4,7 +4,14 @@ import { defaultSettings, parseSettings } from './settings';
 it('recovers missing settings and validates persisted coordinates and opacity', () => {
   expect(parseSettings(null)).toEqual(defaultSettings);
   expect(parseSettings({ opacity: 8, x: NaN, y: -500, locked: 'yes' }))
-    .toEqual({ opacity: 1, x: 40, y: -500, locked: false, layout: 'detailed', autoUpdate: false });
+    .toEqual({ ...defaultSettings, opacity: 1, x: 40, y: -500 });
+});
+
+it('migrates old preferences and bounds scale, margin and placement', () => {
+  expect(parseSettings({ opacity: 0.8 })).toMatchObject({ scale: 1, focusOnly: true, showProjection: true, anchor: 'manual', monitorId: null, margin: 16 });
+  expect(parseSettings({ scale: Infinity, margin: -10, anchor: '__proto__' })).toMatchObject({ scale: 1, margin: 0, anchor: 'manual' });
+  expect(parseSettings({ scale: 8, margin: 999, anchor: 'bottom-right', monitorId: 'display', focusOnly: false, showProjection: false }))
+    .toMatchObject({ scale: 1.5, margin: 200, anchor: 'bottom-right', monitorId: 'display', focusOnly: false, showProjection: false });
 });
 
 it('migrates old preferences and preserves compact mode', () => {

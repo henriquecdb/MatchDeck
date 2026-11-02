@@ -4,7 +4,7 @@ Aplicativo modular de overlays para jogos. Primeira integração: Age of Empires
 
 ## Instalar no Windows
 
-Baixe o instalador **MatchDeck_0.2.1_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, abra o MatchDeck, identifique seu perfil na aba **Partida** e ative a detecção com o AoE2 em janela sem bordas.
+Baixe o instalador **MatchDeck_0.3.0_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, abra o MatchDeck, identifique seu perfil na aba **Partida** e ative a detecção com o AoE2 em janela sem bordas.
 
 Veja o [changelog da versão](CHANGELOG.md). O aplicativo verifica novas versões ao abrir e mostra as notas e o progresso da atualização. A instalação automática é opcional e exige que a detecção esteja desligada e não haja partida de demonstração ativa. Pacotes de atualização são verificados por assinatura. O executável ainda não possui certificado Authenticode de editor Windows.
 
@@ -14,7 +14,9 @@ Para contribuir, consulte [CONTRIBUTING.md](CONTRIBUTING.md). Para publicar vers
 
 Protótipo com detecção real de multiplayer e partidas simuladas para testar posicionamento, opacidade e passagem de cliques. Ranqueadas e partidas rápidas são detectadas quando publicadas pela fonte. Lobbies convencionais dependem da cobertura da fonte. Skirmish offline continua disponível somente na demonstração; campanhas estão fora do escopo.
 
-No navegador há uma prévia simulada. No Tauri há uma janela transparente, sempre no topo, arrastável e com passagem de cliques. Ctrl+Shift+O alterna a trava quando disponível; conflitos com outros aplicativos são informados no painel e não impedem a inicialização. O painel também permite destravar. Fechar o painel encerra o aplicativo e o overlay.
+No navegador há uma prévia simulada. No Tauri há uma janela transparente, sempre no topo, arrastável e com passagem de cliques. Ctrl+Shift+O alterna a trava e Ctrl+Shift+H mostra/oculta somente a partida atual. Conflitos de atalhos são informados no painel e não impedem a inicialização; os controles também estão disponíveis no aplicativo. Fechar o painel encerra o aplicativo e o overlay.
+
+Por padrão, partidas reais aparecem somente com o executável do Age 2 DE em primeiro plano. Desmarque essa opção em **Overlay** para continuar vendo os dados ao usar Alt+Tab. A demonstração permanece visível fora do jogo. Ocultar uma partida não encerra a detecção e não oculta automaticamente a próxima.
 
 Estatísticas e rating vêm da fila correspondente à partida, sem substituir por rating ranqueado de outra modalidade. Dados não disponíveis aparecem como “—”. O catálogo inclui imagens transparentes de unidades únicas de 56 civilizações, distribuídas localmente. Os nomes das unidades estão em inglês. Bordas e rating usam a cor informada para cada jogador na partida. Origem das imagens em `public/units/NOTICE.md`.
 
@@ -22,7 +24,7 @@ Estatísticas e rating vêm da fila correspondente à partida, sem substituir po
 
 As funcionalidades ficam nas abas **Partida**, **Overlay**, **Demonstração** e **Atualizações**. Trocar de aba não encerra a partida nem o monitoramento. A página de carregamento acompanha a inicialização; em caso de falha, permite tentar novamente.
 
-Desative a detecção real e clique em **Iniciar demonstração**. O app usa a última fotografia sincronizada, preservando modalidade, mapa, jogadores, cores e estatísticas. A cópia aparece como **REPLAY DE TESTE**, com a data da sincronização, e não altera o registro original. A última fotografia é salva em `last-match.json` e continua disponível após reiniciar o app.
+Desative a detecção real e escolha **Jogadores fictícios** ou **Última partida sincronizada** antes de clicar em **Iniciar demonstração**. A partida sincronizada preserva modalidade, mapa, jogadores, cores e estatísticas. A cópia aparece como **REPLAY DE TESTE**, com a data da sincronização, e não altera o registro original. A última fotografia é salva em `last-match.json` e continua disponível após reiniciar o app. A opção fictícia sempre usa dados de exemplo, mesmo que exista uma partida salva.
 
 ## Layout e variação de rating
 
@@ -34,7 +36,13 @@ Durante partidas 1v1 de filas reconhecidas, o card apresenta uma projeção orie
 
 Quando a API confirma o término, o resultado efetivo (`ratingDiff`) é salvo na última fotografia sincronizada sem substituir o rating registrado no início. O overlay se esconde normalmente no final; na demonstração de uma partida concluída aparece **Resultado … confirmado**. Para arquivos antigos sem informações de fila/resultado, use **Atualizar últimos dados**.
 
-Se ainda não houver fotografia salva, mas existir um perfil configurado, o primeiro teste busca a última partida disponível para criar a cópia local. Sem perfil ou dados salvos, a demonstração usa jogadores fictícios. **Atualizar últimos dados** permite buscar uma fotografia mais recente antes de iniciar o teste. Nos próximos testes, iniciar a demonstração reutiliza o arquivo local sem novas consultas. A prévia de navegador continua usando dados fictícios e não acessa o arquivo de configuração do desktop.
+Se a opção sincronizada estiver selecionada e ainda não houver fotografia salva, o primeiro teste busca a última partida do perfil configurado. Sem perfil ou dados salvos, escolha jogadores fictícios. **Atualizar últimos dados** permite buscar uma fotografia mais recente antes de iniciar o teste. Nos próximos testes com dados sincronizados, o arquivo local é reutilizado sem novas consultas. A prévia de navegador não acessa o arquivo de configuração do desktop.
+
+## Posição, escala e leitura dos dados
+
+Na aba **Overlay**, selecione o monitor e uma das nove posições prontas, com margem ajustável. O modo manual mantém as coordenadas X/Y em pixels físicos e o arraste; arrastar ativa o modo manual e libera a seleção fixa de monitor. A escala de 50% a 150% independe da opacidade. O posicionamento considera a área útil e o DPI do monitor; se a tela selecionada for desconectada, o aplicativo usa o monitor principal. Janelas maiores que a área útil permitem rolagem. **Restaurar posição, escala e opacidade** recupera uma configuração inicial.
+
+O cabeçalho identifica a fila, o rating indica se é de partidas rápidas ou ranqueadas, e o rodapé informa a sincronização. Passe o mouse sobre valores ausentes para entender a limitação da fonte. A opção **Exibir projeção não oficial** controla apenas as estimativas; resultados confirmados continuam disponíveis.
 
 ## Executar a prévia
 
@@ -107,8 +115,7 @@ Teste manual desktop: iniciar uma partida; mover a janela; ajustar opacidade; tr
 
 ## Próximas etapas
 
-1. Validar o comportamento da janela sobre o AoE2 e medir CPU/memória em build release.
-2. Validar a detecção de início/fim em partidas do usuário, medir o atraso da fonte e ampliar a cobertura de lobbies.
-3. Implementar um detector local separado para skirmish offline.
-4. Ampliar o catálogo para civilizações de outros conjuntos e traduzir nomes de unidades.
-5. Validar o layout com oito jogadores e adicionar seleção de monitor.
+1. Consolidar recuperação de falhas e validar partidas consecutivas, equipes, monitores e atualização no uso real.
+2. Adicionar bandeja, inicialização opcional com Windows, configuração guiada e diagnóstico.
+3. Revisar o catálogo e as traduções e preparar contratos e configurações separados por jogo.
+4. Investigar as integrações de Age IV e StarCraft II; skirmish offline está adiado.

@@ -2,10 +2,13 @@
 
 mod commands;
 mod detection;
+mod displays;
+mod focus;
 mod games;
 mod layout;
 mod model;
 mod overlay;
+mod placement;
 mod storage;
 
 use commands::SharedState;
@@ -71,6 +74,32 @@ fn main() {
                 }
                 Err(error) => eprintln!("Atalho indisponível: {error}"),
             }
+            let visibility_shortcut =
+                app.global_shortcut()
+                    .on_shortcut("CommandOrControl+Shift+H", |app, _, event| {
+                        if event.state() == ShortcutState::Pressed {
+                            let shared = app.state::<SharedState>();
+                            let active = shared
+                                .lock()
+                                .is_ok_and(|state| state.current_match.is_some());
+                            if active {
+                                if let Err(error) =
+                                    commands::toggle_overlay_visibility(app.clone(), shared)
+                                {
+                                    eprintln!("{error}");
+                                }
+                            }
+                        }
+                    });
+            match visibility_shortcut {
+                Ok(()) => {
+                    app.state::<SharedState>()
+                        .lock()
+                        .map_err(|error| error.to_string())?
+                        .visibility_shortcut_available = true
+                }
+                Err(error) => eprintln!("Atalho de visibilidade indisponível: {error}"),
+            }
             let window = app
                 .get_webview_window("overlay")
                 .ok_or("Overlay não encontrado")?;
@@ -94,6 +123,7 @@ fn main() {
                 provider,
                 receiver,
             ));
+            tauri::async_runtime::spawn(overlay::watch_desktop(app.handle().clone()));
             Ok(())
         })
         .on_window_event(|window, event| {
@@ -110,7 +140,9 @@ fn main() {
             commands::configure_overlay,
             commands::identify_local_profile,
             commands::configure_detection,
-            commands::sync_latest_match
+            commands::sync_latest_match,
+            commands::toggle_overlay_visibility,
+            commands::list_monitors
         ])
         .run(tauri::generate_context!())
         .expect("Não foi possível iniciar o MatchDeck");
