@@ -44,7 +44,7 @@ export function ControlPanel({ runtime, desktop }: { runtime: OverlayRuntime; de
         <OverlayPreview match={preview} settings={settings} />
       </>}
       {tab.id === 'demo' && <><div className="section-heading"><h2>Experimente o overlay</h2><p>Teste as informações e a posição antes de jogar.</p></div><DemoPanel runtime={runtime} state={state} desktop={desktop} perform={perform} /></>}
-      {tab.id === 'updates' && <UpdatePanel desktop={desktop} busy={!!match || state.detection.config.enabled} autoUpdate={settings.autoUpdate} onAutoUpdateChange={autoUpdate => configure({ autoUpdate })} />}
+      {tab.id === 'updates' && <UpdatePanel desktop={desktop} visible={activeTab === 'updates'} busy={!!match || state.detection.config.enabled} autoUpdate={settings.autoUpdate} onAutoUpdateChange={autoUpdate => configure({ autoUpdate })} />}
     </section>)}
   </main>;
 }

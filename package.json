@@ -1,7 +1,7 @@
 {
   "name": "matchdeck",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "engines": {
     "node": ">=22.12.0"
@@ -21,7 +21,9 @@
     "@tauri-apps/plugin-process": "^2.4.0",
     "@tauri-apps/plugin-updater": "^2.14.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",
