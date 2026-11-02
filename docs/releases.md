@@ -8,11 +8,11 @@ O pacote do atualizador é assinado com uma chave própria do MatchDeck. Essa as
 
 ## Atualizações dentro do aplicativo
 
-A versão instalada verifica o manifesto HTTPS `releases/latest/download/latest.json` ao abrir e a cada quatro horas. A seção **Atualizações** mostra a versão instalada, a nova versão e suas notas. **Instalar versão …** baixa e verifica a assinatura antes de iniciar o instalador.
+A versão instalada verifica o manifesto HTTPS `releases/latest/download/latest.json` ao abrir e a cada quatro horas, mesmo com outra aba selecionada. A aba **Atualizações** mostra a versão instalada, a nova versão e suas notas. **Instalar versão …** baixa e verifica a assinatura antes de iniciar o instalador.
 
 Uma tela mostra a mudança de versão e o progresso de download. O instalador Windows continua com sua própria barra de progresso e reinicia o aplicativo. No retorno, o painel confirma a mudança de versão. Falhas de rede ou assinatura são exibidas e permitem tentar novamente; pacotes com assinatura inválida não são instalados.
 
-Para instalar sem clicar a cada versão, marque **Instalar automaticamente com a detecção desativada**. Nenhuma instalação começa com uma partida de demonstração ou detecção real ativa. Em desenvolvimento, a instalação fica desativada. Não há como validar uma atualização completa de 0.1.0 para uma versão posterior antes de existir essa versão; os testes automatizados cobrem o fluxo, progresso e falhas com um provedor controlado.
+Para instalar sem clicar a cada versão, marque **Instalar automaticamente com a detecção desativada**. Nenhuma instalação começa com uma partida de demonstração ou detecção real ativa. Em desenvolvimento, a instalação fica desativada. Os testes automatizados cobrem o fluxo, progresso e falhas com um provedor controlado; uma instalação entre versões deve ser validada também no aplicativo instalado.
 
 ## Chave de assinatura
 
@@ -25,13 +25,15 @@ O workflow recebe a chave privada pelo secret de repositório `TAURI_SIGNING_PRI
 1. Atualize `package.json`, `package-lock.json`, `src-tauri/Cargo.toml`, `src-tauri/Cargo.lock` e `src-tauri/tauri.conf.json` para a mesma versão SemVer.
 2. Adicione a seção correspondente no `CHANGELOG.md`.
 3. Execute as verificações de `CONTRIBUTING.md` e `node scripts/release-notes.mjs`.
-4. Faça um commit Conventional Commit em seu nome, por exemplo `chore(release): prepare v0.2.0`.
-5. Envie `main`, crie a tag `v0.2.0` e envie a tag.
+4. Faça um commit Conventional Commit em uma branch, por exemplo `chore(release): prepare v0.3.0`, e abra um PR com título também convencional.
+5. Aguarde os checks, integre o PR e atualize sua `main` local. A branch protegida não aceita integração sem o check obrigatório.
+6. Crie a tag da versão sobre a `main` integrada e envie a tag.
 
 ```powershell
-git push origin main
-git tag -a v0.2.0 -m "MatchDeck v0.2.0"
-git push origin v0.2.0
+git switch main
+git pull --ff-only origin main
+git tag -a v0.3.0 -m "MatchDeck v0.3.0"
+git push origin v0.3.0
 ```
 
 O workflow **Release Windows** verifica o projeto, cria um release em rascunho, compila o instalador, assina o pacote do atualizador e envia instalador, assinatura e `latest.json`. Só publica quando todos os arquivos estão prontos. Em caso de falha, o rascunho permanece disponível para diagnóstico. O workflow também pode ser executado manualmente com uma tag existente.

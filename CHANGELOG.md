@@ -2,6 +2,29 @@
 
 As mudanças relevantes são registradas por versão. O projeto usa Semantic Versioning e Conventional Commits.
 
+## [0.2.0] - 2026-11-02
+
+### Adicionado
+
+- Abas Partida, Overlay, Demonstração e Atualizações, com navegação por teclado.
+- Tela de carregamento desde a abertura da página até a inicialização, com recuperação em caso de falha.
+- Emblemas locais das 56 civilizações para o modo compacto.
+- Identificação e agrupamento das equipes conforme os dados da partida.
+
+### Alterado
+
+- Modo compacto redesenhado como faixa horizontal: uma linha por jogador e colunas por equipe, com cor, emblema, nome, rating e variação.
+- Janela compacta com 720 × 108 pixels lógicos em 1v1 e 720 × 198 em 4v4, reduzindo substancialmente a altura ocupada.
+- O modo completo mantém os cards com imagens das unidades e estatísticas detalhadas.
+- Detecção, demonstração, preferências e verificação de atualizações permanecem ativas ao navegar pelas abas.
+- Progresso de instalação permanece visível mesmo quando outra aba estiver selecionada.
+- Restauração de posição e opacidade preserva o layout escolhido e a preferência de atualização automática.
+
+### Compatibilidade
+
+- As preferências e partidas sincronizadas de 0.1.0 continuam funcionando. Quando uma partida antiga não contém equipes, a interface não inventa associações entre jogadores.
+- Permanecem as limitações de detecção da versão anterior: dependência da API multiplayer, sem skirmish offline ou campanhas, e projeções de rating não oficiais.
+
 ## [0.1.0] - 2026-10-31
 
 ### Adicionado
@@ -35,3 +58,4 @@ As mudanças relevantes são registradas por versão. O projeto usa Semantic Ver
 - A assinatura do atualizador valida os pacotes; o executável ainda não tem certificado Authenticode de editor Windows.
 
 [0.1.0]: https://github.com/henriquecdb/MatchDeck/releases/tag/v0.1.0
+[0.2.0]: https://github.com/henriquecdb/MatchDeck/compare/v0.1.0...v0.2.0

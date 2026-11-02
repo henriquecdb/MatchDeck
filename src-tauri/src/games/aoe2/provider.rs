@@ -23,7 +23,11 @@ impl Aoe2Provider {
     pub fn new() -> Result<Self, String> {
         let client = Client::builder()
             .timeout(Duration::from_secs(15))
-            .user_agent("MatchDeck/0.1.0")
+            .user_agent(concat!(
+                "MatchDeck/",
+                env!("CARGO_PKG_VERSION"),
+                " (https://github.com/henriquecdb/MatchDeck)"
+            ))
             .build()
             .map_err(|error| error.to_string())?;
         Ok(Self { client })
@@ -132,9 +136,13 @@ impl Aoe2Provider {
             remote
                 .teams
                 .iter()
-                .flat_map(|team| &team.players)
+                .flat_map(|team| {
+                    team.players
+                        .iter()
+                        .map(move |player| (team.team_id, player))
+                })
                 .enumerate()
-                .map(|(index, player)| async move {
+                .map(|(index, (team_id, player))| async move {
                     let mut warning = None;
                     let stats = if let (Some(id), Some(queue)) = (player.human_profile_id(), queue)
                     {
@@ -171,6 +179,7 @@ impl Aoe2Provider {
                                 .unwrap_or_else(|| "Civilização indisponível".into()),
                             unique_units: units,
                             symbol: "⚔".into(),
+                            team_id: team_id.filter(|id| *id > 0),
                             civilization_id: player.civ.clone(),
                             color: player.color,
                             color_hex: player.color_hex.clone(),

@@ -4,21 +4,24 @@
     "units": [
       "Jomsviking"
     ],
-    "image": "/units/Jomsviking.png"
+    "image": "/units/Jomsviking.png",
+    "emblem": "/civilizations/danes.png"
   },
   "saxons": {
     "name": "Saxons",
     "units": [
       "Hearth Troop"
     ],
-    "image": "/units/HearthTroop.png"
+    "image": "/units/HearthTroop.png",
+    "emblem": "/civilizations/saxons.png"
   },
   "varangians": {
     "name": "Varangians",
     "units": [
       "Jarl"
     ],
-    "image": "/units/Jarl.png"
+    "image": "/units/Jarl.png",
+    "emblem": "/civilizations/varangians.png"
   },
   "mapuche": {
     "name": "Mapuche",
@@ -26,7 +29,8 @@
       "Kona",
       "Bolas Rider"
     ],
-    "image": "/units/Kona.png"
+    "image": "/units/Kona.png",
+    "emblem": "/civilizations/mapuche.png"
   },
   "muisca": {
     "name": "Muisca",
@@ -34,7 +38,8 @@
       "Guecha Warrior",
       "Temple Guard"
     ],
-    "image": "/units/GuechaWarrior.png"
+    "image": "/units/GuechaWarrior.png",
+    "emblem": "/civilizations/muisca.png"
   },
   "tupi": {
     "name": "Tupi",
@@ -42,7 +47,8 @@
       "Blackwood Archer",
       "Ibirapema Warrior"
     ],
-    "image": "/units/BlackwoodArcher.png"
+    "image": "/units/BlackwoodArcher.png",
+    "emblem": "/civilizations/tupi.png"
   },
   "armenians": {
     "name": "Armenians",
@@ -50,21 +56,24 @@
       "Composite Bowman",
       "Warrior Priest"
     ],
-    "image": "/units/CompositeBowman.png"
+    "image": "/units/CompositeBowman.png",
+    "emblem": "/civilizations/armenians.png"
   },
   "aztecs": {
     "name": "Aztecs",
     "units": [
       "Jaguar Warrior"
     ],
-    "image": "/units/JaguarWarrior.png"
+    "image": "/units/JaguarWarrior.png",
+    "emblem": "/civilizations/aztecs.png"
   },
   "bengalis": {
     "name": "Bengalis",
     "units": [
       "Ratha"
     ],
-    "image": "/units/Ratha.png"
+    "image": "/units/Ratha.png",
+    "emblem": "/civilizations/bengalis.png"
   },
   "dravidians": {
     "name": "Dravidians",
@@ -72,7 +81,8 @@
       "Urumi Swordsman",
       "Thirisadai"
     ],
-    "image": "/units/UrumiSwordsman.png"
+    "image": "/units/UrumiSwordsman.png",
+    "emblem": "/civilizations/dravidians.png"
   },
   "gurjaras": {
     "name": "Gurjaras",
@@ -81,7 +91,8 @@
       "Shrivamsha Rider",
       "Camel Scout"
     ],
-    "image": "/units/ChakramThrower.png"
+    "image": "/units/ChakramThrower.png",
+    "emblem": "/civilizations/gurjaras.png"
   },
   "berbers": {
     "name": "Berbers",
@@ -89,7 +100,8 @@
       "Camel Archer",
       "Genitour"
     ],
-    "image": "/units/CamelArcher.png"
+    "image": "/units/CamelArcher.png",
+    "emblem": "/civilizations/berbers.png"
   },
   "bohemians": {
     "name": "Bohemians",
@@ -97,21 +109,24 @@
       "Hussite Wagon",
       "Houfnice"
     ],
-    "image": "/units/HussiteWagon.png"
+    "image": "/units/HussiteWagon.png",
+    "emblem": "/civilizations/bohemians.png"
   },
   "britons": {
     "name": "Britons",
     "units": [
       "Longbowman"
     ],
-    "image": "/units/Longbowman.png"
+    "image": "/units/Longbowman.png",
+    "emblem": "/civilizations/britons.png"
   },
   "bulgarians": {
     "name": "Bulgarians",
     "units": [
       "Konnik"
     ],
-    "image": "/units/Konnik.png"
+    "image": "/units/Konnik.png",
+    "emblem": "/civilizations/bulgarians.png"
   },
   "burgundians": {
     "name": "Burgundians",
@@ -119,28 +134,32 @@
       "Coustillier",
       "Flemish Militia"
     ],
-    "image": "/units/Coustillier.png"
+    "image": "/units/Coustillier.png",
+    "emblem": "/civilizations/burgundians.png"
   },
   "burmese": {
     "name": "Burmese",
     "units": [
       "Arambai"
     ],
-    "image": "/units/Arambai.png"
+    "image": "/units/Arambai.png",
+    "emblem": "/civilizations/burmese.png"
   },
   "byzantines": {
     "name": "Byzantines",
     "units": [
       "Cataphract"
     ],
-    "image": "/units/Cataphract.png"
+    "image": "/units/Cataphract.png",
+    "emblem": "/civilizations/byzantines.png"
   },
   "celts": {
     "name": "Celts",
     "units": [
       "Woad Raider"
     ],
-    "image": "/units/WoadRaider.png"
+    "image": "/units/WoadRaider.png",
+    "emblem": "/civilizations/celts.png"
   },
   "chinese": {
     "name": "Chinese",
@@ -148,49 +167,56 @@
       "Chu Ko Nu",
       "Dragon Ship"
     ],
-    "image": "/units/ChuKoNu.png"
+    "image": "/units/ChuKoNu.png",
+    "emblem": "/civilizations/chinese.png"
   },
   "cumans": {
     "name": "Cumans",
     "units": [
       "Kipchak"
     ],
-    "image": "/units/Kipchak.png"
+    "image": "/units/Kipchak.png",
+    "emblem": "/civilizations/cumans.png"
   },
   "ethiopians": {
     "name": "Ethiopians",
     "units": [
       "Shotel Warrior"
     ],
-    "image": "/units/ShotelWarrior.png"
+    "image": "/units/ShotelWarrior.png",
+    "emblem": "/civilizations/ethiopians.png"
   },
   "franks": {
     "name": "Franks",
     "units": [
       "Throwing Axeman"
     ],
-    "image": "/units/ThrowingAxeman.png"
+    "image": "/units/ThrowingAxeman.png",
+    "emblem": "/civilizations/franks.png"
   },
   "georgians": {
     "name": "Georgians",
     "units": [
       "Monaspa"
     ],
-    "image": "/units/Monaspa.png"
+    "image": "/units/Monaspa.png",
+    "emblem": "/civilizations/georgians.png"
   },
   "goths": {
     "name": "Goths",
     "units": [
       "Huskarl"
     ],
-    "image": "/units/Huskarl.png"
+    "image": "/units/Huskarl.png",
+    "emblem": "/civilizations/goths.png"
   },
   "huns": {
     "name": "Huns",
     "units": [
       "Tarkan"
     ],
-    "image": "/units/Tarkan.png"
+    "image": "/units/Tarkan.png",
+    "emblem": "/civilizations/huns.png"
   },
   "incas": {
     "name": "Incas",
@@ -198,7 +224,8 @@
       "Kamayuk",
       "Slinger"
     ],
-    "image": "/units/Kamayuk.png"
+    "image": "/units/Kamayuk.png",
+    "emblem": "/civilizations/incas.png"
   },
   "hindustanis": {
     "name": "Hindustanis",
@@ -206,7 +233,8 @@
       "Ghulam",
       "Imperial Camel Rider"
     ],
-    "image": "/units/Ghulam.png"
+    "image": "/units/Ghulam.png",
+    "emblem": "/civilizations/hindustanis.png"
   },
   "italians": {
     "name": "Italians",
@@ -214,14 +242,16 @@
       "Genoese Crossbowman",
       "Condottiero"
     ],
-    "image": "/units/GenoeseCrossbowman.png"
+    "image": "/units/GenoeseCrossbowman.png",
+    "emblem": "/civilizations/italians.png"
   },
   "japanese": {
     "name": "Japanese",
     "units": [
       "Samurai"
     ],
-    "image": "/units/Samurai.png"
+    "image": "/units/Samurai.png",
+    "emblem": "/civilizations/japanese.png"
   },
   "jurchens": {
     "name": "Jurchens",
@@ -229,7 +259,8 @@
       "Iron Pagoda",
       "Grenadier"
     ],
-    "image": "/units/IronPagoda.png"
+    "image": "/units/IronPagoda.png",
+    "emblem": "/civilizations/jurchens.png"
   },
   "khitans": {
     "name": "Khitans",
@@ -237,7 +268,8 @@
       "Liao Dao",
       "Mounted Trebuchet"
     ],
-    "image": "/units/LiaoDao.png"
+    "image": "/units/LiaoDao.png",
+    "emblem": "/civilizations/khitans.png"
   },
   "shu": {
     "name": "Shu",
@@ -246,7 +278,8 @@
       "War Chariot",
       "Liu Bei"
     ],
-    "image": "/units/WhiteFeatherGuard.png"
+    "image": "/units/WhiteFeatherGuard.png",
+    "emblem": "/civilizations/shu.png"
   },
   "wei": {
     "name": "Wei",
@@ -255,7 +288,8 @@
       "Xianbei Raider",
       "Cao Cao"
     ],
-    "image": "/units/TigerCavalry.png"
+    "image": "/units/TigerCavalry.png",
+    "emblem": "/civilizations/wei.png"
   },
   "wu": {
     "name": "Wu",
@@ -264,14 +298,16 @@
       "Jian Swordsman",
       "Sun Jian"
     ],
-    "image": "/units/FireArcher.png"
+    "image": "/units/FireArcher.png",
+    "emblem": "/civilizations/wu.png"
   },
   "khmer": {
     "name": "Khmer",
     "units": [
       "Ballista Elephant"
     ],
-    "image": "/units/BallistaElephant.png"
+    "image": "/units/BallistaElephant.png",
+    "emblem": "/civilizations/khmer.png"
   },
   "koreans": {
     "name": "Koreans",
@@ -279,56 +315,64 @@
       "War Wagon",
       "Turtle Ship"
     ],
-    "image": "/units/WarWagon.png"
+    "image": "/units/WarWagon.png",
+    "emblem": "/civilizations/koreans.png"
   },
   "lithuanians": {
     "name": "Lithuanians",
     "units": [
       "Leitis"
     ],
-    "image": "/units/Leitis.png"
+    "image": "/units/Leitis.png",
+    "emblem": "/civilizations/lithuanians.png"
   },
   "magyars": {
     "name": "Magyars",
     "units": [
       "Magyar Huszar"
     ],
-    "image": "/units/MagyarHuszar.png"
+    "image": "/units/MagyarHuszar.png",
+    "emblem": "/civilizations/magyars.png"
   },
   "malay": {
     "name": "Malay",
     "units": [
       "Karambit Warrior"
     ],
-    "image": "/units/KarambitWarrior.png"
+    "image": "/units/KarambitWarrior.png",
+    "emblem": "/civilizations/malay.png"
   },
   "malians": {
     "name": "Malians",
     "units": [
       "Gbeto"
     ],
-    "image": "/units/Gbeto.png"
+    "image": "/units/Gbeto.png",
+    "emblem": "/civilizations/malians.png"
   },
   "mayans": {
     "name": "Mayans",
     "units": [
       "Plumed Archer"
     ],
-    "image": "/units/PlumedArcher.png"
+    "image": "/units/PlumedArcher.png",
+    "emblem": "/civilizations/mayans.png"
   },
   "mongols": {
     "name": "Mongols",
     "units": [
       "Mangudai"
     ],
-    "image": "/units/Mangudai.png"
+    "image": "/units/Mangudai.png",
+    "emblem": "/civilizations/mongols.png"
   },
   "persians": {
     "name": "Persians",
     "units": [
       "War Elephant"
     ],
-    "image": "/units/WarElephant.png"
+    "image": "/units/WarElephant.png",
+    "emblem": "/civilizations/persians.png"
   },
   "poles": {
     "name": "Poles",
@@ -336,7 +380,8 @@
       "Obuch",
       "Winged Hussar"
     ],
-    "image": "/units/Obuch.png"
+    "image": "/units/Obuch.png",
+    "emblem": "/civilizations/poles.png"
   },
   "portuguese": {
     "name": "Portuguese",
@@ -344,7 +389,8 @@
       "Organ Gun",
       "Caravel"
     ],
-    "image": "/units/OrganGun.png"
+    "image": "/units/OrganGun.png",
+    "emblem": "/civilizations/portuguese.png"
   },
   "romans": {
     "name": "Romans",
@@ -352,28 +398,32 @@
       "Centurion",
       "Legionary"
     ],
-    "image": "/units/Centurion.png"
+    "image": "/units/Centurion.png",
+    "emblem": "/civilizations/romans.png"
   },
   "saracens": {
     "name": "Saracens",
     "units": [
       "Mameluke"
     ],
-    "image": "/units/Mameluke.png"
+    "image": "/units/Mameluke.png",
+    "emblem": "/civilizations/saracens.png"
   },
   "sicilians": {
     "name": "Sicilians",
     "units": [
       "Serjeant"
     ],
-    "image": "/units/Serjeant.png"
+    "image": "/units/Serjeant.png",
+    "emblem": "/civilizations/sicilians.png"
   },
   "slavs": {
     "name": "Slavs",
     "units": [
       "Boyar"
     ],
-    "image": "/units/Boyar.png"
+    "image": "/units/Boyar.png",
+    "emblem": "/civilizations/slavs.png"
   },
   "spanish": {
     "name": "Spanish",
@@ -381,7 +431,8 @@
       "Conquistador",
       "Missionary"
     ],
-    "image": "/units/Conquistador.png"
+    "image": "/units/Conquistador.png",
+    "emblem": "/civilizations/spanish.png"
   },
   "tatars": {
     "name": "Tatars",
@@ -389,34 +440,39 @@
       "Keshik",
       "Flaming Camel"
     ],
-    "image": "/units/Keshik.png"
+    "image": "/units/Keshik.png",
+    "emblem": "/civilizations/tatars.png"
   },
   "teutons": {
     "name": "Teutons",
     "units": [
       "Teutonic Knight"
     ],
-    "image": "/units/TeutonicKnight.png"
+    "image": "/units/TeutonicKnight.png",
+    "emblem": "/civilizations/teutons.png"
   },
   "turks": {
     "name": "Turks",
     "units": [
       "Janissary"
     ],
-    "image": "/units/Janissary.png"
+    "image": "/units/Janissary.png",
+    "emblem": "/civilizations/turks.png"
   },
   "vietnamese": {
     "name": "Vietnamese",
     "units": [
       "Rattan Archer"
     ],
-    "image": "/units/RattanArcher.png"
+    "image": "/units/RattanArcher.png",
+    "emblem": "/civilizations/vietnamese.png"
   },
   "vikings": {
     "name": "Vikings",
     "units": [
       "Berserk"
     ],
-    "image": "/units/Berserk.png"
+    "image": "/units/Berserk.png",
+    "emblem": "/civilizations/vikings.png"
   }
 }

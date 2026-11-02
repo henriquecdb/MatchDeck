@@ -22,8 +22,10 @@ pub struct RemoteMatch {
 }
 
 #[derive(Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RemoteTeam {
     pub players: Vec<RemotePlayer>,
+    pub team_id: Option<i32>,
 }
 
 #[derive(Clone, Deserialize)]

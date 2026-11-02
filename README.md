@@ -4,7 +4,7 @@ Aplicativo modular de overlays para jogos. Primeira integração: Age of Empires
 
 ## Instalar no Windows
 
-Baixe o instalador **MatchDeck_0.1.0_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, abra o MatchDeck, identifique seu perfil e ative a detecção com o AoE2 em janela sem bordas.
+Baixe o instalador **MatchDeck_0.2.0_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, abra o MatchDeck, identifique seu perfil na aba **Partida** e ative a detecção com o AoE2 em janela sem bordas.
 
 Veja o [changelog da versão](CHANGELOG.md). O aplicativo verifica novas versões ao abrir e mostra as notas e o progresso da atualização. A instalação automática é opcional e exige que a detecção esteja desligada e não haja partida de demonstração ativa. Pacotes de atualização são verificados por assinatura. O executável ainda não possui certificado Authenticode de editor Windows.
 
@@ -20,11 +20,15 @@ Estatísticas e rating vêm da fila correspondente à partida, sem substituir po
 
 ## Demonstração com dados sincronizados
 
+As funcionalidades ficam nas abas **Partida**, **Overlay**, **Demonstração** e **Atualizações**. Trocar de aba não encerra a partida nem o monitoramento. A página de carregamento acompanha a inicialização; em caso de falha, permite tentar novamente.
+
 Desative a detecção real e clique em **Iniciar demonstração**. O app usa a última fotografia sincronizada, preservando modalidade, mapa, jogadores, cores e estatísticas. A cópia aparece como **REPLAY DE TESTE**, com a data da sincronização, e não altera o registro original. A última fotografia é salva em `last-match.json` e continua disponível após reiniciar o app.
 
 ## Layout e variação de rating
 
-Em **Overlay → Modo de exibição**, escolha **Completo** (padrão) ou **Compacto**. A configuração persiste entre execuções. O compacto reduz a largura de 480 para 400 pixels lógicos e usa cards menores, mantendo unidade, nome, civilização, rating, vitórias, derrotas e porcentagem. O nome da unidade fica disponível no texto alternativo da imagem.
+Na aba **Overlay → Modo de exibição**, escolha **Completo** (padrão) ou **Compacto**. A configuração persiste entre execuções. O completo mantém os cards com unidades e estatísticas detalhadas. O compacto é uma faixa horizontal com emblemas das civilizações, uma linha por jogador e colunas por equipe. Mostra cor, nome, rating e variação; o nome da civilização e o histórico de vitórias ficam no texto alternativo e nas dicas do jogador.
+
+Um 1v1 compacto ocupa 720 × 108 pixels lógicos, contra 480 × 436 do completo; um 4v4 compacto ocupa 720 × 198. As equipes vêm da API. Em snapshots antigos de 1v1, os participantes aparecem separadamente; em partidas antigas de equipes sem essa informação, aparecem sob “Jogadores”, preservando os dados sem inventar alianças.
 
 Durante partidas 1v1 de filas reconhecidas, o card apresenta uma projeção orientativa de vitória e derrota (`~+X` / `~−Y`). É um modelo Elo genérico com K=32 e divisor 400; não é o cálculo oficial do jogo. Partidas rápidas, calibração e regras específicas de fila podem produzir valores muito diferentes. Equipes, filas desconhecidas ou ratings ausentes exibem “—”. O card e o rodapé identificam a projeção como não oficial.
 
