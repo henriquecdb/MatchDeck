@@ -2,6 +2,19 @@
 
 As mudanças relevantes são registradas por versão. O projeto usa Semantic Versioning e Conventional Commits.
 
+## [0.2.1] - 2026-11-02
+
+### Melhorado
+
+- Changelog na aba Atualizações renderizado como Markdown, com títulos, listas, negrito, código e tabelas.
+- Área de leitura com hierarquia visual, maior espaço, foco por teclado e rolagem adaptada à janela.
+- Identificação da versão nas notas e mensagem alternativa quando não houver changelog disponível.
+- Notas da versão instalada continuam acessíveis mesmo sem atualização pendente; o renderizador carrega apenas ao abrir a aba.
+
+### Segurança
+
+- Notas externas não executam HTML e não carregam imagens remotas.
+
 ## [0.2.0] - 2026-11-02
 
 ### Adicionado
@@ -59,3 +72,4 @@ As mudanças relevantes são registradas por versão. O projeto usa Semantic Ver
 
 [0.1.0]: https://github.com/henriquecdb/MatchDeck/releases/tag/v0.1.0
 [0.2.0]: https://github.com/henriquecdb/MatchDeck/compare/v0.1.0...v0.2.0
+[0.2.1]: https://github.com/henriquecdb/MatchDeck/compare/v0.2.0...v0.2.1

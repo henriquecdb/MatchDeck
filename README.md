@@ -4,7 +4,7 @@ Aplicativo modular de overlays para jogos. Primeira integração: Age of Empires
 
 ## Instalar no Windows
 
-Baixe o instalador **MatchDeck_0.2.0_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, abra o MatchDeck, identifique seu perfil na aba **Partida** e ative a detecção com o AoE2 em janela sem bordas.
+Baixe o instalador **MatchDeck_0.2.1_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, abra o MatchDeck, identifique seu perfil na aba **Partida** e ative a detecção com o AoE2 em janela sem bordas.
 
 Veja o [changelog da versão](CHANGELOG.md). O aplicativo verifica novas versões ao abrir e mostra as notas e o progresso da atualização. A instalação automática é opcional e exige que a detecção esteja desligada e não haja partida de demonstração ativa. Pacotes de atualização são verificados por assinatura. O executável ainda não possui certificado Authenticode de editor Windows.
 

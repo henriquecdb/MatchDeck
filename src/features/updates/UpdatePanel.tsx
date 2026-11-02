@@ -1,22 +1,30 @@
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import metadata from '../../../package.json';
 import { UpdateManager } from '../../application/update-manager';
 import { NativeUpdater } from '../../infrastructure/native-updater';
 import { progressPercent } from '../../domain/updates';
+import changelog from '../../../CHANGELOG.md?raw';
+import { releaseSection } from '../../domain/changelog';
+
+const ReleaseNotes = lazy(() => import('./ReleaseNotes').then(module => ({ default: module.ReleaseNotes })));
+const installedNotes = releaseSection(changelog, metadata.version);
 
 interface Props {
   desktop: boolean;
   busy: boolean;
   autoUpdate: boolean;
   onAutoUpdateChange(value: boolean): void;
+  visible?: boolean;
 }
 
 export function UpdatePanel(props: Props) {
-  return props.desktop ? <DesktopUpdates {...props} /> : <fieldset><legend>Atualizações</legend><p>MatchDeck {metadata.version} · Atualizações disponíveis no aplicativo Windows.</p></fieldset>;
+  return props.desktop ? <DesktopUpdates {...props} /> : <fieldset><legend>Atualizações</legend><p>MatchDeck {metadata.version} · Atualizações disponíveis no aplicativo Windows.</p>
+    {props.visible !== false && <Suspense fallback={<p role="status">Carregando notas da versão…</p>}><ReleaseNotes notes={installedNotes} version={metadata.version} title="Novidades desta versão" /></Suspense>}
+  </fieldset>;
 }
 
-function DesktopUpdates({ busy, autoUpdate, onAutoUpdateChange }: Props) {
+function DesktopUpdates({ busy, autoUpdate, onAutoUpdateChange, visible = true }: Props) {
   const blocked = useRef(busy);
   blocked.current = busy;
   const manager = useMemo(() => new UpdateManager(new NativeUpdater(() => !blocked.current)), []);
@@ -49,7 +57,10 @@ function DesktopUpdates({ busy, autoUpdate, onAutoUpdateChange }: Props) {
         {state.available && <button disabled={busy || import.meta.env.DEV || state.phase === 'checking'} onClick={() => void manager.install()}>Instalar versão {state.available.version}</button>}
       </div>
       {state.phase === 'current' && <p role="status">Você está na versão mais recente.</p>}
-      {state.available && <><p>Versão {state.available.currentVersion} → {state.available.version}</p><details open><summary>O que mudou</summary><pre className="release-notes">{state.available.notes || 'Consulte as notas do release no GitHub.'}</pre></details></>}
+      {state.available && <p>Versão {state.available.currentVersion} → {state.available.version}</p>}
+      {visible && <Suspense fallback={<p role="status">Carregando notas da versão…</p>}><ReleaseNotes
+        notes={state.available?.notes ?? installedNotes} version={state.available?.version ?? metadata.version}
+        title={state.available ? 'O que mudou' : 'Novidades desta versão'} /></Suspense>}
       {state.available && busy && <p>Encerre o teste e desative a detecção para instalar.</p>}
       {state.error && <p className="error" role="alert">Não foi possível concluir a atualização: {state.error}</p>}
     </fieldset>
