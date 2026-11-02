@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import type { OverlayRuntime } from '../../application/runtime';
+import { useEffect, useMemo, useState } from 'react';
+import type { DisplayMonitor, OverlayRuntime } from '../../application/runtime';
 import { useRuntime } from '../../application/use-runtime';
 import { replayMatch } from '../../domain/match';
 import type { OverlaySettings } from '../../domain/settings';
@@ -16,6 +16,10 @@ import metadata from '../../../package.json';
 export function ControlPanel({ runtime, desktop }: { runtime: OverlayRuntime; desktop: boolean }) {
   const { state, ready, error, perform, retry } = useRuntime(runtime);
   const [activeTab, setActiveTab] = useState<AppTab>('match');
+  const [monitors, setMonitors] = useState<DisplayMonitor[]>([]);
+  const [monitorError, setMonitorError] = useState<string | null>(null);
+  const refreshMonitors = () => { setMonitorError(null); void runtime.listMonitors().then(setMonitors).catch(cause => setMonitorError(String(cause))); };
+  useEffect(() => { if (ready && activeTab === 'overlay') { let disposed = false; void runtime.listMonitors().then(value => { if (!disposed) { setMonitors(value); setMonitorError(null); } }).catch(cause => { if (!disposed) setMonitorError(String(cause)); }); return () => { disposed = true; }; } }, [runtime, ready, activeTab]);
   const sample = useMemo(() => createDemoMatch('ranked'), []);
   const { settings, match } = state;
   const preview = match ?? (state.lastSynced ? replayMatch(state.lastSynced) : sample);
@@ -35,12 +39,14 @@ export function ControlPanel({ runtime, desktop }: { runtime: OverlayRuntime; de
       {tab.id === 'match' && <>
         <div className="section-heading"><h2>Conecte sua partida</h2><p>Escolha seu perfil e deixe o MatchDeck acompanhar o multiplayer.</p></div>
         <DetectionPanel runtime={runtime} status={state.detection} desktop={desktop} ready={ready} />
-        {match && <div className="session-summary"><strong>{match.map}</strong><span>{match.players.map(player => player.name).join(' × ')}</span><p>O overlay continua visível enquanto você navega pelas abas.</p></div>}
+        {match && <div className="session-summary"><strong>{match.map}</strong><span>{match.players.map(player => player.name).join(' × ')}</span><p>{state.hiddenMatchId === match.id ? 'Overlay oculto nesta partida. A detecção continua ativa.' : settings.focusOnly && match.source === 'live' ? 'O overlay acompanha o foco do Age 2.' : 'O overlay permanece visível ao trocar de janela.'}</p>
+          <button onClick={() => void perform(() => runtime.toggleVisibility())}>{state.hiddenMatchId === match.id ? 'Mostrar nesta partida' : 'Ocultar nesta partida'}</button></div>}
+        <p>{state.visibilityShortcutAvailable ? 'Ctrl+Shift+H mostra ou oculta o overlay nesta partida.' : desktop ? 'Ctrl+Shift+H indisponível. Use o botão da partida para mostrar ou ocultar.' : 'Ctrl+Shift+H está disponível no aplicativo Windows quando o atalho estiver livre.'}</p>
         {match?.warnings?.map(warning => <p role="status" key={warning}>{warning}</p>)}
       </>}
       {tab.id === 'overlay' && <>
         <div className="section-heading"><h2>Do seu jeito</h2><p>Ajuste o visual e escolha onde as informações aparecem.</p></div>
-        <OverlaySettingsPanel settings={settings} desktop={desktop} shortcutAvailable={state.shortcutAvailable} onChange={configure} />
+        <OverlaySettingsPanel settings={settings} desktop={desktop} shortcutAvailable={state.shortcutAvailable} onChange={configure} monitors={monitors} onRefreshMonitors={refreshMonitors} monitorError={monitorError} />
         <OverlayPreview match={preview} settings={settings} />
       </>}
       {tab.id === 'demo' && <><div className="section-heading"><h2>Experimente o overlay</h2><p>Teste as informações e a posição antes de jogar.</p></div><DemoPanel runtime={runtime} state={state} desktop={desktop} perform={perform} /></>}

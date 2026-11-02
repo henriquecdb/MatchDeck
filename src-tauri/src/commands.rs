@@ -26,12 +26,14 @@ pub fn start_match(
     if state.detection.config.enabled {
         return Err("Desative a detecção real antes de iniciar uma demonstração".into());
     }
-    let incoming = if matches!(incoming.source, crate::model::MatchSource::Demo) {
+    let incoming = if incoming.replay_of.is_some()
+        && matches!(incoming.source, crate::model::MatchSource::Demo)
+    {
         state
             .last_synced
             .as_ref()
             .map(MatchSnapshot::as_demo)
-            .unwrap_or(incoming)
+            .ok_or("Nenhuma partida sincronizada disponível para demonstração")?
     } else {
         incoming
     };
@@ -99,7 +101,38 @@ pub fn finish_match(app: tauri::AppHandle, state: State<'_, SharedState>) -> Res
         return Err("Desative a detecção para esconder a partida real".into());
     }
     state.current_match = None;
+    state.hidden_match_id = None;
     overlay::synchronize(&app, &state, false)
+}
+
+#[tauri::command]
+pub fn toggle_overlay_visibility(
+    app: tauri::AppHandle,
+    state: State<'_, SharedState>,
+) -> Result<(), String> {
+    let mut state = state.lock().map_err(|error| error.to_string())?;
+    let id = state
+        .current_match
+        .as_ref()
+        .map(|current| current.id.clone())
+        .ok_or("Não há partida em andamento")?;
+    state.hidden_match_id = if state.hidden_match_id.as_ref() == Some(&id) {
+        None
+    } else {
+        Some(id)
+    };
+    overlay::synchronize(&app, &state, false)
+}
+
+#[tauri::command]
+pub fn list_monitors(
+    app: tauri::AppHandle,
+) -> Result<Vec<crate::displays::DisplayMonitor>, String> {
+    use tauri::Manager;
+    crate::displays::list(
+        &app.get_webview_window("overlay")
+            .ok_or("Overlay não encontrado")?,
+    )
 }
 
 #[tauri::command]

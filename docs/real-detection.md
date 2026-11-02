@@ -23,9 +23,9 @@
 
 ## Limites desta versão
 
-O monitor não lê memória do jogo nem injeta código. Ele acompanha o perfil configurado; portanto pode encontrar a partida mesmo que o jogo esteja aberto em outra máquina. Não há ainda controle de visibilidade baseado no foco do jogo.
+O monitor não lê memória do jogo nem injeta código. Ele acompanha o perfil configurado; portanto pode encontrar a partida mesmo que o jogo esteja aberto em outra máquina. Por padrão, o overlay de partidas reais só aparece com o executável local AoE2DE_s.exe ou AoE2DE.exe em primeiro plano. A opção em Overlay permite mantê-lo visível no Alt+Tab. Demonstrações não exigem o foco do jogo. O foco é verificado a cada 500 ms; o posicionamento e mudanças de monitor são revistos a cada quatro segundos, sem novas consultas à API.
 
-A latência depende da fonte externa; não existe garantia de exibição imediata na tela de carregamento nem de ocultação imediata ao sair. Uma confirmação de término atrasada pode manter o overlay após o final. Use **Desativar detecção** quando precisar escondê-lo manualmente.
+A latência depende da fonte externa; não existe garantia de exibição imediata na tela de carregamento nem de ocultação imediata ao sair. Uma confirmação de término atrasada pode manter o overlay após o final. Use **Ocultar nesta partida** ou Ctrl+Shift+H para escondê-lo sem interromper o monitoramento. A próxima partida não herda essa ocultação. A opção de foco continua sendo respeitada ao voltar a mostrar o overlay.
 
 Ranqueadas e partidas rápidas usam o mesmo mecanismo. Lobbies não publicados pela fonte não são detectados. Skirmish offline, campanhas e cenários personalizados não estão implementados pelo detector. O suporte simulado a skirmish permanece disponível com a detecção desligada.
 

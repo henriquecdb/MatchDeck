@@ -2,6 +2,34 @@
 
 As mudanças relevantes são registradas por versão. O projeto usa Semantic Versioning e Conventional Commits.
 
+## [0.3.0] - 2026-11-02
+
+### Adicionado
+
+- Visibilidade de partidas reais acompanhando o foco do Age of Empires II: DE, com opção de manter o overlay no Alt+Tab.
+- Atalho Ctrl+Shift+H e botão para mostrar ou ocultar somente a partida atual, sem encerrar a detecção.
+- Seleção de monitor, nove posições prontas, margens e escala de 50% a 150%, independentes da opacidade.
+- Recuperação de posições fora da área útil e adaptação a mudanças de monitor ou escala do Windows.
+- Escolha explícita entre demonstração com jogadores fictícios e a última partida sincronizada.
+
+### Melhorado
+
+- Identificação da fila e do tipo de rating, horário da sincronização e explicações para estatísticas indisponíveis.
+- Projeção não oficial de rating pode ser desativada sem ocultar resultados confirmados.
+- Demonstrações permanecem visíveis fora do jogo; arrastar o overlay ativa o posicionamento manual.
+- Preferências das versões anteriores são migradas com valores padrão para as novas opções.
+- Janelas maiores que a área útil do monitor permitem rolagem.
+
+### Publicação
+
+- Checks e release usam a mesma chave de cache Rust para reaproveitar as dependências do perfil de testes da main.
+- Testes, otimizações do executável, assinatura e formato de instalação foram preservados.
+
+### Limitações conhecidas
+
+- Início e fim das partidas continuam dependendo da API multiplayer. Skirmish offline permanece fora do escopo.
+- O controle de foco reconhece o executável do Age 2 DE; tela cheia exclusiva continua sem validação.
+
 ## [0.2.1] - 2026-11-02
 
 ### Melhorado
@@ -73,3 +101,4 @@ As mudanças relevantes são registradas por versão. O projeto usa Semantic Ver
 [0.1.0]: https://github.com/henriquecdb/MatchDeck/releases/tag/v0.1.0
 [0.2.0]: https://github.com/henriquecdb/MatchDeck/compare/v0.1.0...v0.2.0
 [0.2.1]: https://github.com/henriquecdb/MatchDeck/compare/v0.2.0...v0.2.1
+[0.3.0]: https://github.com/henriquecdb/MatchDeck/compare/v0.2.1...v0.3.0

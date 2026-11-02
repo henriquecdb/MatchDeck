@@ -1,7 +1,7 @@
 import type { MatchSnapshot, Player } from '../../domain/match';
 import { projectRating } from '../../domain/rating';
 
-export function RatingImpact({ match, player, condensed = false }: { match: MatchSnapshot; player: Player; condensed?: boolean }) {
+export function RatingImpact({ match, player, condensed = false, showProjection = true }: { match: MatchSnapshot; player: Player; condensed?: boolean; showProjection?: boolean }) {
   const className = `rating-impact${condensed ? ' rating-impact-inline' : ''}`;
   if (match.finishedAt) {
     const delta = player.ratingChange;
@@ -9,6 +9,7 @@ export function RatingImpact({ match, player, condensed = false }: { match: Matc
       <span>Resultado</span><strong className={delta != null && delta < 0 ? 'losses' : 'wins'}>{delta == null ? '—' : `${delta >= 0 ? '+' : ''}${delta}`}</strong><span className="impact-kind">confirmado</span>
     </div>;
   }
+  if (!showProjection) return null;
   const projection = projectRating(match, player);
   return projection ? <div className={className} title="Projeção orientativa do modelo Elo com K=32. Não é uma previsão oficial; partidas rápidas e contas em calibração podem ter variações diferentes.">
     <span>Vitória</span><strong className="wins">~+{projection.win}</strong><span>Derrota</span><strong className="losses">~{projection.loss === 0 ? '−0' : projection.loss}</strong><span className="impact-kind">est.</span>

@@ -1,10 +1,10 @@
 import type { AppState, OverlayRuntime } from '../application/runtime';
-import { captureMatch, replayMatch, type MatchSnapshot } from '../domain/match';
+import { captureMatch, type MatchSnapshot } from '../domain/match';
 import { defaultSettings, parseSettings, type OverlaySettings } from '../domain/settings';
 import { defaultDetection, type PlayerProfile } from '../domain/detection';
 
 export class BrowserRuntime implements OverlayRuntime {
-  private state: AppState = { match: null, settings: { ...defaultSettings }, detection: structuredClone(defaultDetection), shortcutAvailable: false, lastSynced: null };
+  private state: AppState = { match: null, settings: { ...defaultSettings }, detection: structuredClone(defaultDetection), shortcutAvailable: false, visibilityShortcutAvailable: false, hiddenMatchId: null, lastSynced: null };
   private listeners = new Set<(state: AppState) => void>();
 
   constructor() {
@@ -30,13 +30,21 @@ export class BrowserRuntime implements OverlayRuntime {
   }
 
   async start(match: MatchSnapshot) {
-    const incoming = match.source === 'demo' && this.state.lastSynced ? replayMatch(this.state.lastSynced) : match;
-    this.state.match = captureMatch(this.state.match, incoming);
+    this.state.match = captureMatch(this.state.match, match);
     this.publish();
   }
 
   async finish() {
     this.state.match = null;
+    this.state.hiddenMatchId = null;
+    this.publish();
+  }
+
+  async listMonitors() { return []; }
+
+  async toggleVisibility() {
+    const id = this.state.match?.id ?? null;
+    this.state.hiddenMatchId = this.state.hiddenMatchId === id ? null : id;
     this.publish();
   }
 

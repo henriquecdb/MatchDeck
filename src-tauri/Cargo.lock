@@ -1909,7 +1909,7 @@ dependencies = [
 
 [[package]]
 name = "matchdeck"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "chrono",
  "futures-util",
@@ -1922,6 +1922,7 @@ dependencies = [
  "tauri-plugin-process",
  "tauri-plugin-updater",
  "tokio",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]

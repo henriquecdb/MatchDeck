@@ -4,7 +4,7 @@ import type { AppState, OverlayRuntime } from './runtime';
 import { defaultDetection } from '../domain/detection';
 
 export function useRuntime(runtime: OverlayRuntime) {
-  const [state, setState] = useState<AppState>({ match: null, settings: defaultSettings, detection: defaultDetection, shortcutAvailable: false, lastSynced: null });
+  const [state, setState] = useState<AppState>({ match: null, settings: defaultSettings, detection: defaultDetection, shortcutAvailable: false, visibilityShortcutAvailable: false, hiddenMatchId: null, lastSynced: null });
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [attempt, setAttempt] = useState(0);
