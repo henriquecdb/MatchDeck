@@ -81,6 +81,8 @@ pub struct Player {
     pub losses: Option<u32>,
     #[serde(default)]
     pub rating_change: Option<i32>,
+    #[serde(default)]
+    pub team_id: Option<i32>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]

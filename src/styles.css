@@ -57,31 +57,48 @@ input[type=number] { width: 110px; }
 .rating-impact .impact-kind { font-size: 8px; }
 .impact-unavailable { color: #8898ac; font-size: 9px; }
 .rating-disclaimer { color: #93a1b6; font-size: 9px; margin-top: 8px; }
-.layout-compact { width: 400px; padding: 8px; border-radius: 7px; }
-.layout-compact .overlay-heading { padding: 0 2px 7px; }
-.layout-compact .overlay-brand { font-size: 10px; }
-.layout-compact .match-source { font-size: 7px; margin-top: 3px; }
-.layout-compact .match-context strong { font-size: 12px; }
-.layout-compact .match-context > span { font-size: 8px; margin-top: 2px; }
-.layout-compact .player-list { gap: 5px; }
-.layout-compact .player { grid-template-columns: 58px minmax(0, 1fr) 68px; min-height: 94px; }
-.layout-compact .unit-portrait { width: 58px; height: 83px; }
-.layout-compact .player-content { padding: 6px 0 6px 4px; }
-.layout-compact .player-name strong { font-size: 12px; }
-.layout-compact .player-slot { width: 15px; height: 15px; font-size: 9px; }
-.layout-compact .civilization-name { font-size: 10px; margin-top: 4px; }
-.layout-compact .unit-name { display: none; }
-.layout-compact .player-results { margin-top: 4px; font-size: 10px; gap: 10px; }
-.layout-compact .rating-impact { font-size: 9px; gap: 4px; margin-top: 4px; }
-.layout-compact .rating-impact .impact-kind { display: none; }
-.layout-compact .rating { font-size: 22px; }
-.layout-compact .player-numbers { padding: 6px 4px; }
-.layout-compact .win-rate { background: none; width: auto; height: auto; margin: 4px 0 0; }
-.layout-compact .win-rate span { background: none; width: auto; height: auto; font-size: 10px; color: #5bdfa0; }
-.layout-compact .stat-label { font-size: 7px; }
-.layout-compact .player-numbers > .stat-label:last-child { margin-top: 3px; }
-.layout-compact .rating-disclaimer, .layout-compact .replay-caption { font-size: 8px; }
 .release-notes { white-space: pre-wrap; font: inherit; color: #becbdd; line-height: 1.6; max-height: 260px; overflow: auto; }
 .update-backdrop { position: fixed; inset: 0; z-index: 100; background: #080e18e8; display: grid; place-items: center; padding: 24px; }
 .update-dialog { width: 100%; max-width: 480px; border: 1px solid #4b607b; border-radius: 10px; padding: 24px; background: #192332; }
 .update-dialog progress { width: 100%; accent-color: #50c9e9; }
+.boot-screen { margin: 0; max-width: none; width: 100%; }
+.app-shell { max-width: 920px; margin: 24px auto; padding: 0 24px 32px; }
+.app-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.app-heading h1 { margin: 0; font-size: 27px; letter-spacing: -1px; }
+.app-heading h1 span { color: #50c9e9; }
+.app-heading p { margin: 4px 0 0; font-size: 12px; color: #8fa1b8; }
+.app-version { display: flex; align-items: flex-end; flex-direction: column; gap: 7px; color: #8fa1b8; font-size: 11px; }
+.connection-badge { background: #25303e; border: 1px solid #3d4c60; padding: 4px 9px; border-radius: 12px; color: #afbfce; }
+.connection-badge.is-active { border-color: #2c795c; color: #5bdfa0; background: #18362e; }
+.app-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 5px; background: #101720; border: 1px solid #303d50; border-radius: 8px; margin: 20px 0 24px; }
+.app-tabs button { border: 1px solid transparent; background: transparent; padding: 10px 4px; color: #94a6be; }
+.app-tabs button[aria-selected=true] { background: #24374b; color: #dff7ff; border-color: #3c6a84; }
+.app-tabs button:focus-visible { outline: 2px solid #50c9e9; outline-offset: 2px; }
+.app-panel { min-height: 280px; }
+.section-heading h2 { margin: 0; font-size: 20px; }
+.section-heading p { margin-top: 6px; font-size: 13px; }
+.app-panel fieldset { border-color: #3a495c; border-radius: 8px; }
+.session-summary { display: flex; flex-direction: column; gap: 6px; padding: 18px; border: 1px solid #3a495c; border-radius: 8px; background: #17232d; }
+.session-summary p { margin: 0; font-size: 12px; }
+.preview-section h2 { font-size: 15px; }
+.preview { background: #263443; border: 1px solid #35475b; border-radius: 8px; padding: 12px; }
+.linear-overlay { width: 720px; min-width: 720px; padding: 8px; border: 1px solid #354253; border-radius: 7px; background: #10151e; color: #e9edf2; }
+.linear-heading { display: flex; align-items: center; gap: 8px; height: 20px; margin-bottom: 6px; }
+.linear-heading > strong { font-size: 12px; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.linear-queue { font-size: 10px; color: #9aa9be; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.linear-source { font-size: 8px; letter-spacing: .7px; color: #79d3e9; background: #193442; border-radius: 3px; padding: 3px 5px; white-space: nowrap; }
+.linear-teams { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.linear-teams.single-team { grid-template-columns: minmax(0, 1fr); }
+.linear-team { min-width: 0; }
+.linear-team h3 { margin: 0 0 4px; height: 14px; line-height: 14px; color: #8fa1b8; font-size: 10px; font-weight: 500; border-bottom: 1px solid #28394d; }
+.linear-player { display: grid; grid-template-columns: 14px 24px minmax(0, 1fr) 40px 74px; column-gap: 6px; align-items: center; height: 30px; overflow: hidden; }
+.linear-color { width: 14px; height: 14px; display: grid; place-items: center; font-size: 9px; line-height: 14px; border-radius: 3px; background: var(--player-color); color: #fff; font-weight: 700; text-shadow: 0 1px 2px #000; }
+.civilization-emblem { width: 24px; height: 24px; object-fit: contain; }
+.emblem-fallback { display: grid; place-items: center; color: #93a1b6; font-size: 9px; border: 1px solid #354253; border-radius: 50%; }
+.linear-name { font-size: 12px; font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.linear-rating { font-size: 13px; color: var(--player-color); text-align: right; font-variant-numeric: tabular-nums; }
+.rating-impact-inline { margin: 0; justify-content: flex-end; gap: 5px; font-size: 10px; font-variant-numeric: tabular-nums; }
+.rating-impact-inline > span { display: none; }
+.linear-footer { display: flex; justify-content: space-between; color: #7e90a6; font-size: 8px; line-height: 12px; height: 12px; margin-top: 4px; }
+.overlay-window .linear-overlay { cursor: move; }
+@media (max-width: 560px) { .app-shell { padding: 0 12px 24px; } .app-tabs button { font-size: 12px; } }

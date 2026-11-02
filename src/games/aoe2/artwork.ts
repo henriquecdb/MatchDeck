@@ -5,6 +5,7 @@ interface UnitArtwork {
   name: string;
   units: string[];
   image: string;
+  emblem: string;
 }
 
 const catalog: Record<string, UnitArtwork> = catalogData;

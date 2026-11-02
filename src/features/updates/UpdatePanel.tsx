@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { createPortal } from 'react-dom';
 import metadata from '../../../package.json';
 import { UpdateManager } from '../../application/update-manager';
 import { NativeUpdater } from '../../infrastructure/native-updater';
@@ -52,12 +53,12 @@ function DesktopUpdates({ busy, autoUpdate, onAutoUpdateChange }: Props) {
       {state.available && busy && <p>Encerre o teste e desative a detecção para instalar.</p>}
       {state.error && <p className="error" role="alert">Não foi possível concluir a atualização: {state.error}</p>}
     </fieldset>
-    {installing && <div className="update-backdrop"><section className="update-dialog" role="dialog" aria-modal="true" aria-label="Atualizando MatchDeck">
+    {installing && createPortal(<div className="update-backdrop"><section className="update-dialog" role="dialog" aria-modal="true" aria-label="Atualizando MatchDeck">
       <h2>Atualizando MatchDeck</h2><p>{state.available?.currentVersion} → {state.available?.version}</p>
       <p role="status">{state.phase === 'downloading' ? 'Baixando e verificando a atualização…' : 'Instalando a atualização. O aplicativo será reiniciado…'}</p>
       <progress max="100" value={state.phase === 'downloading' ? percent : undefined} />
       {state.phase === 'downloading' && <p>{percent === undefined ? `${(state.downloaded / 1048576).toFixed(1)} MB baixados` : `${percent}%`}</p>}
       <p>A instalação continuará na janela de progresso do Windows.</p>
-    </section></div>}
+    </section></div>, document.body)}
   </>;
 }

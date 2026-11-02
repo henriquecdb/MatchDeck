@@ -1,0 +1,86 @@
+use crate::model::{MatchSnapshot, OverlayLayout};
+use std::collections::BTreeMap;
+
+pub fn overlay_size(snapshot: &MatchSnapshot, layout: &OverlayLayout) -> (f64, f64) {
+    if matches!(layout, OverlayLayout::Detailed) {
+        return (480.0, 136.0 + snapshot.players.len() as f64 * 150.0);
+    }
+    let counts = if snapshot
+        .players
+        .iter()
+        .all(|player| player.team_id.is_some_and(|id| id > 0))
+    {
+        let mut teams = BTreeMap::<i32, usize>::new();
+        for player in &snapshot.players {
+            *teams.entry(player.team_id.unwrap()).or_default() += 1;
+        }
+        teams.into_values().collect::<Vec<_>>()
+    } else if snapshot.players.len() == 2
+        && snapshot
+            .queue_id
+            .as_ref()
+            .is_some_and(|queue| queue.ends_with("_1v1"))
+    {
+        vec![1, 1]
+    } else {
+        vec![snapshot.players.len()]
+    };
+    let pairs = counts.chunks(2).collect::<Vec<_>>();
+    let height: usize = pairs
+        .iter()
+        .map(|pair| 18 + pair.iter().max().unwrap_or(&0) * 30)
+        .sum();
+    (
+        720.0,
+        (60 + height + pairs.len().saturating_sub(1) * 8) as f64,
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    fn snapshot(team_ids: &[Option<i32>], queue: &str) -> MatchSnapshot {
+        serde_json::from_value(json!({
+            "id":"test", "gameId":"aoe2-de", "mode":"ranked", "map":"Arena", "source":"demo", "queueId":queue,
+            "players":team_ids.iter().enumerate().map(|(index, team)| json!({
+                "id":index.to_string(),"name":"Player","civilization":"Franks","uniqueUnits":[],"symbol":"", "teamId":team
+            })).collect::<Vec<_>>()
+        })).unwrap()
+    }
+
+    #[test]
+    fn compact_window_tracks_team_rows_instead_of_full_cards() {
+        let duel = snapshot(&[None, None], "rm_1v1");
+        assert_eq!(overlay_size(&duel, &OverlayLayout::Compact), (720.0, 108.0));
+        assert_eq!(
+            overlay_size(&duel, &OverlayLayout::Detailed),
+            (480.0, 436.0)
+        );
+        let teams = snapshot(
+            &[
+                Some(1),
+                Some(2),
+                Some(1),
+                Some(2),
+                Some(1),
+                Some(2),
+                Some(1),
+                Some(2),
+            ],
+            "rm_team",
+        );
+        assert_eq!(
+            overlay_size(&teams, &OverlayLayout::Compact),
+            (720.0, 198.0)
+        );
+        let unknown = snapshot(&[None, None, None, None], "rm_team");
+        assert_eq!(
+            overlay_size(&unknown, &OverlayLayout::Compact),
+            (720.0, 198.0)
+        );
+        let ffa = snapshot(&[Some(1), Some(2), Some(3), Some(4)], "unranked");
+        assert_eq!(overlay_size(&ffa, &OverlayLayout::Compact), (720.0, 164.0));
+    }
+}

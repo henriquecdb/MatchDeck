@@ -7,8 +7,11 @@ export function useRuntime(runtime: OverlayRuntime) {
   const [state, setState] = useState<AppState>({ match: null, settings: defaultSettings, detection: defaultDetection, shortcutAvailable: false, lastSynced: null });
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
+    setReady(false);
+    setError(null);
     let disposed = false;
     let receivedUpdate = false;
     let unsubscribe: (() => void) | undefined;
@@ -29,12 +32,12 @@ export function useRuntime(runtime: OverlayRuntime) {
       }
     })();
     return () => { disposed = true; unsubscribe?.(); };
-  }, [runtime]);
+  }, [runtime, attempt]);
 
   async function perform(action: () => Promise<void>) {
     setError(null);
     try { await action(); } catch (cause) { setError(String(cause)); }
   }
 
-  return { state, ready, error, perform };
+  return { state, ready, error, perform, retry: () => setAttempt(value => value + 1) };
 }

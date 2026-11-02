@@ -14,5 +14,7 @@ it('bundles a real transparent cutout for every catalogued civilization', () => 
     }
     expect(transparent, `${entry.name}: transparent background`).toBe(true);
     expect(visible, `${entry.name}: visible artwork`).toBe(true);
+    const emblem = PNG.sync.read(readFileSync(`public${entry.emblem}`));
+    expect(emblem.width, `${entry.name}: local civilization emblem`).toBeGreaterThan(0);
   }
 });

@@ -19,6 +19,7 @@ export interface Player {
   wins: number | null;
   losses: number | null;
   ratingChange?: number | null;
+  teamId?: number | null;
 }
 
 export interface MatchSnapshot {

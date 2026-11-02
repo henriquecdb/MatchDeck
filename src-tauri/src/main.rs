@@ -3,6 +3,7 @@
 mod commands;
 mod detection;
 mod games;
+mod layout;
 mod model;
 mod overlay;
 mod storage;

@@ -4,9 +4,11 @@ import { playerColor, unitArtwork } from '../../games/aoe2/artwork';
 import { UnitPortrait } from './UnitPortrait';
 import { RatingImpact } from './RatingImpact';
 import type { OverlaySettings } from '../../domain/settings';
+import { CompactOverlay } from './CompactOverlay';
 
 export function MatchOverlay({ match, layout = 'detailed' }: { match: MatchSnapshot; layout?: OverlaySettings['layout'] }) {
-  return <section className={`match-overlay layout-${layout}`} aria-label="Dados da partida">
+  if (layout === 'compact') return <CompactOverlay match={match} />;
+  return <section className="match-overlay layout-detailed" aria-label="Dados da partida">
     <header className="overlay-heading">
       <div><strong className="overlay-brand">MATCH<span>DECK</span></strong><span className="match-source">{match.source === 'demo' ? (match.replayOf ? 'REPLAY DE TESTE' : 'DEMONSTRAÇÃO') : 'AO VIVO'}</span></div>
       <div className="match-context"><strong>{match.map}</strong><span>{match.queue || modeLabels[match.mode]}</span></div>
