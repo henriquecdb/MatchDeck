@@ -6,6 +6,7 @@ mod diagnostics;
 mod displays;
 mod focus;
 mod games;
+mod language;
 mod layout;
 mod lifecycle;
 mod model;

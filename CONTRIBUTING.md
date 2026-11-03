@@ -31,3 +31,11 @@ cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
 ```
 
 Consulte [Publicação de versões](docs/releases.md) antes de criar uma tag de release.
+
+## Traduções
+
+Os textos em português são as chaves do catálogo `src/i18n/en.json`. Componentes usam `useI18n()` para traduzir textos e formatar datas no idioma da interface. Mensagens vindas do runtime são traduzidas na apresentação, preservando o estado e os dados da fonte. O menu nativo da bandeja usa o mesmo catálogo.
+
+O idioma dos nomes do jogo é independente: o adaptador recebe `gameLanguage` ao consultar o catálogo de civilizações e unidades. Não traduza nomes de jogadores nem altere snapshots para trocar o idioma.
+
+Ao publicar, registre a versão em `CHANGELOG.md` e `CHANGELOG.en.md`. O gerador exige ambas as seções e inclui os idiomas nas notas da release; o aplicativo seleciona a seção correspondente à interface.

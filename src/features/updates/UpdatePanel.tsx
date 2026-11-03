@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/LanguageProvider';
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import metadata from '../../../package.json';
@@ -5,10 +6,12 @@ import { UpdateManager } from '../../application/update-manager';
 import { NativeUpdater } from '../../infrastructure/native-updater';
 import { progressPercent } from '../../domain/updates';
 import changelog from '../../../CHANGELOG.md?raw';
+import englishChangelog from '../../../CHANGELOG.en.md?raw';
 import { releaseSection } from '../../domain/changelog';
 
 const ReleaseNotes = lazy(() => import('./ReleaseNotes').then(module => ({ default: module.ReleaseNotes })));
 const installedNotes = releaseSection(changelog, metadata.version);
+const installedEnglishNotes = releaseSection(englishChangelog, metadata.version);
 
 interface Props {
   desktop: boolean;
@@ -19,12 +22,14 @@ interface Props {
 }
 
 export function UpdatePanel(props: Props) {
-  return props.desktop ? <DesktopUpdates {...props} /> : <fieldset><legend>Atualizações</legend><p>MatchDeck {metadata.version} · Atualizações disponíveis no aplicativo Windows.</p>
-    {props.visible !== false && <Suspense fallback={<p role="status">Carregando notas da versão…</p>}><ReleaseNotes notes={installedNotes} version={metadata.version} title="Novidades desta versão" /></Suspense>}
+  const { t, language } = useI18n();
+  return props.desktop ? <DesktopUpdates {...props} /> : <fieldset><legend>{t('Atualizações')}</legend><p>MatchDeck {metadata.version}  {t('· Atualizações disponíveis no aplicativo Windows.')}</p>
+    {props.visible !== false && <Suspense fallback={<p role="status">{t('Carregando notas da versão…')}</p>}><ReleaseNotes notes={language === 'en' ? installedEnglishNotes : installedNotes} version={metadata.version} title={t('Novidades desta versão')} /></Suspense>}
   </fieldset>;
 }
 
 function DesktopUpdates({ busy, autoUpdate, onAutoUpdateChange, visible = true }: Props) {
+  const { t, language } = useI18n();
   const blocked = useRef(busy);
   blocked.current = busy;
   const manager = useMemo(() => new UpdateManager(new NativeUpdater(() => !blocked.current)), []);
@@ -47,29 +52,29 @@ function DesktopUpdates({ busy, autoUpdate, onAutoUpdateChange, visible = true }
 
   return <>
     <fieldset disabled={installing}>
-      <legend>Atualizações · versão {metadata.version}</legend>
-      {previousVersion && previousVersion !== metadata.version && <p role="status">Atualizado de {previousVersion} para {metadata.version}.</p>}
-      <label><input type="checkbox" checked={autoUpdate} onChange={event => onAutoUpdateChange(event.target.checked)} /> Instalar automaticamente com a detecção desativada</label>
-      <p>A versão instalada verifica novidades ao abrir e a cada quatro horas. Nenhuma instalação começa com uma partida ou detecção ativa.</p>
-      {import.meta.env.DEV && <p>Na versão de desenvolvimento, a instalação automática fica desativada.</p>}
+      <legend>{t('Atualizações · versão')} {metadata.version}</legend>
+      {previousVersion && previousVersion !== metadata.version && <p role="status">{t('Atualizado de')} {previousVersion}  {t('para')} {metadata.version}.</p>}
+      <label><input type="checkbox" checked={autoUpdate} onChange={event => onAutoUpdateChange(event.target.checked)} />  {t('Instalar automaticamente com a detecção desativada')}</label>
+      <p>{t('A versão instalada verifica novidades ao abrir e a cada quatro horas. Nenhuma instalação começa com uma partida ou detecção ativa.')}</p>
+      {import.meta.env.DEV && <p>{t('Na versão de desenvolvimento, a instalação automática fica desativada.')}</p>}
       <div className="actions">
-        <button disabled={state.phase === 'checking'} onClick={() => void manager.check()}>{state.phase === 'checking' ? 'Verificando…' : 'Verificar atualizações'}</button>
-        {state.available && <button disabled={busy || import.meta.env.DEV || state.phase === 'checking'} onClick={() => void manager.install()}>Instalar versão {state.available.version}</button>}
+        <button disabled={state.phase === 'checking'} onClick={() => void manager.check()}>{state.phase === 'checking' ? t('Verificando…') : t('Verificar atualizações')}</button>
+        {state.available && <button disabled={busy || import.meta.env.DEV || state.phase === 'checking'} onClick={() => void manager.install()}>{t('Instalar versão')} {state.available.version}</button>}
       </div>
-      {state.phase === 'current' && <p role="status">Você está na versão mais recente.</p>}
-      {state.available && <p>Versão {state.available.currentVersion} → {state.available.version}</p>}
-      {visible && <Suspense fallback={<p role="status">Carregando notas da versão…</p>}><ReleaseNotes
-        notes={state.available?.notes ?? installedNotes} version={state.available?.version ?? metadata.version}
-        title={state.available ? 'O que mudou' : 'Novidades desta versão'} /></Suspense>}
-      {state.available && busy && <p>Encerre o teste e desative a detecção para instalar.</p>}
-      {state.error && <p className="error" role="alert">Não foi possível concluir a atualização: {state.error}</p>}
+      {state.phase === 'current' && <p role="status">{t('Você está na versão mais recente.')}</p>}
+      {state.available && <p>{t('Versão')} {state.available.currentVersion} → {state.available.version}</p>}
+      {visible && <Suspense fallback={<p role="status">{t('Carregando notas da versão…')}</p>}><ReleaseNotes
+        notes={state.available?.notes ?? (language === 'en' ? installedEnglishNotes : installedNotes)} version={state.available?.version ?? metadata.version}
+        title={state.available ? t('O que mudou') : t('Novidades desta versão')} /></Suspense>}
+      {state.available && busy && <p>{t('Encerre o teste e desative a detecção para instalar.')}</p>}
+      {state.error && <p className="error" role="alert">{t('Não foi possível concluir a atualização:')} {t(state.error)}</p>}
     </fieldset>
-    {installing && createPortal(<div className="update-backdrop"><section className="update-dialog" role="dialog" aria-modal="true" aria-label="Atualizando MatchDeck">
-      <h2>Atualizando MatchDeck</h2><p>{state.available?.currentVersion} → {state.available?.version}</p>
-      <p role="status">{state.phase === 'downloading' ? 'Baixando e verificando a atualização…' : 'Instalando a atualização. O aplicativo será reiniciado…'}</p>
+    {installing && createPortal(<div className="update-backdrop"><section className="update-dialog" role="dialog" aria-modal="true" aria-label={t('Atualizando MatchDeck')}>
+      <h2>{t('Atualizando MatchDeck')}</h2><p>{state.available?.currentVersion} → {state.available?.version}</p>
+      <p role="status">{state.phase === 'downloading' ? t('Baixando e verificando a atualização…') : t('Instalando a atualização. O aplicativo será reiniciado…')}</p>
       <progress max="100" value={state.phase === 'downloading' ? percent : undefined} />
-      {state.phase === 'downloading' && <p>{percent === undefined ? `${(state.downloaded / 1048576).toFixed(1)} MB baixados` : `${percent}%`}</p>}
-      <p>A instalação continuará na janela de progresso do Windows.</p>
+      {state.phase === 'downloading' && <p>{percent === undefined ? t('{0} MB baixados', { 0: (state.downloaded / 1048576).toFixed(1) }) : `${percent}%`}</p>}
+      <p>{t('A instalação continuará na janela de progresso do Windows.')}</p>
     </section></div>, document.body)}
   </>;
 }

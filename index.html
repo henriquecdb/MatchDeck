@@ -13,6 +13,15 @@
   </head>
   <body>
     <div id="root"><div class="boot-screen"><div class="boot-mark" aria-hidden="true">M</div><strong class="boot-title">MATCH<span>DECK</span></strong><p role="status">Carregando MatchDeck…</p><progress aria-label="Carregando aplicativo"></progress></div></div>
+    <script>
+      try {
+        if (localStorage.getItem('matchdeck.interfaceLanguage') === 'en') {
+          document.documentElement.lang = 'en';
+          document.querySelector('[role="status"]').textContent = 'Loading MatchDeck…';
+          document.querySelector('progress').setAttribute('aria-label', 'Loading application');
+        }
+      } catch {}
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

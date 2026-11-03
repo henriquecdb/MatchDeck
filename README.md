@@ -4,7 +4,7 @@ Aplicativo modular de overlays para jogos. Primeira integração: Age of Empires
 
 ## Instalar no Windows
 
-Baixe o instalador **MatchDeck_0.4.1_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, siga a configuração guiada, identifique seu perfil na aba **Partida** e ative a detecção com o AoE2 em janela sem bordas.
+Baixe o instalador **MatchDeck_0.4.2_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, siga a configuração guiada, identifique seu perfil na aba **Partida** e ative a detecção com o AoE2 em janela sem bordas.
 
 Veja o [changelog da versão](CHANGELOG.md). O aplicativo verifica novas versões ao abrir e mostra as notas e o progresso da atualização. A instalação automática é opcional e exige que a detecção esteja desligada e não haja partida de demonstração ativa. Pacotes de atualização são verificados por assinatura. O executável ainda não possui certificado Authenticode de editor Windows.
 
@@ -18,7 +18,9 @@ No navegador há uma prévia simulada. No Tauri há uma janela transparente, sem
 
 Por padrão, partidas reais aparecem somente com o executável do Age 2 DE em primeiro plano. Desmarque essa opção em **Overlay** para continuar vendo os dados ao usar Alt+Tab. A demonstração permanece visível fora do jogo. Ocultar uma partida não encerra a detecção e não oculta automaticamente a próxima.
 
-Estatísticas e rating vêm da fila correspondente à partida, sem substituir por rating ranqueado de outra modalidade. Dados não disponíveis aparecem como “—”. O catálogo inclui imagens transparentes e nomes em português de unidades de 56 civilizações, distribuídos localmente. Bordas e rating usam a cor informada para cada jogador na partida. Origem das imagens e traduções em `public/units/NOTICE.md`.
+Estatísticas e rating vêm da fila correspondente à partida, sem substituir por rating ranqueado de outra modalidade. Dados não disponíveis aparecem como “—”. O catálogo inclui imagens transparentes e nomes em inglês e português de unidades de 56 civilizações, distribuídos localmente. Bordas e rating usam a cor informada para cada jogador na partida. Origem das imagens e traduções em `public/units/NOTICE.md`.
+
+Em **Configurações → Idioma**, escolha português brasileiro ou inglês para a interface. O idioma de **Civilizações e unidades** é independente e começa em inglês, inclusive com a interface em português. As alterações são imediatas na prévia e no overlay e ficam salvas para a próxima abertura. A troca usa os catálogos locais e preserva os dados sincronizados da partida.
 
 ## Demonstração com dados sincronizados
 
