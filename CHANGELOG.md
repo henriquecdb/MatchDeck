@@ -4,6 +4,12 @@ As mudanças relevantes são registradas por versão. O projeto usa Semantic Ver
 
 ## [0.4.3] - 2026-11-03
 
+### Segurança
+
+- Auditorias npm e RustSec no GitHub Actions, sem ignorar vulnerabilidades conhecidas.
+- Build Windows independente para PRs e varredura ClamAV do executável e instalador, com hashes e relatório.
+- Publicação de releases condicionada à aprovação das auditorias e varredura do pacote final.
+
 ### Adicionado
 
 - Configuração independente dos atalhos globais de travar/destravar e mostrar/ocultar o overlay, mantendo Ctrl+Shift+O e Ctrl+Shift+H como padrões.

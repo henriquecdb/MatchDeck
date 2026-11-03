@@ -2,6 +2,12 @@
 
 ## [0.4.3] - 2026-11-03
 
+### Security
+
+- npm and RustSec dependency audits in GitHub Actions, without ignoring known vulnerabilities.
+- Independent Windows PR builds and ClamAV scans of the executable and installer, with hashes and reports.
+- Release publication gated on successful dependency audits and final package scanning.
+
 ### Added
 
 - Independent global hotkey settings for overlay lock and visibility, retaining Ctrl+Shift+O and Ctrl+Shift+H as defaults.

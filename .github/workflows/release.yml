@@ -14,8 +14,12 @@ concurrency:
   group: release-${{ github.event.inputs.tag || github.ref }}
   cancel-in-progress: false
 jobs:
+  dependencies:
+    uses: ./.github/workflows/security.yml
   release:
     runs-on: windows-latest
+    outputs:
+      tag: ${{ steps.notes.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -53,7 +57,24 @@ jobs:
           uploadUpdaterJson: true
           updaterJsonPreferNsis: true
           args: --ci -- --locked
-      - name: Publish complete release
-        run: gh release edit ${{ steps.notes.outputs.tag }} --draft=false --latest
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: windows-release-package
+          path: |
+            src-tauri/target/release/matchdeck.exe
+            src-tauri/target/release/bundle/nsis/*-setup.exe
+          if-no-files-found: error
+  scan:
+    needs: release
+    uses: ./.github/workflows/binary-scan.yml
+    with:
+      artifact: windows-release-package
+  publish:
+    needs: [release, scan, dependencies]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish verified release
+        run: gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest
         env:
+          RELEASE_TAG: ${{ needs.release.outputs.tag }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
