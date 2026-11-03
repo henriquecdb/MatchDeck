@@ -20,7 +20,7 @@ pub fn synchronize(
         .map_err(|error| error.to_string())?;
     app.emit("state-changed", state)
         .map_err(|error| error.to_string())?;
-    refresh_visibility(&window, state)
+    refresh_visibility(&window, state, reposition)
 }
 
 fn refresh_geometry(window: &tauri::WebviewWindow, state: &AppState) -> Result<(), String> {
@@ -41,7 +41,11 @@ pub fn should_show(state: &AppState, game_focused: bool) -> bool {
     })
 }
 
-fn refresh_visibility(window: &tauri::WebviewWindow, state: &AppState) -> Result<(), String> {
+fn refresh_visibility(
+    window: &tauri::WebviewWindow,
+    state: &AppState,
+    raise: bool,
+) -> Result<(), String> {
     let needs_focus = state
         .current_match
         .as_ref()
@@ -51,16 +55,30 @@ fn refresh_visibility(window: &tauri::WebviewWindow, state: &AppState) -> Result
         state,
         !needs_focus || crate::focus::game_is_foreground(window, !state.settings.locked),
     );
-    if window.is_visible().map_err(|error| error.to_string())? == visible {
+    if window.is_visible().map_err(|error| error.to_string())? == visible
+        && (!visible || (!raise && is_topmost(window)?))
+    {
         return Ok(());
     }
     set_visibility(window, visible)
 }
 
 #[cfg(windows)]
+fn is_topmost(window: &tauri::WebviewWindow) -> Result<bool, String> {
+    Ok(crate::visibility::is_topmost(
+        window.hwnd().map_err(|error| error.to_string())?.0,
+    ))
+}
+
+#[cfg(not(windows))]
+fn is_topmost(_: &tauri::WebviewWindow) -> Result<bool, String> {
+    Ok(true)
+}
+
+#[cfg(windows)]
 fn set_visibility(window: &tauri::WebviewWindow, visible: bool) -> Result<(), String> {
     let handle = window.hwnd().map_err(|error| error.to_string())?;
-    // A janela exibida com ShowWindow não atualiza o cache do Tauri; ocultá-la exige a mesma API.
+    // A visibilidade nativa não atualiza o cache do Tauri; show e hide devem usar Win32.
     crate::visibility::set_native_visibility(handle.0, visible)?;
     Ok(())
 }
@@ -86,7 +104,7 @@ pub async fn watch_desktop(app: tauri::AppHandle) {
         let Some(window) = app.get_webview_window("overlay") else {
             return;
         };
-        if let Err(error) = refresh_visibility(&window, &snapshot) {
+        if let Err(error) = refresh_visibility(&window, &snapshot, false) {
             eprintln!("{error}");
         }
         ticks = (ticks + 1) % 8;

@@ -2,6 +2,13 @@
 
 As mudanças relevantes são registradas por versão. O projeto usa Semantic Versioning e Conventional Commits.
 
+## [0.4.1] - 2026-11-03
+
+### Corrigido
+
+- Overlay de demonstração e partidas exibido acima das janelas comuns no Windows, sem roubar o foco.
+- Recuperação da posição sempre no topo quando o Windows remove essa condição da janela.
+
 ## [0.4.0] - 2026-11-03
 
 ### Adicionado
@@ -146,3 +153,5 @@ As mudanças relevantes são registradas por versão. O projeto usa Semantic Ver
 [0.3.0]: https://github.com/henriquecdb/MatchDeck/compare/v0.2.1...v0.3.0
 [0.3.1]: https://github.com/henriquecdb/MatchDeck/compare/v0.3.0...v0.3.1
 [0.4.0]: https://github.com/henriquecdb/MatchDeck/compare/v0.3.1...v0.4.0
+
+[0.4.1]: https://github.com/henriquecdb/MatchDeck/compare/v0.4.0...v0.4.1
