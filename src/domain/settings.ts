@@ -11,9 +11,13 @@ export interface OverlaySettings {
   monitorId: string | null;
   anchor: 'manual' | 'top-left' | 'top-center' | 'top-right' | 'center-left' | 'center' | 'center-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
   margin: number;
+  showRating: boolean;
+  showRecord: boolean;
+  showWinRate: boolean;
+  highlightSelf: boolean;
 }
 
-export const defaultSettings: OverlaySettings = { opacity: 0.9, x: 40, y: 80, locked: false, layout: 'detailed', autoUpdate: false, scale: 1, focusOnly: true, showProjection: true, monitorId: null, anchor: 'manual', margin: 16 };
+export const defaultSettings: OverlaySettings = { opacity: 0.9, x: 40, y: 80, locked: false, layout: 'detailed', autoUpdate: false, scale: 1, focusOnly: true, showProjection: true, monitorId: null, anchor: 'manual', margin: 16, showRating: true, showRecord: true, showWinRate: true, highlightSelf: true };
 
 export const anchorLabels: Record<OverlaySettings['anchor'], string> = {
   manual: 'Manual · arrastar ou informar X/Y', 'top-left': 'Superior esquerdo', 'top-center': 'Superior central', 'top-right': 'Superior direito',
@@ -41,5 +45,9 @@ export function parseSettings(value: unknown): OverlaySettings {
     monitorId: typeof candidate.monitorId === 'string' ? candidate.monitorId : null,
     anchor: typeof candidate.anchor === 'string' && Object.hasOwn(anchorLabels, candidate.anchor) ? candidate.anchor as OverlaySettings['anchor'] : 'manual',
     margin: typeof candidate.margin === 'number' && Number.isFinite(candidate.margin) ? Math.round(Math.max(0, Math.min(200, candidate.margin))) : 16,
+    showRating: candidate.showRating !== false,
+    showRecord: candidate.showRecord !== false,
+    showWinRate: candidate.showWinRate !== false,
+    highlightSelf: candidate.highlightSelf !== false,
   };
 }

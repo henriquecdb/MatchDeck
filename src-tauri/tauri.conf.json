@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "MatchDeck",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "identifier": "com.matchdeck.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -11,7 +11,7 @@
   },
   "app": {
     "windows": [
-      { "label": "main", "title": "MatchDeck", "width": 900, "height": 820, "minWidth": 600, "minHeight": 600, "backgroundColor": "#10151e" },
+      { "label": "main", "title": "MatchDeck", "width": 960, "height": 820, "minWidth": 600, "minHeight": 600, "backgroundColor": "#10151e", "visible": false },
       {
         "label": "overlay",
         "title": "MatchDeck Overlay",

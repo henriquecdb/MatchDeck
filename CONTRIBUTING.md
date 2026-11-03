@@ -17,6 +17,8 @@ Tipos aceitos incluem `feat`, `fix`, `docs`, `refactor`, `perf`, `test`, `build`
 
 No GitHub, o check obrigatório **Conventional Commits** valida todos os commits do PR e o título do PR, usado no squash merge. A validação também roda nos pushes de `main`. Mensagens inválidas bloqueiam a integração; ignorar o hook local não ignora o GitHub Actions. Abra uma branch e um PR para contribuir.
 
+Ao integrar por squash, valide a mensagem final completa, incluindo o corpo. O limite do corpo é de 100 caracteres por linha. Uma mensagem criada apenas no momento da integração não passa pelo hook local nem pela validação anterior dos commits do PR. Grave a mensagem pretendida em um arquivo e execute `npx --no -- commitlint --edit caminho-do-arquivo` antes do merge.
+
 ## Verificações
 
 ```powershell

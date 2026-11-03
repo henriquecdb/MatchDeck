@@ -37,12 +37,13 @@ export function DetectionPanel({ runtime, status, desktop, ready }: Props) {
       })}>Identificar perfil local</button>
       <button disabled={status.config.enabled || !profileInput.trim()} onClick={() => void perform(() => runtime.configureDetection(true, profileInput))}>Ativar detecção</button>
       <button disabled={!status.config.enabled} onClick={() => void perform(() => runtime.configureDetection(false, profileInput))}>Desativar detecção</button>
+      <button disabled={!status.config.enabled} onClick={() => void perform(() => runtime.retryDetection())}>Consultar agora</button>
     </div>
     {identifiedName && !status.config.enabled && <p>Perfil identificado: {identifiedName}. Clique em Ativar detecção.</p>}
     {status.config.profile && <p>Perfil configurado: <strong>{status.config.profile.name}</strong> · {status.config.profile.profileId}</p>}
     <p role="status">{busy ? 'Processando…' : status.message}</p>
-    {status.lastChecked && <p>Última consulta concluída: {new Date(status.lastChecked).toLocaleTimeString('pt-BR')}</p>}
+    {status.lastChecked && <p>Última consulta bem-sucedida: {new Date(status.lastChecked).toLocaleTimeString('pt-BR')}</p>}
     {error && <p role="alert" className="error">{error}</p>}
-    <p>Consultas a cada 20 segundos. O início e o fim dependem da publicação pela fonte externa e podem atrasar. Skirmish offline e campanhas não são detectados nesta etapa.</p>
+    <p>Consultas a cada 20 segundos, com intervalo progressivo após falhas. Ranqueadas e partidas rápidas dependem da publicação pela fonte. Lobbies personalizados, especialmente contra IA, não têm cobertura garantida. Skirmish offline e campanhas não são detectados.</p>
   </fieldset>;
 }

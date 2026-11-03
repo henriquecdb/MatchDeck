@@ -21,6 +21,7 @@ pub struct DetectionStatus {
     pub phase: String,
     pub message: String,
     pub last_checked: Option<String>,
+    pub failures: u32,
 }
 
 impl Default for DetectionStatus {
@@ -30,6 +31,7 @@ impl Default for DetectionStatus {
             phase: "disabled".into(),
             message: "Detecção desativada".into(),
             last_checked: None,
+            failures: 0,
         }
     }
 }

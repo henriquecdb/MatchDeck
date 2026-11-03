@@ -13,6 +13,7 @@ export interface DetectionStatus {
   phase: 'disabled' | 'waiting' | 'loading' | 'in-match' | 'error';
   message: string;
   lastChecked: string | null;
+  failures?: number;
 }
 
 export const defaultDetection: DetectionStatus = {

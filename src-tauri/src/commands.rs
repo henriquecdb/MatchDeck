@@ -26,6 +26,9 @@ pub fn start_match(
     if state.detection.config.enabled {
         return Err("Desative a detecção real antes de iniciar uma demonstração".into());
     }
+    if !crate::games::supports(&incoming.game_id) {
+        return Err("Integração de jogo indisponível".into());
+    }
     let incoming = if incoming.replay_of.is_some()
         && matches!(incoming.source, crate::model::MatchSource::Demo)
     {
@@ -72,7 +75,8 @@ pub async fn sync_latest_match(
         .filter(|candidate| candidate.includes(profile.profile_id) && candidate.supported())
         .max_by_key(|candidate| candidate.started)
         .ok_or("Nenhuma partida compatível encontrada para este perfil")?;
-    let snapshot = controller.provider.snapshot(latest).await;
+    let mut snapshot = controller.provider.snapshot(latest).await;
+    snapshot.self_player_id = Some(profile.profile_id.to_string());
     let published = {
         let mut state = state.lock().map_err(|error| error.to_string())?;
         if state
@@ -174,6 +178,16 @@ pub async fn configure_detection(
         }
         .into();
         state.detection.last_checked = None;
+        state.detection.failures = 0;
+        crate::diagnostics::record(
+            &mut state,
+            "detection",
+            if enabled {
+                "Monitoramento ativado."
+            } else {
+                "Monitoramento desativado."
+            },
+        );
         state.current_match = None;
         state.clone()
     };

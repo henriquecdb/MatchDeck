@@ -62,6 +62,14 @@ fn update(
     }
     state.detection.phase = phase.into();
     state.detection.message = message;
+    if phase == "error" {
+        state.detection.failures = state.detection.failures.saturating_add(1);
+        crate::diagnostics::record(
+            &mut state,
+            "network",
+            "Consulta falhou; nova tentativa com intervalo progressivo.",
+        );
+    }
     app.emit("state-changed", &*state)
         .map_err(|error| error.to_string())
 }
@@ -94,14 +102,27 @@ async fn cycle(
             "loading",
             "Partida encontrada; carregando os dados dos jogadores".into(),
         )?;
-        let mut snapshot = provider.snapshot(remote).await;
+        let cached = app
+            .state::<SharedState>()
+            .lock()
+            .map_err(|error| error.to_string())?
+            .last_synced
+            .clone()
+            .filter(|cached| can_resume(cached, remote, profile.profile_id));
+        let resumed = cached.is_some();
+        let mut snapshot = if let Some(cached) = cached {
+            cached
+        } else {
+            provider.snapshot(remote).await
+        };
         for _ in 0..2 {
-            if snapshot.warnings.is_empty() {
+            if resumed || snapshot.warnings.is_empty() {
                 break;
             }
             tokio::time::sleep(Duration::from_secs(5)).await;
             snapshot = provider.snapshot(remote).await;
         }
+        snapshot.self_player_id = Some(profile.profile_id.to_string());
         Some(snapshot)
     } else {
         None
@@ -114,6 +135,11 @@ async fn cycle(
             return Ok(());
         }
         if let Some(mut new_match) = new_match {
+            crate::diagnostics::record(
+                &mut state,
+                "match",
+                "Partida capturada ou retomada; dados preservados até o encerramento.",
+            );
             if let Err(error) = storage::save_last_match(app, &new_match) {
                 new_match.warnings.push(format!(
                     "Não foi possível salvar a partida para demonstração: {error}"
@@ -123,6 +149,7 @@ async fn cycle(
             state.current_match = Some(new_match);
         }
         if matches!(action, MatchAction::Finish) {
+            crate::diagnostics::record(&mut state, "match", "Encerramento confirmado pela fonte.");
             if let Some(current) = &state.current_match {
                 if let Some(remote) = feed
                     .matches
@@ -140,6 +167,29 @@ async fn cycle(
             }
             state.current_match = None;
         }
+        if state.current_match.is_none() {
+            if let Some(cached) = state
+                .last_synced
+                .as_ref()
+                .filter(|cached| cached.finished_at.is_none())
+            {
+                if let Some(remote) = feed.matches.iter().find(|remote| {
+                    cached.id == format!("aoe2-{}", remote.match_id)
+                        && remote.includes(profile.profile_id)
+                        && remote.is_finished()
+                }) {
+                    let result = crate::games::aoe2::outcome::record_outcome(cached, remote);
+                    storage::save_last_match(app, &result)?;
+                    state.last_synced = Some(result);
+                    crate::diagnostics::record(
+                        &mut state,
+                        "match",
+                        "Resultado recuperado após interrupção do aplicativo.",
+                    );
+                }
+            }
+        }
+        state.detection.failures = 0;
         state.detection.last_checked = Some(now().to_rfc3339());
         let active = state.current_match.is_some();
         state.detection.phase = if active { "in-match" } else { "waiting" }.into();
@@ -156,6 +206,17 @@ async fn cycle(
         app.emit("state-changed", snapshot)
             .map_err(|error| error.to_string())
     }
+}
+
+fn can_resume(cached: &crate::model::MatchSnapshot, remote: &RemoteMatch, profile_id: u64) -> bool {
+    cached.game_id == "aoe2-de"
+        && matches!(cached.source, MatchSource::Live)
+        && cached.finished_at.is_none()
+        && cached.id == format!("aoe2-{}", remote.match_id)
+        && cached
+            .players
+            .iter()
+            .any(|player| player.id == profile_id.to_string())
 }
 
 pub async fn run(
@@ -247,5 +308,22 @@ mod tests {
             decide(&feed(json!("2026-10-31T02:08:00Z")), 42, None, time),
             MatchAction::Keep
         ));
+    }
+
+    #[test]
+    fn resumes_only_the_same_unfinished_live_match_for_a_participant() {
+        let feed = feed(json!(null));
+        let remote = &feed.matches[0];
+        let mut snapshot: crate::model::MatchSnapshot = serde_json::from_value(json!({
+            "id":"aoe2-10","gameId":"aoe2-de","mode":"ranked","map":"Arena","source":"live",
+            "players":[{"id":"42","name":"Player","civilization":"Franks","uniqueUnits":[],"symbol":"","rating":1234}]
+        })).unwrap();
+        assert!(can_resume(&snapshot, remote, 42));
+        assert!(!can_resume(&snapshot, remote, 43));
+        snapshot.source = MatchSource::Demo;
+        assert!(!can_resume(&snapshot, remote, 42));
+        snapshot.source = MatchSource::Live;
+        snapshot.finished_at = Some("2026-10-31T03:00:00Z".into());
+        assert!(!can_resume(&snapshot, remote, 42));
     }
 }

@@ -39,6 +39,7 @@ pub struct RemotePlayer {
     pub color: Option<u8>,
     pub color_hex: Option<String>,
     pub rating_diff: Option<i32>,
+    pub won: Option<bool>,
 }
 
 impl RemoteMatch {

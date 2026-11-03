@@ -23,6 +23,14 @@ pub struct OverlaySettings {
     pub anchor: Anchor,
     #[serde(default = "default_margin")]
     pub margin: u32,
+    #[serde(default = "enabled")]
+    pub show_rating: bool,
+    #[serde(default = "enabled")]
+    pub show_record: bool,
+    #[serde(default = "enabled")]
+    pub show_win_rate: bool,
+    #[serde(default = "enabled")]
+    pub highlight_self: bool,
 }
 
 fn default_scale() -> f64 {
@@ -74,6 +82,10 @@ impl Default for OverlaySettings {
             monitor_id: None,
             anchor: Anchor::Manual,
             margin: 16,
+            show_rating: true,
+            show_record: true,
+            show_win_rate: true,
+            highlight_self: true,
         }
     }
 }
@@ -103,6 +115,7 @@ pub enum MatchMode {
     Ranked,
     Quick,
     Skirmish,
+    Custom,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -133,6 +146,8 @@ pub struct Player {
     pub rating_change: Option<i32>,
     #[serde(default)]
     pub team_id: Option<i32>,
+    #[serde(default)]
+    pub won: Option<bool>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -156,6 +171,8 @@ pub struct MatchSnapshot {
     pub replay_of: Option<String>,
     #[serde(default)]
     pub finished_at: Option<String>,
+    #[serde(default)]
+    pub self_player_id: Option<String>,
 }
 
 impl MatchSnapshot {
@@ -179,6 +196,13 @@ pub struct AppState {
     pub last_synced: Option<MatchSnapshot>,
     pub visibility_shortcut_available: bool,
     pub hidden_match_id: Option<String>,
+    pub preferences: crate::preferences::AppPreferences,
+    pub autostart: bool,
+    pub tray_available: bool,
+    pub close_requested: bool,
+    pub startup_ms: Option<u64>,
+    pub app_error: Option<String>,
+    pub events: Vec<crate::diagnostics::DiagnosticEvent>,
 }
 
 #[cfg(test)]

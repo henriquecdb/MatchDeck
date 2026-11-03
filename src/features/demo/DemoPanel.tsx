@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { AppState, OverlayRuntime } from '../../application/runtime';
 import { modeLabels, replayMatch, type MatchMode } from '../../domain/match';
-import { createDemoMatch } from '../../games/aoe2/demo';
+import { gameIntegration } from '../../games/registry';
 import { OverlayPreview } from '../overlay/OverlayPreview';
 
 interface Props {
@@ -36,7 +36,7 @@ export function DemoPanel({ runtime, state, desktop, perform }: Props) {
         </select></label>}
       <div className="actions">
         <button disabled={!!match || (source === 'synced' && !lastSynced && (!desktop || !detection.config.profile))} onClick={() => run(async () => {
-          if (source === 'fictional') { await runtime.start(createDemoMatch(mode)); return; }
+          if (source === 'fictional') { await runtime.start(gameIntegration('aoe2-de')!.demo(mode)); return; }
           if (!lastSynced) await runtime.syncLatest();
           const latest = (await runtime.read()).lastSynced;
           if (!latest) throw new Error('Nenhuma partida sincronizada disponível. Selecione jogadores fictícios ou sincronize seu perfil.');
