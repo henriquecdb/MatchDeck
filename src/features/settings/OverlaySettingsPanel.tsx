@@ -44,6 +44,7 @@ export function OverlaySettingsPanel({ settings, desktop, shortcutAvailable, onC
     <label><input type="checkbox" checked={settings.focusOnly} onChange={event => onChange({ focusOnly: event.target.checked })} /> Mostrar partidas reais somente com o Age 2 em primeiro plano</label>
     <p>Desmarque para manter visível no Alt+Tab. A demonstração aparece mesmo fora do jogo.</p>
     <label><input type="checkbox" checked={settings.showProjection} onChange={event => onChange({ showProjection: event.target.checked })} /> Exibir projeção não oficial de ganho/perda de rating</label>
+    <p>Controla os valores estimados com ~ durante a partida. O resultado real confirmado de uma partida concluída continua visível. Estimativas exigem uma fila 1v1 reconhecida e os ratings dos dois jogadores.</p>
     <label><input type="checkbox" checked={settings.locked} onChange={event => onChange({ locked: event.target.checked })} /> Travar overlay e passar cliques para o jogo</label>
     <p>Destrave por este painel para arrastar o overlay. {desktop && (shortcutAvailable ? 'Ctrl+Shift+O também alterna a trava.' : 'Ctrl+Shift+O está indisponível; use a opção acima.')}</p>
     <button onClick={() => onChange({ x: defaultSettings.x, y: defaultSettings.y, opacity: defaultSettings.opacity, scale: 1, monitorId: null, anchor: 'manual', locked: false })}>Restaurar posição, escala e opacidade</button>

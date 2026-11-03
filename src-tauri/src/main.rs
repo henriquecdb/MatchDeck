@@ -10,6 +10,7 @@ mod model;
 mod overlay;
 mod placement;
 mod storage;
+mod visibility;
 
 use commands::SharedState;
 use std::sync::Mutex;

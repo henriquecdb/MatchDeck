@@ -54,27 +54,25 @@ fn refresh_visibility(window: &tauri::WebviewWindow, state: &AppState) -> Result
     if window.is_visible().map_err(|error| error.to_string())? == visible {
         return Ok(());
     }
-    if visible {
-        show_without_focus(window)?;
-    } else {
-        window.hide().map_err(|error| error.to_string())?;
-    }
-    Ok(())
+    set_visibility(window, visible)
 }
 
 #[cfg(windows)]
-fn show_without_focus(window: &tauri::WebviewWindow) -> Result<(), String> {
-    use windows_sys::Win32::UI::WindowsAndMessaging::{ShowWindow, SW_SHOWNOACTIVATE};
+fn set_visibility(window: &tauri::WebviewWindow, visible: bool) -> Result<(), String> {
     let handle = window.hwnd().map_err(|error| error.to_string())?;
-    unsafe {
-        ShowWindow(handle.0, SW_SHOWNOACTIVATE);
-    }
+    // A janela exibida com ShowWindow não atualiza o cache do Tauri; ocultá-la exige a mesma API.
+    crate::visibility::set_native_visibility(handle.0, visible)?;
     Ok(())
 }
 
 #[cfg(not(windows))]
-fn show_without_focus(window: &tauri::WebviewWindow) -> Result<(), String> {
-    window.show().map_err(|error| error.to_string())
+fn set_visibility(window: &tauri::WebviewWindow, visible: bool) -> Result<(), String> {
+    if visible {
+        window.show()
+    } else {
+        window.hide()
+    }
+    .map_err(|error| error.to_string())
 }
 
 pub async fn watch_desktop(app: tauri::AppHandle) {

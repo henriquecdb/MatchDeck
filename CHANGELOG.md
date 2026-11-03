@@ -2,6 +2,18 @@
 
 As mudanças relevantes são registradas por versão. O projeto usa Semantic Versioning e Conventional Commits.
 
+## [0.3.1] - 2026-11-02
+
+### Corrigido
+
+- Ocultação do overlay no Windows por Ctrl+Shift+H, pelo botão da partida e pela mudança de foco: exibir e ocultar agora usam a mesma API nativa, evitando que o cache de visibilidade do Tauri ignore o comando de esconder.
+- A exibição permanece sem ativação de foco e a ocultação não desliga a detecção.
+
+### Melhorado
+
+- Explicação da opção de projeção de rating: ela controla somente as estimativas com ~, enquanto resultados reais confirmados continuam visíveis.
+- Teste nativo Windows para ciclos de exibir/ocultar sem roubar foco e testes de alteração da projeção durante uma demonstração nos dois layouts.
+
 ## [0.3.0] - 2026-11-02
 
 ### Adicionado
@@ -102,3 +114,4 @@ As mudanças relevantes são registradas por versão. O projeto usa Semantic Ver
 [0.2.0]: https://github.com/henriquecdb/MatchDeck/compare/v0.1.0...v0.2.0
 [0.2.1]: https://github.com/henriquecdb/MatchDeck/compare/v0.2.0...v0.2.1
 [0.3.0]: https://github.com/henriquecdb/MatchDeck/compare/v0.2.1...v0.3.0
+[0.3.1]: https://github.com/henriquecdb/MatchDeck/compare/v0.3.0...v0.3.1

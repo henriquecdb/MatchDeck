@@ -4,6 +4,9 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { BrowserRuntime } from '../../infrastructure/browser-runtime';
 import type { AppState } from '../../application/runtime';
 import { ControlPanel } from './ControlPanel';
+import { createDemoMatch } from '../../games/aoe2/demo';
+import { defaultSettings } from '../../domain/settings';
+import { within } from '@testing-library/react';
 
 afterEach(() => { cleanup(); localStorage.clear(); vi.restoreAllMocks(); });
 
@@ -24,6 +27,25 @@ it('shows loading until initialization completes and offers retry after failure'
   await screen.findByRole('alert');
   fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }));
   await screen.findByRole('tab', { name: 'Partida' });
+});
+
+it.each(['detailed', 'compact'] as const)('updates projection visibility during an active %s demonstration', async layout => {
+  const runtime = new BrowserRuntime();
+  await runtime.configure({ ...defaultSettings, layout });
+  const match = createDemoMatch('ranked');
+  await runtime.start(match);
+  render(<ControlPanel runtime={runtime} desktop={false} />);
+  await screen.findByRole('tab', { name: 'Overlay' });
+  fireEvent.click(screen.getByRole('tab', { name: 'Overlay' }));
+  const region = screen.getByRole('region', { name: layout === 'compact' ? 'Dados da partida em modo compacto' : 'Dados da partida' });
+  expect(within(region).getAllByText(/~\+/)).toHaveLength(2);
+  const checkbox = screen.getByRole('checkbox', { name: 'Exibir projeção não oficial de ganho/perda de rating' });
+  fireEvent.click(checkbox);
+  await waitFor(() => expect(within(region).queryByText(/~\+/)).toBeNull());
+  expect((await runtime.read()).settings.showProjection).toBe(false);
+  expect((await runtime.read()).match?.id).toBe(match.id);
+  fireEvent.click(checkbox);
+  await waitFor(() => expect(within(region).getAllByText(/~\+/)).toHaveLength(2));
 });
 
 it('separates features and preserves an active demonstration and preferences across tabs', async () => {
