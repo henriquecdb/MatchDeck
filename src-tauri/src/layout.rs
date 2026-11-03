@@ -2,6 +2,19 @@ use crate::model::{MatchSnapshot, OverlayLayout};
 use std::collections::BTreeMap;
 
 pub fn overlay_size(snapshot: &MatchSnapshot, layout: &OverlayLayout) -> (f64, f64) {
+    let duel = snapshot.players.len() == 2
+        && !snapshot
+            .queue_id
+            .as_ref()
+            .is_some_and(|queue| queue.ends_with("_team"))
+        && !snapshot.players[0]
+            .team_id
+            .is_some_and(|id| id > 0 && snapshot.players[1].team_id == Some(id));
+    let layout = if matches!(layout, OverlayLayout::Detailed) && !duel {
+        &OverlayLayout::Stacked
+    } else {
+        layout
+    };
     if matches!(layout, OverlayLayout::Detailed) {
         return (480.0, 136.0 + snapshot.players.len() as f64 * 150.0);
     }
@@ -26,10 +39,6 @@ pub fn overlay_size(snapshot: &MatchSnapshot, layout: &OverlayLayout) -> (f64, f
         vec![snapshot.players.len()]
     };
     let pairs = counts.chunks(2).collect::<Vec<_>>();
-    let duel = snapshot.players.len() == 2
-        && !snapshot.players[0]
-            .team_id
-            .is_some_and(|id| id > 0 && snapshot.players[1].team_id == Some(id));
     let heading = if duel { 0 } else { 18 };
     if matches!(layout, OverlayLayout::Stacked) {
         return (
@@ -102,5 +111,34 @@ mod tests {
         );
         let ffa = snapshot(&[Some(1), Some(2), Some(3), Some(4)], "unranked");
         assert_eq!(overlay_size(&ffa, &OverlayLayout::Compact), (720.0, 164.0));
+    }
+
+    #[test]
+    fn detailed_preference_only_gets_a_detailed_window_for_duels() {
+        for size in [2, 3, 4] {
+            let ids = (0..size * 2)
+                .map(|index| Some(if index < size { 1 } else { 2 }))
+                .collect::<Vec<_>>();
+            let teams = snapshot(&ids, "rm_team");
+            assert_eq!(
+                overlay_size(&teams, &OverlayLayout::Detailed),
+                (360.0, (100 + size * 60) as f64)
+            );
+        }
+        let partial_team = snapshot(&[Some(1), Some(2)], "rm_team");
+        assert_eq!(
+            overlay_size(&partial_team, &OverlayLayout::Detailed),
+            (360.0, 160.0)
+        );
+        let teammates = snapshot(&[Some(1), Some(1)], "rm_team");
+        assert_eq!(
+            overlay_size(&teammates, &OverlayLayout::Detailed),
+            (360.0, 138.0)
+        );
+        let duel = snapshot(&[Some(1), Some(2)], "rm_1v1");
+        assert_eq!(
+            overlay_size(&duel, &OverlayLayout::Detailed),
+            (480.0, 436.0)
+        );
     }
 }

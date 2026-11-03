@@ -347,5 +347,7 @@
   "Expandir navegação": "Expand navigation",
   "Recolher navegação": "Collapse navigation",
   "Recolher": "Collapse",
-  "Integração ativa": "Active integration"
+  "Integração ativa": "Active integration",
+  "Completo · apenas 1v1": "Detailed · 1v1 only",
+  "O modo completo é exclusivo para 1v1. Nos demais formatos, essa preferência usa automaticamente o compacto vertical e volta ao completo no próximo 1v1.": "Detailed mode is exclusive to 1v1. In other formats, this preference automatically uses vertical compact and returns to detailed in the next 1v1."
 }

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.4] - 2026-11-03
+
+### Fixed
+
+- Detailed overlays are limited to 1v1 duels, and the option is disabled during other match formats.
+- A saved detailed preference automatically uses vertical compact for teams and other formats, restoring detailed mode for the next 1v1.
+- Native window dimensions follow the effective layout, including demos and settings saved by earlier versions.
+
 ## [0.4.3] - 2026-11-03
 
 ### Security
@@ -33,3 +41,5 @@
 [0.4.2]: https://github.com/henriquecdb/MatchDeck/compare/v0.4.1...v0.4.2
 
 [0.4.3]: https://github.com/henriquecdb/MatchDeck/compare/v0.4.2...v0.4.3
+
+[0.4.4]: https://github.com/henriquecdb/MatchDeck/compare/v0.4.3...v0.4.4

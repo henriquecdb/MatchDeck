@@ -8,10 +8,12 @@ import { UnitPortrait } from './UnitPortrait';
 import { RatingImpact } from './RatingImpact';
 import { defaultSettings, type OverlaySettings } from '../../domain/settings';
 import { CompactOverlay } from './CompactOverlay';
+import { resolveOverlayLayout } from '../../domain/overlay-layout';
 
 export function MatchOverlay({ match, layout = 'detailed', showProjection = true, display = defaultSettings }: { match: MatchSnapshot; layout?: OverlaySettings['layout']; showProjection?: boolean; display?: OverlaySettings }) {
   const { t, gameLanguage } = useI18n();
-  if (layout !== 'detailed') return <CompactOverlay match={match} stacked={layout === 'stacked'} showProjection={showProjection} display={display} />;
+  const activeLayout = resolveOverlayLayout(layout, match);
+  if (activeLayout !== 'detailed') return <CompactOverlay match={match} stacked={activeLayout === 'stacked'} showProjection={showProjection} display={display} />;
   return <section className="match-overlay layout-detailed" aria-label={t('Dados da partida')}>
     <header className="overlay-heading">
       <div><strong className="overlay-brand">MATCH<span>DECK</span></strong><span className="match-source">{match.source === 'demo' ? (match.replayOf ? t('REPLAY DE TESTE') : t('DEMONSTRAÇÃO')) : t('AO VIVO')}</span></div>

@@ -10,6 +10,20 @@ import { within } from '@testing-library/react';
 
 afterEach(() => { cleanup(); localStorage.clear(); vi.restoreAllMocks(); });
 
+it('disables detailed layout in teams and restores the saved detailed preference for the next duel', async () => {
+  const runtime = new BrowserRuntime();
+  await runtime.start(createDemoMatch('ranked', 2));
+  render(<ControlPanel runtime={runtime} desktop={false} />);
+  fireEvent.click(await screen.findByRole('tab', { name: 'Overlay' }));
+  expect(screen.getByRole('combobox', { name: 'Modo de exibição' })).toHaveProperty('value', 'stacked');
+  expect(screen.getByRole('option', { name: 'Completo · apenas 1v1' })).toHaveProperty('disabled', true);
+  expect((await runtime.read()).settings.layout).toBe('detailed');
+  await act(async () => { await runtime.finish(); await runtime.start(createDemoMatch('ranked')); });
+  await waitFor(() => expect(screen.getByRole('combobox', { name: 'Modo de exibição' })).toHaveProperty('value', 'detailed'));
+  expect(screen.getByRole('option', { name: 'Completo · apenas 1v1' })).toHaveProperty('disabled', false);
+  expect(screen.getByRole('region', { name: 'Dados da partida' })).toBeTruthy();
+});
+
 it('shows loading until initialization completes and offers retry after failure', async () => {
   const runtime = new BrowserRuntime();
   const initial = await runtime.read();

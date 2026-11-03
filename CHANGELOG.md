@@ -2,6 +2,14 @@
 
 As mudanças relevantes são registradas por versão. O projeto usa Semantic Versioning e Conventional Commits.
 
+## [0.4.4] - 2026-11-03
+
+### Corrigido
+
+- Overlay completo permitido somente em duelos 1v1, com a opção desabilitada durante partidas de outros formatos.
+- Preferência pelo completo usa automaticamente o compacto vertical em equipes e demais formatos, preservando o completo para o próximo 1v1.
+- Dimensões da janela nativa acompanham o layout efetivamente exibido, inclusive na demonstração e com preferências salvas em versões anteriores.
+
 ## [0.4.3] - 2026-11-03
 
 ### Segurança
@@ -189,3 +197,5 @@ As mudanças relevantes são registradas por versão. O projeto usa Semantic Ver
 [0.4.2]: https://github.com/henriquecdb/MatchDeck/compare/v0.4.1...v0.4.2
 
 [0.4.3]: https://github.com/henriquecdb/MatchDeck/compare/v0.4.2...v0.4.3
+
+[0.4.4]: https://github.com/henriquecdb/MatchDeck/compare/v0.4.3...v0.4.4
