@@ -1,3 +1,4 @@
+import { hotkeyError } from '../domain/hotkeys';
 import type { AppState, OverlayRuntime } from '../application/runtime';
 import { captureMatch, type MatchSnapshot } from '../domain/match';
 import { defaultSettings, parseSettings, type OverlaySettings } from '../domain/settings';
@@ -19,7 +20,7 @@ export class BrowserRuntime implements OverlayRuntime {
   }
 
   async read() { return structuredClone(this.state); }
-  async configureApp(preferences: AppPreferences) { this.state.preferences = parsePreferences(preferences); localStorage.setItem('matchdeck.preferences', JSON.stringify(this.state.preferences)); this.publish(); }
+  async configureApp(preferences: AppPreferences) { const normalized = parsePreferences(preferences); const error = hotkeyError(normalized.hotkeys); if (error) throw new Error(error); this.state.preferences = normalized; localStorage.setItem('matchdeck.preferences', JSON.stringify(this.state.preferences)); this.publish(); }
   async initialized(elapsedMs: number) { if (this.state.startupMs == null) { this.state.startupMs = Math.round(elapsedMs); this.publish(); } }
   async setAutostart(_enabled: boolean): Promise<void> { throw new Error('Inicialização com Windows disponível no aplicativo instalado.'); }
   async closeApp(_action: 'minimize' | 'exit' | 'cancel') { this.state.closeRequested = false; this.publish(); }

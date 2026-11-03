@@ -1,0 +1,37 @@
+name: Binary security scan
+on:
+  workflow_call:
+    inputs:
+      artifact:
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  scan:
+    name: Binary scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ${{ inputs.artifact }}
+          path: scan
+      - name: Install and update ClamAV
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends clamav
+          sudo systemctl stop clamav-freshclam || true
+          sudo freshclam --stdout
+      - name: Scan Windows package without executing it
+        run: |
+          test "$(find scan -type f -iname '*.exe' | wc -l)" -ge 2
+          clamscan --recursive --infected --alert-exceeds-max --max-filesize=100M --max-scansize=500M --log=clamav-report.txt scan
+          find scan -type f -iname '*.exe' -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: security-report-${{ inputs.artifact }}
+          path: |
+            clamav-report.txt
+            SHA256SUMS.txt
+          if-no-files-found: warn

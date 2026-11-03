@@ -4,7 +4,7 @@ Aplicativo modular de overlays para jogos. Primeira integração: Age of Empires
 
 ## Instalar no Windows
 
-Baixe o instalador **MatchDeck_0.4.2_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, siga a configuração guiada, identifique seu perfil na aba **Partida** e ative a detecção com o AoE2 em janela sem bordas.
+Baixe o instalador **MatchDeck_0.4.3_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, siga a configuração guiada, identifique seu perfil na aba **Partida** e ative a detecção com o AoE2 em janela sem bordas.
 
 Veja o [changelog da versão](CHANGELOG.md). O aplicativo verifica novas versões ao abrir e mostra as notas e o progresso da atualização. A instalação automática é opcional e exige que a detecção esteja desligada e não haja partida de demonstração ativa. Pacotes de atualização são verificados por assinatura. O executável ainda não possui certificado Authenticode de editor Windows.
 
@@ -16,17 +16,25 @@ Protótipo com detecção real de multiplayer e partidas simuladas para testar p
 
 No navegador há uma prévia simulada. No Tauri há uma janela transparente, sempre no topo, arrastável e com passagem de cliques. Ctrl+Shift+O alterna a trava e Ctrl+Shift+H mostra/oculta somente a partida atual. Conflitos de atalhos são informados no painel e não impedem a inicialização; os controles também estão disponíveis no aplicativo. Ao fechar o painel, escolha continuar na bandeja ou encerrar todo o aplicativo. A preferência pode ser lembrada e alterada em Configurações.
 
+Em **Configurações → Atalhos globais**, altere os modificadores e a tecla de cada ação, desative uma combinação ou restaure os padrões. **Salvar atalhos** aplica e persiste a mudança. Combinações duplicadas são rejeitadas; conflitos com outros aplicativos ou falhas ao salvar restauram os atalhos anteriores. Os controles do painel e da bandeja continuam disponíveis.
+
+O modo **Compacto vertical** usa 360 px de largura e empilha os jogadores; o compacto horizontal existente usa 720 px e mantém as equipes lado a lado. Em duelos 1v1, os dois compactos dispensam os títulos de equipe. Os overlays não exibem horários de sincronização; a data continua disponível nos dados da demonstração e no diagnóstico.
+
 Por padrão, partidas reais aparecem somente com o executável do Age 2 DE em primeiro plano. Desmarque essa opção em **Overlay** para continuar vendo os dados ao usar Alt+Tab. A demonstração permanece visível fora do jogo. Ocultar uma partida não encerra a detecção e não oculta automaticamente a próxima.
 
 Estatísticas e rating vêm da fila correspondente à partida, sem substituir por rating ranqueado de outra modalidade. Dados não disponíveis aparecem como “—”. O catálogo inclui imagens transparentes e nomes em inglês e português de unidades de 56 civilizações, distribuídos localmente. Bordas e rating usam a cor informada para cada jogador na partida. Origem das imagens e traduções em `public/units/NOTICE.md`.
 
 Em **Configurações → Idioma**, escolha português brasileiro ou inglês para a interface. O idioma de **Civilizações e unidades** é independente e começa em inglês, inclusive com a interface em português. As alterações são imediatas na prévia e no overlay e ficam salvas para a próxima abertura. A troca usa os catálogos locais e preserva os dados sincronizados da partida.
 
+O painel usa navegação lateral recolhível, com ícones e a seção ativa em destaque. A barra se adapta à largura da janela, lembra sua escolha e permite navegar com as setas do teclado sem encerrar a demonstração ou a detecção.
+
 ## Demonstração com dados sincronizados
 
 As funcionalidades ficam nas abas **Partida**, **Overlay**, **Demonstração**, **Atualizações**, **Configurações** e **Diagnóstico**. Trocar de aba não encerra a partida nem o monitoramento. A página de carregamento acompanha a inicialização e permite nova tentativa em caso de falha ou demora. Ela pode desaparecer rapidamente em uma abertura normal; não existe espera artificial. Em Configurações, use **Visualizar tela de carregamento** para inspecioná-la e consulte o tempo de inicialização da interface.
 
 Desative a detecção real e escolha **Jogadores fictícios** ou **Última partida sincronizada** antes de clicar em **Iniciar demonstração**. A partida sincronizada preserva modalidade, mapa, jogadores, cores e estatísticas. A cópia aparece como **REPLAY DE TESTE**, com a data da sincronização, e não altera o registro original. A última fotografia é salva em `last-match.json` e continua disponível após reiniciar o app. A opção fictícia sempre usa dados de exemplo, mesmo que exista uma partida salva.
+
+Com jogadores fictícios, selecione **Formato da demonstração** para testar 1v1, 2v2, 3v3 ou 4v4. As equipes e as cores são distintas, sem consultas à API. Os layouts de equipe preservam seus títulos para distinguir os lados.
 
 ## Layout e variação de rating
 

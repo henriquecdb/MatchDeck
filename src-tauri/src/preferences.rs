@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 pub struct AppPreferences {
+    pub hotkeys: crate::hotkeys::Hotkeys,
     pub language: InterfaceLanguage,
     pub game_language: GameLanguage,
     pub launch_minimized: bool,

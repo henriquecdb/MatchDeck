@@ -7,6 +7,16 @@ import { DemoPanel } from './DemoPanel';
 
 afterEach(() => { cleanup(); localStorage.clear(); });
 
+it('starts an eight-player team demo from the format selector', async () => {
+  const runtime = new BrowserRuntime();
+  const state = await runtime.read();
+  render(<DemoPanel runtime={runtime} state={state} desktop={false} perform={action => action()} />);
+  fireEvent.change(screen.getByRole('combobox', { name: 'Formato da demonstração' }), { target: { value: '4' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Iniciar demonstração' }));
+  await waitFor(async () => expect((await runtime.read()).match?.players).toHaveLength(8));
+  expect((await runtime.read()).match?.queueId).toBe('rm_team');
+});
+
 it('can use fictional players even when a synchronized match is available', async () => {
   const runtime = new BrowserRuntime();
   const state = await runtime.read();

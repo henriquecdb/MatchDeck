@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { AppState, OverlayRuntime } from '../../application/runtime';
 import { LoadingScreen } from '../shell/LoadingScreen';
 import { Modal } from '../shell/Modal';
+import { HotkeySettings } from './HotkeySettings';
 
 export function GeneralSettings({ state, runtime, desktop, perform }: { state: AppState; runtime: OverlayRuntime; desktop: boolean; perform(action: () => Promise<void>): Promise<void> }) {
   const { t } = useI18n();
@@ -13,6 +14,7 @@ export function GeneralSettings({ state, runtime, desktop, perform }: { state: A
     void perform(async () => { setBusy(true); try { await runtime.configureApp({ ...preferences, ...patch }); } finally { setBusy(false); } });
   }
   return <>
+    <HotkeySettings state={state} runtime={runtime} desktop={desktop} perform={perform} />
     <fieldset disabled={busy}><legend>{t('Idioma')}</legend>
       <label>{t('Idioma da interface')} <select value={preferences.language} onChange={event => configure({ language: event.target.value as typeof preferences.language })}>
         <option value="pt-BR">Português (Brasil)</option><option value="en">English</option>

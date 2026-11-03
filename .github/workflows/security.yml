@@ -1,0 +1,35 @@
+name: Security dependencies
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  dependencies:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm audit --audit-level=low
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        id: audit-cache
+        with:
+          path: ~/.cargo/bin/cargo-audit
+          key: cargo-audit-0.22.2-ubuntu-x64
+      - if: steps.audit-cache.outputs.cache-hit != 'true'
+        run: cargo install cargo-audit --locked --version 0.22.2
+      - run: cargo audit --file src-tauri/Cargo.lock
+      - run: npx --no vitest run scripts/check-rust-audit.test.mjs
+      - name: Check RustSec warnings against the Windows build
+        run: |
+          cargo audit --file src-tauri/Cargo.lock --json > rust-audit.json
+          cargo metadata --manifest-path src-tauri/Cargo.toml --locked --format-version 1 --filter-platform x86_64-pc-windows-msvc > windows-metadata.json
+          node scripts/check-rust-audit.mjs rust-audit.json windows-metadata.json

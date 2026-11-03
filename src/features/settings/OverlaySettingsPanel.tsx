@@ -2,25 +2,27 @@ import { useI18n } from '../../i18n/LanguageProvider';
 import type { OverlaySettings } from '../../domain/settings';
 import { anchorLabels, defaultSettings } from '../../domain/settings';
 import type { DisplayMonitor } from '../../application/runtime';
+import { defaultHotkeys, hotkeyLabel } from '../../domain/hotkeys';
 
 interface Props {
   settings: OverlaySettings;
   desktop: boolean;
   shortcutAvailable: boolean;
+  lockShortcut?: string | null;
   onChange(patch: Partial<OverlaySettings>): void;
   monitors: DisplayMonitor[];
   onRefreshMonitors(): void;
   monitorError: string | null;
 }
 
-export function OverlaySettingsPanel({ settings, desktop, shortcutAvailable, onChange, monitors, onRefreshMonitors, monitorError }: Props) {
+export function OverlaySettingsPanel({ settings, desktop, shortcutAvailable, lockShortcut = defaultHotkeys.lockOverlay, onChange, monitors, onRefreshMonitors, monitorError }: Props) {
   const { t } = useI18n();
   return <fieldset>
     <legend>{t('Aparência e posição')}</legend>
     <label>{t('Modo de exibição')} <select value={settings.layout} onChange={event => onChange({ layout: event.target.value as OverlaySettings['layout'] })}>
-      <option value="detailed">{t('Completo · cards com unidades')}</option><option value="compact">{t('Compacto · faixa por equipes')}</option>
+      <option value="detailed">{t('Completo · cards com unidades')}</option><option value="compact">{t('Compacto · faixa por equipes')}</option><option value="stacked">{t('Compacto vertical · jogadores empilhados')}</option>
     </select></label>
-    <p>{t('O compacto organiza os jogadores em linhas, com os emblemas das civilizações. O completo mantém as unidades e as estatísticas detalhadas.')}</p>
+    <p>{t('O compacto horizontal mantém as equipes lado a lado. O vertical empilha os jogadores e usa metade da largura. Ambos usam emblemas das civilizações.')}</p>
     <label>{t('Opacidade:')} {Math.round(settings.opacity * 100)}%
       <input type="range" min="0.2" max="1" step="0.05" value={settings.opacity} onChange={event => onChange({ opacity: Number(event.target.value) })} />
     </label>
@@ -53,7 +55,7 @@ export function OverlaySettingsPanel({ settings, desktop, shortcutAvailable, onC
     <p>{t('No modo compacto, vitórias, derrotas e porcentagem aparecem nas dicas dos jogadores.')}</p>
     <label><input type="checkbox" checked={settings.highlightSelf} onChange={event => onChange({ highlightSelf: event.target.checked })} />  {t('Destacar meu jogador')}</label>
     <label><input type="checkbox" checked={settings.locked} onChange={event => onChange({ locked: event.target.checked })} />  {t('Travar overlay e passar cliques para o jogo')}</label>
-    <p>{t('Destrave por este painel para arrastar o overlay.')} {desktop && (shortcutAvailable ? t('Ctrl+Shift+O também alterna a trava.') : t('Ctrl+Shift+O está indisponível; use a opção acima.'))}</p>
+    <p>{t('Destrave por este painel para arrastar o overlay.')} {desktop && (shortcutAvailable && lockShortcut ? t('{0} também alterna a trava.', { 0: hotkeyLabel(lockShortcut) }) : t('Atalho da trava indisponível ou desativado; use a opção acima.'))}</p>
     <button onClick={() => onChange({ x: defaultSettings.x, y: defaultSettings.y, opacity: defaultSettings.opacity, scale: 1, monitorId: null, anchor: 'manual', locked: false })}>{t('Restaurar posição, escala e opacidade')}</button>
   </fieldset>;
 }
