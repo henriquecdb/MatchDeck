@@ -6,6 +6,7 @@ mod diagnostics;
 mod displays;
 mod focus;
 mod games;
+mod hotkeys;
 mod language;
 mod layout;
 mod lifecycle;
@@ -19,7 +20,6 @@ mod visibility;
 use commands::SharedState;
 use std::sync::Mutex;
 use tauri::{Emitter, Manager};
-use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 
 fn main() {
     tauri::Builder::default()
@@ -31,11 +31,16 @@ fn main() {
                 .args(["--autostart"])
                 .build(),
         )
-        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(
+            tauri_plugin_global_shortcut::Builder::new()
+                .with_handler(hotkeys::handle)
+                .build(),
+        )
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
         .manage(Mutex::new(model::AppState::default()))
         .manage(storage::PositionSaveRevision::default())
+        .manage(hotkeys::ConfigurationLock(Mutex::new(())))
         .setup(|app| {
             let handle = app.handle().clone();
             let provider = games::aoe2::provider::Aoe2Provider::new()?;
@@ -89,63 +94,7 @@ fn main() {
                     }
                 }
             }
-            let shortcut =
-                app.global_shortcut()
-                    .on_shortcut("CommandOrControl+Shift+O", |app, _, event| {
-                        if event.state() != ShortcutState::Pressed {
-                            return;
-                        }
-                        let state = app.state::<SharedState>();
-                        if let Ok(mut state) = state.lock() {
-                            let mut settings = state.settings.clone();
-                            settings.locked = !settings.locked;
-                            match storage::save(app, &settings) {
-                                Ok(()) => {
-                                    state.settings = settings;
-                                    if let Err(error) = overlay::synchronize(app, &state, false) {
-                                        eprintln!("{error}");
-                                    }
-                                }
-                                Err(error) => eprintln!("{error}"),
-                            }
-                        };
-                    });
-            match shortcut {
-                Ok(()) => {
-                    let state = app.state::<SharedState>();
-                    state
-                        .lock()
-                        .map_err(|error| error.to_string())?
-                        .shortcut_available = true;
-                }
-                Err(error) => eprintln!("Atalho indisponível: {error}"),
-            }
-            let visibility_shortcut =
-                app.global_shortcut()
-                    .on_shortcut("CommandOrControl+Shift+H", |app, _, event| {
-                        if event.state() == ShortcutState::Pressed {
-                            let shared = app.state::<SharedState>();
-                            let active = shared
-                                .lock()
-                                .is_ok_and(|state| state.current_match.is_some());
-                            if active {
-                                if let Err(error) =
-                                    commands::toggle_overlay_visibility(app.clone(), shared)
-                                {
-                                    eprintln!("{error}");
-                                }
-                            }
-                        }
-                    });
-            match visibility_shortcut {
-                Ok(()) => {
-                    app.state::<SharedState>()
-                        .lock()
-                        .map_err(|error| error.to_string())?
-                        .visibility_shortcut_available = true
-                }
-                Err(error) => eprintln!("Atalho de visibilidade indisponível: {error}"),
-            }
+            hotkeys::initialize(&handle)?;
             let window = app
                 .get_webview_window("overlay")
                 .ok_or("Overlay não encontrado")?;

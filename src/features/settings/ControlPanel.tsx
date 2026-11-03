@@ -18,6 +18,7 @@ import { CloseDialog } from './CloseDialog';
 import { DiagnosticsPanel } from '../diagnostics/DiagnosticsPanel';
 import { Onboarding } from '../onboarding/Onboarding';
 import { LastResult } from '../match/LastResult';
+import { hotkeyLabel } from '../../domain/hotkeys';
 
 export function ControlPanel({ runtime, desktop }: { runtime: OverlayRuntime; desktop: boolean }) {
   const runtimeState = useRuntime(runtime);
@@ -57,13 +58,13 @@ function ControlPanelContent({ runtime, desktop, runtimeState }: { runtime: Over
         <DetectionPanel runtime={runtime} status={state.detection} desktop={desktop} ready={ready} />
         {match && <div className="session-summary"><strong>{match.map}</strong><span>{match.players.map(player => player.name).join(' × ')}</span><p>{state.hiddenMatchId === match.id ? t('Overlay oculto nesta partida. A detecção continua ativa.') : settings.focusOnly && match.source === 'live' ? t("O overlay acompanha o foco do Age 2.") : t('O overlay permanece visível ao trocar de janela.')}</p>
           <button onClick={() => void perform(() => runtime.toggleVisibility())}>{state.hiddenMatchId === match.id ? t('Mostrar nesta partida') : t('Ocultar nesta partida')}</button></div>}
-        <p>{state.visibilityShortcutAvailable ? t('Ctrl+Shift+H mostra ou oculta o overlay nesta partida.') : desktop ? t('Ctrl+Shift+H indisponível. Use o botão da partida para mostrar ou ocultar.') : t('Ctrl+Shift+H está disponível no aplicativo Windows quando o atalho estiver livre.')}</p>
+        <p>{state.preferences.hotkeys.toggleOverlay ? state.visibilityShortcutAvailable ? t('{0} mostra ou oculta o overlay nesta partida.', { 0: hotkeyLabel(state.preferences.hotkeys.toggleOverlay) }) : t('Atalho de visibilidade indisponível. Use o botão da partida para mostrar ou ocultar.') : t('Atalho de visibilidade desativado. Use o botão da partida.')}</p>
         {match?.warnings?.map(warning => <p role="status" key={warning}>{t(warning)}</p>)}
         <LastResult match={state.lastSynced} />
       </>}
       {tab.id === 'overlay' && <>
         <div className="section-heading"><h2>{t('Do seu jeito')}</h2><p>{t('Ajuste o visual e escolha onde as informações aparecem.')}</p></div>
-        <OverlaySettingsPanel settings={settings} desktop={desktop} shortcutAvailable={state.shortcutAvailable} onChange={configure} monitors={monitors} onRefreshMonitors={refreshMonitors} monitorError={monitorError} />
+        <OverlaySettingsPanel settings={settings} desktop={desktop} shortcutAvailable={state.shortcutAvailable} lockShortcut={state.preferences.hotkeys.lockOverlay} onChange={configure} monitors={monitors} onRefreshMonitors={refreshMonitors} monitorError={monitorError} />
         <OverlayPreview match={preview} settings={settings} />
       </>}
       {tab.id === 'demo' && <><div className="section-heading"><h2>{t('Experimente o overlay')}</h2><p>{t('Teste as informações e a posição antes de jogar.')}</p></div><DemoPanel runtime={runtime} state={state} desktop={desktop} perform={perform} /></>}

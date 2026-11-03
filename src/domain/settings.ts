@@ -3,7 +3,7 @@ export interface OverlaySettings {
   x: number;
   y: number;
   locked: boolean;
-  layout: 'detailed' | 'compact';
+  layout: 'detailed' | 'compact' | 'stacked';
   autoUpdate: boolean;
   scale: number;
   focusOnly: boolean;
@@ -37,7 +37,7 @@ export function parseSettings(value: unknown): OverlaySettings {
     x: coordinate('x', defaultSettings.x),
     y: coordinate('y', defaultSettings.y),
     locked: typeof candidate.locked === 'boolean' ? candidate.locked : false,
-    layout: candidate.layout === 'compact' ? 'compact' : 'detailed',
+    layout: candidate.layout === 'compact' || candidate.layout === 'stacked' ? candidate.layout : 'detailed',
     autoUpdate: candidate.autoUpdate === true,
     scale: typeof candidate.scale === 'number' && Number.isFinite(candidate.scale) ? Math.max(0.5, Math.min(1.5, candidate.scale)) : 1,
     focusOnly: candidate.focusOnly !== false,

@@ -14,7 +14,7 @@ it('identifies quick rating and explains missing queue statistics', () => {
   expect(screen.getByText('Partida rápida · Mapa aleatório 1v1')).toBeTruthy();
   expect(screen.getAllByTitle('Rating de partidas rápidas')).toHaveLength(2);
   expect(screen.getAllByTitle(/A fonte não forneceu esta estatística/).length).toBeGreaterThan(0);
-  expect(screen.getByText('Dados fictícios')).toBeTruthy();
+  expect(screen.queryByText('Dados fictícios')).toBeNull();
   expect(syncLabel({ ...match, syncedAt: 'invalid' })).toBe('Horário de sincronização indisponível');
 });
 

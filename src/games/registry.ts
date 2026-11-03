@@ -1,4 +1,4 @@
-import { createDemoMatch } from './aoe2/demo';
+import { createDemoMatch, type DemoTeamSize } from './aoe2/demo';
 import { unitArtwork } from './aoe2/artwork';
 import type { MatchMode, Player } from '../domain/match';
 import games from './games.json';
@@ -9,7 +9,7 @@ export interface GameIntegration {
   id: string;
   name: string;
   capabilities: { liveMultiplayer: boolean; offline: boolean; customLobbies: 'unverified' | 'supported'; };
-  demo(mode: MatchMode): ReturnType<typeof createDemoMatch>;
+  demo(mode: MatchMode, teamSize?: DemoTeamSize): ReturnType<typeof createDemoMatch>;
   artwork(player: Player, language?: Language): FactionArtwork | undefined;
 }
 

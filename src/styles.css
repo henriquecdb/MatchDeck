@@ -111,6 +111,13 @@ input[type=number] { width: 110px; }
 .linear-source { font-size: 8px; letter-spacing: .7px; color: #79d3e9; background: #193442; border-radius: 3px; padding: 3px 5px; white-space: nowrap; }
 .linear-teams { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .linear-teams.single-team { grid-template-columns: minmax(0, 1fr); }
+.linear-overlay.is-stacked { width: 360px; min-width: 360px; }
+.linear-overlay.is-stacked .linear-teams { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+.hotkey-row { padding: 14px 0; border-bottom: 1px solid #354253; }
+.hotkey-row > strong { margin-right: 12px; }
+.hotkey-row .actions { flex-wrap: wrap; gap: 12px; }
+.hotkey-row .actions label { display: flex; align-items: center; gap: 6px; margin: 0; }
+.hotkey-row small { color: #9aa9be; }
 .linear-team { min-width: 0; }
 .linear-team h3 { margin: 0 0 4px; height: 14px; line-height: 14px; color: #8fa1b8; font-size: 10px; font-weight: 500; border-bottom: 1px solid #28394d; }
 .linear-player { display: grid; grid-template-columns: 14px 24px minmax(0, 1fr) 40px 74px; column-gap: 6px; align-items: center; height: 30px; overflow: hidden; }

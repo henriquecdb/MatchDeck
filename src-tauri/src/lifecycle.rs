@@ -38,16 +38,29 @@ pub fn configure_app(
     state: State<'_, SharedState>,
     preferences: AppPreferences,
 ) -> Result<(), String> {
-    let mut state = state.lock().map_err(|error| error.to_string())?;
+    let configuration = app.state::<crate::hotkeys::ConfigurationLock>();
+    let _configuration = configuration.0.lock().map_err(|error| error.to_string())?;
+    let state = state.lock().map_err(|error| error.to_string())?;
     if !state.tray_available
         && (preferences.launch_minimized || preferences.close_action == CloseAction::Minimize)
     {
         return Err("A bandeja está indisponível; mantenha a janela acessível.".into());
     }
-    storage::save_preferences(&app, &preferences)?;
+    let previous = state.preferences.clone();
+    drop(state);
+    let result = crate::hotkeys::configure(&app, &previous.hotkeys, &preferences);
+    let shared = app.state::<SharedState>();
+    let mut state = shared.lock().map_err(|error| error.to_string())?;
+    if let Err(error) = result {
+        crate::hotkeys::update_availability(&app, &mut state);
+        app.emit("state-changed", &*state)
+            .map_err(|error| error.to_string())?;
+        return Err(error);
+    }
     let language_changed = state.preferences.language != preferences.language;
     let language = preferences.language;
     state.preferences = preferences;
+    crate::hotkeys::update_availability(&app, &mut state);
     app.emit("state-changed", &*state)
         .map_err(|error| error.to_string())?;
     drop(state);

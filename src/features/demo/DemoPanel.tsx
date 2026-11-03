@@ -4,6 +4,7 @@ import type { AppState, OverlayRuntime } from '../../application/runtime';
 import { modeLabels, replayMatch, type MatchMode } from '../../domain/match';
 import { gameIntegration } from '../../games/registry';
 import { OverlayPreview } from '../overlay/OverlayPreview';
+import type { DemoTeamSize } from '../../games/aoe2/demo';
 
 interface Props {
   runtime: OverlayRuntime;
@@ -15,6 +16,7 @@ interface Props {
 export function DemoPanel({ runtime, state, desktop, perform }: Props) {
   const { t, language } = useI18n();
   const [mode, setMode] = useState<MatchMode>('ranked');
+  const [teamSize, setTeamSize] = useState<DemoTeamSize>(1);
   const [busy, setBusy] = useState(false);
   const [source, setSource] = useState<'synced' | 'fictional'>(state.lastSynced || state.detection.config.profile ? 'synced' : 'fictional');
   const { match, lastSynced, detection, settings } = state;
@@ -36,9 +38,12 @@ export function DemoPanel({ runtime, state, desktop, perform }: Props) {
       {source === 'fictional' && <label>{t('Modalidade fictícia')} <select disabled={!!match} value={mode} onChange={event => setMode(event.target.value as MatchMode)}>
           {Object.entries(modeLabels).map(([value, label]) => <option key={value} value={value}>{t(label)}</option>)}
         </select></label>}
+      {source === 'fictional' && <label>{t('Formato da demonstração')} <select disabled={!!match} value={teamSize} onChange={event => setTeamSize(Number(event.target.value) as DemoTeamSize)}>
+        {[1, 2, 3, 4].map(size => <option key={size} value={size}>{size}v{size}</option>)}
+      </select></label>}
       <div className="actions">
         <button disabled={!!match || (source === 'synced' && !lastSynced && (!desktop || !detection.config.profile))} onClick={() => run(async () => {
-          if (source === 'fictional') { await runtime.start(gameIntegration('aoe2-de')!.demo(mode)); return; }
+          if (source === 'fictional') { await runtime.start(gameIntegration('aoe2-de')!.demo(mode, teamSize)); return; }
           if (!lastSynced) await runtime.syncLatest();
           const latest = (await runtime.read()).lastSynced;
           if (!latest) throw new Error('Nenhuma partida sincronizada disponível. Selecione jogadores fictícios ou sincronize seu perfil.');

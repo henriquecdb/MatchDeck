@@ -26,9 +26,24 @@ pub fn overlay_size(snapshot: &MatchSnapshot, layout: &OverlayLayout) -> (f64, f
         vec![snapshot.players.len()]
     };
     let pairs = counts.chunks(2).collect::<Vec<_>>();
+    let duel = snapshot.players.len() == 2
+        && !snapshot.players[0]
+            .team_id
+            .is_some_and(|id| id > 0 && snapshot.players[1].team_id == Some(id));
+    let heading = if duel { 0 } else { 18 };
+    if matches!(layout, OverlayLayout::Stacked) {
+        return (
+            360.0,
+            (60 + counts
+                .iter()
+                .map(|count| heading + count * 30)
+                .sum::<usize>()
+                + counts.len().saturating_sub(1) * 4) as f64,
+        );
+    }
     let height: usize = pairs
         .iter()
-        .map(|pair| 18 + pair.iter().max().unwrap_or(&0) * 30)
+        .map(|pair| heading + pair.iter().max().unwrap_or(&0) * 30)
         .sum();
     (
         720.0,
@@ -53,7 +68,8 @@ mod tests {
     #[test]
     fn compact_window_tracks_team_rows_instead_of_full_cards() {
         let duel = snapshot(&[None, None], "rm_1v1");
-        assert_eq!(overlay_size(&duel, &OverlayLayout::Compact), (720.0, 108.0));
+        assert_eq!(overlay_size(&duel, &OverlayLayout::Compact), (720.0, 90.0));
+        assert_eq!(overlay_size(&duel, &OverlayLayout::Stacked), (360.0, 124.0));
         assert_eq!(
             overlay_size(&duel, &OverlayLayout::Detailed),
             (480.0, 436.0)
@@ -74,6 +90,10 @@ mod tests {
         assert_eq!(
             overlay_size(&teams, &OverlayLayout::Compact),
             (720.0, 198.0)
+        );
+        assert_eq!(
+            overlay_size(&teams, &OverlayLayout::Stacked),
+            (360.0, 340.0)
         );
         let unknown = snapshot(&[None, None, None, None], "rm_team");
         assert_eq!(

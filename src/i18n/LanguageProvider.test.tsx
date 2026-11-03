@@ -52,7 +52,7 @@ it.each(['pt-BR', 'en'] as Language[])('keeps %s interface independent from both
         expect(screen.getByText(gameLanguage === 'en' ? 'Throwing Axeman' : 'Lançador de Machado')).toBeTruthy();
       } else {
         expect(view.container.querySelector('.linear-player')?.getAttribute('title')).toContain(gameLanguage === 'en' ? 'Franks' : 'Francos');
-        expect(screen.getByRole('heading', { name: language === 'en' ? 'Team 1' : 'Equipe 1' })).toBeTruthy();
+        expect(screen.queryByRole('heading', { name: language === 'en' ? 'Team 1' : 'Equipe 1' })).toBeNull();
         expect(screen.getByRole('img', { name: language === 'en' ? `${gameLanguage === 'en' ? 'Franks' : 'Francos'} emblem` : `Emblema de ${gameLanguage === 'en' ? 'Franks' : 'Francos'}` })).toBeTruthy();
       }
       view.unmount();

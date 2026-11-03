@@ -2,6 +2,20 @@
 
 As mudanças relevantes são registradas por versão. O projeto usa Semantic Versioning e Conventional Commits.
 
+## [0.4.3] - 2026-11-03
+
+### Adicionado
+
+- Configuração independente dos atalhos globais de travar/destravar e mostrar/ocultar o overlay, mantendo Ctrl+Shift+O e Ctrl+Shift+H como padrões.
+- Opções para desativar atalhos, restaurar padrões e validar combinações duplicadas, com recuperação dos atalhos anteriores em caso de conflito ou falha ao salvar.
+- Compacto vertical com 360 px de largura, mantendo o compacto horizontal existente de 720 px.
+- Demonstrações fictícias de 1v1, 2v2, 3v3 e 4v4, com equipes, civilizações e cores distintas.
+
+### Melhorado
+
+- Removidos os horários de sincronização dos overlays e os títulos de equipe em duelos 1v1.
+- Textos de ajuda exibem as combinações configuradas pelo usuário.
+
 ## [0.4.2] - 2026-11-03
 
 ### Adicionado
@@ -166,3 +180,5 @@ As mudanças relevantes são registradas por versão. O projeto usa Semantic Ver
 [0.4.1]: https://github.com/henriquecdb/MatchDeck/compare/v0.4.0...v0.4.1
 
 [0.4.2]: https://github.com/henriquecdb/MatchDeck/compare/v0.4.1...v0.4.2
+
+[0.4.3]: https://github.com/henriquecdb/MatchDeck/compare/v0.4.2...v0.4.3

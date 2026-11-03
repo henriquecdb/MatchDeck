@@ -1,6 +1,6 @@
 import { useI18n } from '../../i18n/LanguageProvider';
 import { winRate, type MatchSnapshot } from '../../domain/match';
-import { missingStats, queueLabel, ratingLabel, syncLabel } from '../../domain/match-labels';
+import { missingStats, queueLabel, ratingLabel } from '../../domain/match-labels';
 import type { CSSProperties } from 'react';
 import { playerColor } from '../../domain/player-color';
 import { gameIntegration } from '../../games/registry';
@@ -10,8 +10,8 @@ import { defaultSettings, type OverlaySettings } from '../../domain/settings';
 import { CompactOverlay } from './CompactOverlay';
 
 export function MatchOverlay({ match, layout = 'detailed', showProjection = true, display = defaultSettings }: { match: MatchSnapshot; layout?: OverlaySettings['layout']; showProjection?: boolean; display?: OverlaySettings }) {
-  const { t, language, gameLanguage } = useI18n();
-  if (layout === 'compact') return <CompactOverlay match={match} showProjection={showProjection} display={display} />;
+  const { t, gameLanguage } = useI18n();
+  if (layout !== 'detailed') return <CompactOverlay match={match} stacked={layout === 'stacked'} showProjection={showProjection} display={display} />;
   return <section className="match-overlay layout-detailed" aria-label={t('Dados da partida')}>
     <header className="overlay-heading">
       <div><strong className="overlay-brand">MATCH<span>DECK</span></strong><span className="match-source">{match.source === 'demo' ? (match.replayOf ? t('REPLAY DE TESTE') : t('DEMONSTRAÇÃO')) : t('AO VIVO')}</span></div>
@@ -35,6 +35,5 @@ export function MatchOverlay({ match, layout = 'detailed', showProjection = true
       </article>;
     })}</div>
     {!match.finishedAt && showProjection && <div className="rating-disclaimer">{t('~ Projeção Elo orientativa · não oficial')}</div>}
-    <footer className="replay-caption">{syncLabel(match, language)}</footer>
   </section>;
 }

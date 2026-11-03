@@ -65,6 +65,7 @@ pub enum OverlayLayout {
     #[default]
     Detailed,
     Compact,
+    Stacked,
 }
 
 impl Default for OverlaySettings {

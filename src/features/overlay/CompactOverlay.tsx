@@ -1,26 +1,27 @@
 import { useI18n } from '../../i18n/LanguageProvider';
 import type { CSSProperties } from 'react';
 import { winRate, type MatchSnapshot, type Player } from '../../domain/match';
-import { missingStats, queueLabel, ratingLabel, syncLabel } from '../../domain/match-labels';
-import { matchTeams } from '../../domain/teams';
+import { missingStats, queueLabel, ratingLabel } from '../../domain/match-labels';
+import { isDuel, matchTeams } from '../../domain/teams';
 import { playerColor } from '../../domain/player-color';
 import { gameIntegration } from '../../games/registry';
 import { defaultSettings, type OverlaySettings } from '../../domain/settings';
 import { CivilizationEmblem } from './CivilizationEmblem';
 import { RatingImpact } from './RatingImpact';
 
-export function CompactOverlay({ match, showProjection = true, display = defaultSettings }: { match: MatchSnapshot; showProjection?: boolean; display?: OverlaySettings }) {
-  const { t, language } = useI18n();
+export function CompactOverlay({ match, stacked = false, showProjection = true, display = defaultSettings }: { match: MatchSnapshot; stacked?: boolean; showProjection?: boolean; display?: OverlaySettings }) {
+  const { t } = useI18n();
   const teams = matchTeams(match);
-  return <section className="linear-overlay" aria-label={t('Dados da partida em modo compacto')}>
+  const duel = isDuel(match);
+  return <section className={`linear-overlay${stacked ? ' is-stacked' : ''}`} aria-label={t('Dados da partida em modo compacto')}>
     <header className="linear-heading"><strong>{match.map}</strong><span className="linear-queue" title={`${t(ratingLabel(match))} · ${t(queueLabel(match))}`}>{t(queueLabel(match))}</span><span className="linear-source">{match.source === 'live' ? t('AO VIVO') : match.replayOf ? t('REPLAY DE TESTE') : t('DEMONSTRAÇÃO')}</span></header>
     <div className={`linear-teams ${teams.length === 1 ? 'single-team' : ''}`}>
-      {teams.map(team => <section className="linear-team" key={team.id} aria-label={t(team.label)}>
-        <h3>{t(team.label)}</h3>
+      {teams.map(team => <section className="linear-team" key={team.id} aria-label={duel ? t('Jogadores') : t(team.label)}>
+        {!duel && <h3>{t(team.label)}</h3>}
         {team.players.map(player => <CompactPlayer match={match} player={player} key={player.id} showProjection={showProjection} display={display} />)}
       </section>)}
     </div>
-    <footer className="linear-footer"><span>{showProjection && !match.finishedAt ? t('Variações com ~ são estimativas não oficiais') : 'MATCHDECK'}</span><span>{syncLabel(match, language)}</span></footer>
+    <footer className="linear-footer"><span>{showProjection && !match.finishedAt ? t('Variações com ~ são estimativas não oficiais') : 'MATCHDECK'}</span></footer>
   </section>;
 }
 
