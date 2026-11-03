@@ -10,6 +10,7 @@ A aprovação de testes, a assinatura do atualizador e uma varredura antivírus 
 - O executável e o instalador são examinados pelo ClamAV em Linux, sem executá-los. O banco de assinaturas precisa ser atualizado com sucesso.
 - Uma detecção, erro de scanner ou falha de atualização do banco impede a aprovação da varredura. Os relatórios e hashes SHA-256 ficam nos artefatos do Actions.
 - Releases permanecem em rascunho até as auditorias de dependências e a varredura dos arquivos efetivamente publicados serem aprovadas. Checks e release mantêm o cache compartilhado dos testes Rust; candidatos usam um cache separado para os artefatos otimizados. Auditoria e build executam em paralelo.
+- A publicação ocorre após a conferência final da assinatura e do antivírus pelo responsável pela release. O workflow não publica automaticamente nem sobrescreve uma versão pública existente.
 
 ## Alerta Kaspersky no desenvolvimento
 

@@ -2,6 +2,8 @@
 
 Consulte também [Verificações de segurança](security.md). A publicação exige auditorias de dependências e varredura do executável e instalador. Uma falha mantém a release em rascunho, sem disponibilizá-la ao atualizador.
 
+O workflow prepara a release em rascunho e não a publica automaticamente. Após a execução aprovada, confira a assinatura do atualizador, os hashes e a verificação do pacote final no antivírus antes de publicar com `gh release edit v<VERSÃO> --draft=false --latest`. Versões já publicadas não podem ser sobrescritas pelo workflow.
+
 ## Instalação pelo usuário final
 
 Acesse [Releases](https://github.com/henriquecdb/MatchDeck/releases/latest), baixe `MatchDeck_<versão>_x64-setup.exe` e execute o instalador. A instalação é por usuário. Node, Rust e Visual Studio não são necessários no computador do usuário final. O instalador trata a dependência do WebView2.

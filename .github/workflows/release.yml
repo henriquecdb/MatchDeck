@@ -28,6 +28,25 @@ jobs:
         with:
           node-version: '22'
           cache: npm
+      - name: Prepare release notes
+        id: notes
+        run: node scripts/release-notes.mjs
+        env:
+          RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+      - name: Refuse to overwrite a published release
+        run: |
+          $pages = gh api --paginate --slurp "repos/$env:GITHUB_REPOSITORY/releases?per_page=100" | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          foreach ($page in $pages) {
+            foreach ($release in $page) {
+              if ($release.tag_name -eq $env:RELEASE_TAG -and !$release.draft) {
+                throw "Published releases are immutable; create a new version."
+              }
+            }
+          }
+        env:
+          RELEASE_TAG: ${{ steps.notes.outputs.tag }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
         with:
           components: rustfmt, clippy
@@ -39,11 +58,6 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: cargo test --manifest-path src-tauri/Cargo.toml --locked
-      - name: Prepare release notes
-        id: notes
-        run: node scripts/release-notes.mjs
-        env:
-          RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
       - uses: tauri-apps/tauri-action@1deb371b0cd8bd54025b384f1cd735e725c4060f # v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -69,12 +83,16 @@ jobs:
     uses: ./.github/workflows/binary-scan.yml
     with:
       artifact: windows-release-package
-  publish:
+  ready:
     needs: [release, scan, dependencies]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - name: Publish verified release
-        run: gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest
+      - name: Keep the scanned package in draft for final validation
+        run: |
+          test "$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)" = true
+          echo "Package checks passed. Verify the updater signature and antivirus report before publishing."
         env:
           RELEASE_TAG: ${{ needs.release.outputs.tag }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
