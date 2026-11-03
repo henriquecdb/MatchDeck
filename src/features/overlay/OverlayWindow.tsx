@@ -1,3 +1,4 @@
+import { LanguageProvider, useI18n } from '../../i18n/LanguageProvider';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import type { OverlayRuntime } from '../../application/runtime';
 import { useRuntime } from '../../application/use-runtime';
@@ -5,7 +6,12 @@ import { MatchOverlay } from './MatchOverlay';
 
 export function OverlayWindow({ runtime }: { runtime: OverlayRuntime }) {
   const { state, error } = useRuntime(runtime);
-  if (error) return <p role="alert">{error}</p>;
+  return <LanguageProvider preferences={state.preferences}><OverlayContent runtime={runtime} state={state} error={error} /></LanguageProvider>;
+}
+
+function OverlayContent({ runtime, state, error }: { runtime: OverlayRuntime; state: ReturnType<typeof useRuntime>['state']; error: string | null }) {
+  const { t } = useI18n();
+  if (error) return <p role="alert">{t(error)}</p>;
   if (!state.match) return null;
   return <div style={{ opacity: state.settings.opacity, zoom: state.settings.scale }} onPointerDown={event => {
     if (!state.settings.locked && event.button === 0) void (async () => {

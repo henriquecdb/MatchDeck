@@ -45,9 +45,16 @@ pub fn configure_app(
         return Err("A bandeja está indisponível; mantenha a janela acessível.".into());
     }
     storage::save_preferences(&app, &preferences)?;
+    let language_changed = state.preferences.language != preferences.language;
+    let language = preferences.language;
     state.preferences = preferences;
     app.emit("state-changed", &*state)
-        .map_err(|error| error.to_string())
+        .map_err(|error| error.to_string())?;
+    drop(state);
+    if language_changed {
+        refresh_tray_language(&app, language)?;
+    }
+    Ok(())
 }
 
 #[tauri::command]
@@ -170,44 +177,78 @@ pub fn retry_detection(app: tauri::AppHandle) -> Result<(), String> {
         .map_err(|error| error.to_string())
 }
 
-pub fn create_tray(app: &tauri::AppHandle) -> Result<(), String> {
-    use tauri::{
-        menu::{Menu, MenuItem},
-        tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    };
+fn tray_menu(
+    app: &tauri::AppHandle,
+    language: crate::preferences::InterfaceLanguage,
+) -> Result<tauri::menu::Menu<tauri::Wry>, String> {
+    use tauri::menu::{Menu, MenuItem};
+    let label = |message| crate::language::text(language, message);
     let items = [
-        MenuItem::with_id(app, "open", "Abrir MatchDeck", true, None::<&str>),
+        MenuItem::with_id(app, "open", label("Abrir MatchDeck"), true, None::<&str>),
         MenuItem::with_id(
             app,
             "detection",
-            "Ativar/desativar detecção",
+            label("Ativar/desativar detecção"),
             true,
             None::<&str>,
         ),
         MenuItem::with_id(
             app,
             "visibility",
-            "Mostrar/ocultar overlay",
+            label("Mostrar/ocultar overlay"),
             true,
             None::<&str>,
         ),
-        MenuItem::with_id(app, "demo", "Testar última partida", true, None::<&str>),
-        MenuItem::with_id(app, "exit", "Sair do MatchDeck", true, None::<&str>),
+        MenuItem::with_id(
+            app,
+            "demo",
+            label("Testar última partida"),
+            true,
+            None::<&str>,
+        ),
+        MenuItem::with_id(app, "exit", label("Sair do MatchDeck"), true, None::<&str>),
     ]
     .into_iter()
     .collect::<tauri::Result<Vec<_>>>()
     .map_err(|error| error.to_string())?;
-    let menu = Menu::with_items(
+    Menu::with_items(
         app,
         &items
             .iter()
             .map(|item| item as &dyn tauri::menu::IsMenuItem<_>)
             .collect::<Vec<_>>(),
     )
-    .map_err(|error| error.to_string())?;
+    .map_err(|error| error.to_string())
+}
+
+fn refresh_tray_language(
+    app: &tauri::AppHandle,
+    language: crate::preferences::InterfaceLanguage,
+) -> Result<(), String> {
+    if let Some(tray) = app.tray_by_id("matchdeck") {
+        tray.set_menu(Some(tray_menu(app, language)?))
+            .map_err(|error| error.to_string())?;
+        tray.set_tooltip(Some(crate::language::text(
+            language,
+            "MatchDeck · clique para abrir",
+        )))
+        .map_err(|error| error.to_string())?;
+    }
+    Ok(())
+}
+
+pub fn create_tray(app: &tauri::AppHandle) -> Result<(), String> {
+    use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
+    let language = app
+        .state::<SharedState>()
+        .lock()
+        .map_err(|error| error.to_string())?
+        .preferences
+        .language;
+    let menu = tray_menu(app, language)?;
     TrayIconBuilder::with_id("matchdeck")
         .icon(app.default_window_icon().ok_or("Ícone da bandeja indisponível")?.clone())
-        .tooltip("MatchDeck · clique para abrir")
+        .tooltip(crate::language::text(language, "MatchDeck · clique para abrir"))
         .menu(&menu).show_menu_on_left_click(false)
         .on_tray_icon_event(|tray, event| { if matches!(event, TrayIconEvent::Click { button: MouseButton::Left, button_state: MouseButtonState::Up, .. }) { open_main(tray.app_handle()); } })
         .on_menu_event(|app, event| {

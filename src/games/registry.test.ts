@@ -9,7 +9,8 @@ it('registers only installed integrations and preserves explicit capability limi
   expect(installedGames.map(game => game.id)).toEqual(['aoe2-de']);
   expect(gameIntegration('sc2')).toBeUndefined();
   expect(gameIntegration('aoe2-de')?.capabilities).toMatchObject({ offline: false, customLobbies: 'unverified' });
-  expect(gameIntegration('aoe2-de')?.artwork(createDemoMatch('ranked').players[0])?.units[0]).toBe('Lançador de Machado');
+  expect(gameIntegration('aoe2-de')?.artwork(createDemoMatch('ranked').players[0])?.units[0]).toBe('Throwing Axeman');
+  expect(gameIntegration('aoe2-de')?.artwork(createDemoMatch('ranked').players[0], 'pt-BR')?.units[0]).toBe('Lançador de Machado');
 });
 
 it('covers all bundled civilizations with localized labels and existing image assets', () => {

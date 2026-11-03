@@ -7,6 +7,7 @@ import { OverlayWindow } from './features/overlay/OverlayWindow';
 import { LoadingScreen } from './features/shell/LoadingScreen';
 import './styles.css';
 import { AppErrorBoundary } from './features/shell/AppErrorBoundary';
+import { LanguageProvider, startupPreferences } from './i18n/LanguageProvider';
 
 const desktop = isTauri();
 const overlay = desktop && new URLSearchParams(location.search).get('window') === 'overlay';
@@ -14,6 +15,6 @@ document.body.className = overlay ? 'overlay-window' : 'control-window';
 const runtime = desktop ? new TauriRuntime() : new BrowserRuntime();
 const ControlPanel = lazy(() => import('./features/settings/ControlPanel').then(module => ({ default: module.ControlPanel })));
 
-createRoot(document.getElementById('root')!).render(<AppErrorBoundary><Suspense fallback={overlay ? null : <LoadingScreen />}>{overlay
+createRoot(document.getElementById('root')!).render(<LanguageProvider preferences={startupPreferences()}><AppErrorBoundary><Suspense fallback={overlay ? null : <LoadingScreen />}>{overlay
   ? <OverlayWindow runtime={runtime} />
-  : <ControlPanel runtime={runtime} desktop={desktop} />}</Suspense></AppErrorBoundary>);
+  : <ControlPanel runtime={runtime} desktop={desktop} />}</Suspense></AppErrorBoundary></LanguageProvider>);

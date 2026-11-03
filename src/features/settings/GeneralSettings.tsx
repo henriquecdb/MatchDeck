@@ -1,9 +1,11 @@
+import { useI18n } from '../../i18n/LanguageProvider';
 import { useState } from 'react';
 import type { AppState, OverlayRuntime } from '../../application/runtime';
 import { LoadingScreen } from '../shell/LoadingScreen';
 import { Modal } from '../shell/Modal';
 
 export function GeneralSettings({ state, runtime, desktop, perform }: { state: AppState; runtime: OverlayRuntime; desktop: boolean; perform(action: () => Promise<void>): Promise<void> }) {
+  const { t } = useI18n();
   const [preview, setPreview] = useState(false);
   const [busy, setBusy] = useState(false);
   const preferences = state.preferences;
@@ -11,22 +13,31 @@ export function GeneralSettings({ state, runtime, desktop, perform }: { state: A
     void perform(async () => { setBusy(true); try { await runtime.configureApp({ ...preferences, ...patch }); } finally { setBusy(false); } });
   }
   return <>
-    <fieldset disabled={busy}><legend>Aplicativo e Windows</legend>
+    <fieldset disabled={busy}><legend>{t('Idioma')}</legend>
+      <label>{t('Idioma da interface')} <select value={preferences.language} onChange={event => configure({ language: event.target.value as typeof preferences.language })}>
+        <option value="pt-BR">Português (Brasil)</option><option value="en">English</option>
+      </select></label>
+      <label>{t('Civilizações e unidades')} <select value={preferences.gameLanguage} onChange={event => configure({ gameLanguage: event.target.value as typeof preferences.gameLanguage })}>
+        <option value="en">English</option><option value="pt-BR">Português (Brasil)</option>
+      </select></label>
+      <p>{t('Os nomes das civilizações e unidades usam inglês por padrão, independentemente do idioma da interface.')}</p>
+    </fieldset>
+    <fieldset disabled={busy}><legend>{t('Aplicativo e Windows')}</legend>
       <label><input type="checkbox" disabled={!desktop} checked={state.autostart} onChange={event => {
         const enabled = event.target.checked;
         void perform(async () => { setBusy(true); try { await runtime.setAutostart(enabled); } finally { setBusy(false); } });
-      }} /> Iniciar com o Windows</label>
-      <label><input type="checkbox" disabled={!desktop || !state.trayAvailable} checked={preferences.launchMinimized} onChange={event => configure({ launchMinimized: event.target.checked })} /> Abrir minimizado na bandeja</label>
-      <label>Ao fechar a janela <select disabled={!desktop} value={preferences.closeAction} onChange={event => configure({ closeAction: event.target.value as typeof preferences.closeAction })}>
-        <option value="ask">Perguntar o que fazer</option><option value="minimize" disabled={!state.trayAvailable}>Continuar na bandeja</option><option value="exit">Encerrar o aplicativo</option>
+      }} />  {t('Iniciar com o Windows')}</label>
+      <label><input type="checkbox" disabled={!desktop || !state.trayAvailable} checked={preferences.launchMinimized} onChange={event => configure({ launchMinimized: event.target.checked })} />  {t('Abrir minimizado na bandeja')}</label>
+      <label>{t('Ao fechar a janela')} <select disabled={!desktop} value={preferences.closeAction} onChange={event => configure({ closeAction: event.target.value as typeof preferences.closeAction })}>
+        <option value="ask">{t('Perguntar o que fazer')}</option><option value="minimize" disabled={!state.trayAvailable}>{t('Continuar na bandeja')}</option><option value="exit">{t('Encerrar o aplicativo')}</option>
       </select></label>
-      <p>{state.trayAvailable ? 'Use o ícone da bandeja para reabrir o painel, controlar a detecção ou sair.' : 'A bandeja está indisponível nesta execução; a janela continuará acessível.'}</p>
-      <button disabled={!desktop || !state.trayAvailable} onClick={() => void perform(() => runtime.closeApp('minimize'))}>Minimizar para a bandeja</button>
+      <p>{state.trayAvailable ? t('Use o ícone da bandeja para reabrir o painel, controlar a detecção ou sair.') : t('A bandeja está indisponível nesta execução; a janela continuará acessível.')}</p>
+      <button disabled={!desktop || !state.trayAvailable} onClick={() => void perform(() => runtime.closeApp('minimize'))}>{t('Minimizar para a bandeja')}</button>
     </fieldset>
-    <fieldset><legend>Carregamento e configuração inicial</legend>
-      <p>{state.startupMs == null ? 'O tempo de abertura será informado ao concluir a inicialização.' : `Interface pronta em ${state.startupMs} ms nesta execução.`} A tela de carregamento pode aparecer brevemente quando a abertura é rápida.</p>
-      <div className="actions"><button onClick={() => setPreview(true)}>Visualizar tela de carregamento</button><button onClick={() => configure({ onboardingComplete: false })}>Reabrir configuração guiada</button></div>
+    <fieldset><legend>{t('Carregamento e configuração inicial')}</legend>
+      <p>{state.startupMs == null ? t('O tempo de abertura será informado ao concluir a inicialização.') : t('Interface pronta em {0} ms nesta execução.', { 0: state.startupMs })}  {t('A tela de carregamento pode aparecer brevemente quando a abertura é rápida.')}</p>
+      <div className="actions"><button onClick={() => setPreview(true)}>{t('Visualizar tela de carregamento')}</button><button onClick={() => configure({ onboardingComplete: false })}>{t('Reabrir configuração guiada')}</button></div>
     </fieldset>
-    {preview && <Modal title="Prévia do carregamento" onClose={() => setPreview(false)}><LoadingScreen /><button onClick={() => setPreview(false)}>Fechar prévia</button></Modal>}
+    {preview && <Modal title={t('Prévia do carregamento')} onClose={() => setPreview(false)}><LoadingScreen /><button onClick={() => setPreview(false)}>{t('Fechar prévia')}</button></Modal>}
   </>;
 }

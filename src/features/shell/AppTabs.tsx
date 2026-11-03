@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/LanguageProvider';
 import { useRef, type KeyboardEvent } from 'react';
 
 export const appTabs = [
@@ -12,6 +13,7 @@ export const appTabs = [
 export type AppTab = typeof appTabs[number]['id'];
 
 export function AppTabs({ active, onChange }: { active: AppTab; onChange(tab: AppTab): void }) {
+  const { t } = useI18n();
   const buttons = useRef<Array<HTMLButtonElement | null>>([]);
 
   function navigate(event: KeyboardEvent, index: number) {
@@ -26,9 +28,9 @@ export function AppTabs({ active, onChange }: { active: AppTab; onChange(tab: Ap
     buttons.current[next]?.focus();
   }
 
-  return <nav className="app-tabs" role="tablist" aria-label="Funcionalidades">
+  return <nav className="app-tabs" role="tablist" aria-label={t('Funcionalidades')}>
     {appTabs.map((tab, index) => <button key={tab.id} ref={element => { buttons.current[index] = element; }}
       role="tab" id={`tab-${tab.id}`} aria-controls={`panel-${tab.id}`} aria-selected={active === tab.id}
-      tabIndex={active === tab.id ? 0 : -1} onClick={() => onChange(tab.id)} onKeyDown={event => navigate(event, index)}>{tab.label}</button>)}
+      tabIndex={active === tab.id ? 0 : -1} onClick={() => onChange(tab.id)} onKeyDown={event => navigate(event, index)}>{t(tab.label)}</button>)}
   </nav>;
 }

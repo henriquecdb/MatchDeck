@@ -2,6 +2,15 @@
 
 As mudanças relevantes são registradas por versão. O projeto usa Semantic Versioning e Conventional Commits.
 
+## [0.4.2] - 2026-11-03
+
+### Adicionado
+
+- Interface em português brasileiro ou inglês, incluindo overlay, carregamento e menu da bandeja.
+- Seleção independente do idioma dos nomes das civilizações e unidades únicas, com inglês como padrão em ambos os idiomas da interface.
+- Troca de idioma imediata e persistida entre reinícios, preservando configurações e dados das partidas.
+- Notas da versão bilíngues, exibidas no idioma escolhido para a interface.
+
 ## [0.4.1] - 2026-11-03
 
 ### Corrigido
@@ -155,3 +164,5 @@ As mudanças relevantes são registradas por versão. O projeto usa Semantic Ver
 [0.4.0]: https://github.com/henriquecdb/MatchDeck/compare/v0.3.1...v0.4.0
 
 [0.4.1]: https://github.com/henriquecdb/MatchDeck/compare/v0.4.0...v0.4.1
+
+[0.4.2]: https://github.com/henriquecdb/MatchDeck/compare/v0.4.1...v0.4.2

@@ -1,4 +1,6 @@
 import { modeLabels, type MatchSnapshot } from './match';
+import type { Language } from './preferences';
+import { translate } from '../i18n/translate';
 
 const queues: Record<string, string> = {
   unranked: 'Lobby personalizado · não ranqueado',
@@ -18,10 +20,10 @@ export function ratingLabel(match: MatchSnapshot): string {
   return match.mode === 'quick' ? 'Rating de partidas rápidas' : match.mode === 'ranked' ? 'Rating ranqueado' : match.mode === 'custom' ? 'Rating não ranqueado' : 'Rating';
 }
 
-export function syncLabel(match: MatchSnapshot): string {
-  if (!match.syncedAt) return match.source === 'demo' && !match.replayOf ? 'Dados fictícios' : 'Horário de sincronização indisponível';
+export function syncLabel(match: MatchSnapshot, language: Language = 'pt-BR'): string {
+  if (!match.syncedAt) return translate(match.source === 'demo' && !match.replayOf ? 'Dados fictícios' : 'Horário de sincronização indisponível', language);
   const date = new Date(match.syncedAt);
-  return Number.isNaN(date.getTime()) ? 'Horário de sincronização indisponível' : `Sincronizado em ${date.toLocaleString('pt-BR')}`;
+  return Number.isNaN(date.getTime()) ? translate('Horário de sincronização indisponível', language) : translate('Sincronizado em {0}', language, { 0: date.toLocaleString(language) });
 }
 
 export const missingStats = 'A fonte não forneceu esta estatística para a fila da partida. O valor não é substituído por dados de outra modalidade.';
