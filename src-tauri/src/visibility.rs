@@ -4,23 +4,49 @@ pub fn set_native_visibility(
     visible: bool,
 ) -> Result<(), String> {
     use windows_sys::Win32::UI::WindowsAndMessaging::{
-        IsWindow, ShowWindow, SW_HIDE, SW_SHOWNOACTIVATE,
+        IsWindow, SetWindowPos, ShowWindow, HWND_TOPMOST, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE,
+        SW_HIDE, SW_SHOWNOACTIVATE,
     };
     unsafe {
         if IsWindow(handle) == 0 {
             return Err("Janela do overlay indisponível".into());
         }
-        ShowWindow(handle, if visible { SW_SHOWNOACTIVATE } else { SW_HIDE });
+        if visible {
+            ShowWindow(handle, SW_SHOWNOACTIVATE);
+            if SetWindowPos(
+                handle,
+                HWND_TOPMOST,
+                0,
+                0,
+                0,
+                0,
+                SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE,
+            ) == 0
+            {
+                return Err(std::io::Error::last_os_error().to_string());
+            }
+        } else {
+            ShowWindow(handle, SW_HIDE);
+        }
     }
     Ok(())
+}
+
+#[cfg(windows)]
+pub fn is_topmost(handle: windows_sys::Win32::Foundation::HWND) -> bool {
+    use windows_sys::Win32::UI::WindowsAndMessaging::{
+        GetWindowLongPtrW, GWL_EXSTYLE, WS_EX_TOPMOST,
+    };
+    unsafe { GetWindowLongPtrW(handle, GWL_EXSTYLE) & WS_EX_TOPMOST as isize != 0 }
 }
 
 #[cfg(all(test, windows))]
 mod tests {
     use super::*;
     use windows_sys::Win32::UI::WindowsAndMessaging::{
-        CreateWindowExW, DestroyWindow, GetForegroundWindow, IsWindowVisible, WS_EX_NOACTIVATE,
-        WS_EX_TOOLWINDOW, WS_POPUP,
+        CreateWindowExW, DestroyWindow, GetForegroundWindow, IsWindowVisible, SetWindowPos,
+        HWND_NOTOPMOST, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW,
+        WS_POPUP,
     };
 
     struct TestWindow(windows_sys::Win32::Foundation::HWND);
@@ -55,6 +81,25 @@ mod tests {
         for _ in 0..3 {
             set_native_visibility(window.0, true).unwrap();
             assert_ne!(unsafe { IsWindowVisible(window.0) }, 0);
+            assert!(is_topmost(window.0));
+            assert_ne!(unsafe { GetForegroundWindow() }, window.0);
+            assert_ne!(
+                unsafe {
+                    SetWindowPos(
+                        window.0,
+                        HWND_NOTOPMOST,
+                        0,
+                        0,
+                        0,
+                        0,
+                        SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE,
+                    )
+                },
+                0
+            );
+            assert!(!is_topmost(window.0));
+            set_native_visibility(window.0, true).unwrap();
+            assert!(is_topmost(window.0));
             assert_ne!(unsafe { GetForegroundWindow() }, window.0);
             set_native_visibility(window.0, false).unwrap();
             assert_eq!(unsafe { IsWindowVisible(window.0) }, 0);
