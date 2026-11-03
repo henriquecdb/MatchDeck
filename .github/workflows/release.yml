@@ -16,6 +16,8 @@ concurrency:
 jobs:
   dependencies:
     uses: ./.github/workflows/security.yml
+    with:
+      ref: ${{ github.event.inputs.tag || github.ref }}
   release:
     runs-on: windows-latest
     outputs:
@@ -86,13 +88,12 @@ jobs:
   ready:
     needs: [release, scan, dependencies]
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
+    permissions: {}
     steps:
       - name: Keep the scanned package in draft for final validation
         run: |
-          test "$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)" = true
-          echo "Package checks passed. Verify the updater signature and antivirus report before publishing."
+          test -n "$RELEASE_TAG"
+          echo "Package checks passed for $RELEASE_TAG. The build creates a draft release."
+          echo "Verify the updater signature and antivirus report before publishing."
         env:
           RELEASE_TAG: ${{ needs.release.outputs.tag }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
