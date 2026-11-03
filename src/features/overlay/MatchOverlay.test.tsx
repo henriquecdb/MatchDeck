@@ -4,6 +4,7 @@ import { afterEach, expect, it } from 'vitest';
 import { createDemoMatch } from '../../games/aoe2/demo';
 import { MatchOverlay } from './MatchOverlay';
 import { syncLabel } from '../../domain/match-labels';
+import { defaultSettings } from '../../domain/settings';
 
 afterEach(cleanup);
 
@@ -15,6 +16,21 @@ it('identifies quick rating and explains missing queue statistics', () => {
   expect(screen.getAllByTitle(/A fonte não forneceu esta estatística/).length).toBeGreaterThan(0);
   expect(screen.getByText('Dados fictícios')).toBeTruthy();
   expect(syncLabel({ ...match, syncedAt: 'invalid' })).toBe('Horário de sincronização indisponível');
+});
+
+it('highlights the configured player and hides optional fields in both layouts', () => {
+  const match = createDemoMatch('ranked');
+  const display = { ...defaultSettings, showRating: false, showRecord: false, showWinRate: false };
+  const view = render(<MatchOverlay match={match} display={display} />);
+  expect(screen.getByText('Você')).toBeTruthy();
+  expect(view.container.querySelector('.player.is-self')).toBeTruthy();
+  expect(view.container.querySelector('.rating')).toBeNull();
+  expect(view.container.querySelector('.player-results')).toBeNull();
+  expect(view.container.querySelector('.win-rate')).toBeNull();
+  view.rerender(<MatchOverlay match={match} layout="compact" display={display} />);
+  expect(view.container.querySelector('.linear-player.is-self')).toBeTruthy();
+  expect(view.container.querySelector('.linear-rating')).toBeNull();
+  expect(view.container.querySelector('.linear-player')?.getAttribute('title')).not.toContain('120 V');
 });
 
 it('can hide estimates without hiding confirmed rating changes', () => {

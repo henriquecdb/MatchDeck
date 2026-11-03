@@ -1,0 +1,7 @@
+[
+  {
+    "id": "aoe2-de",
+    "name": "Age of Empires II: Definitive Edition",
+    "capabilities": { "liveMultiplayer": true, "offline": false, "customLobbies": "unverified" }
+  }
+]

@@ -56,3 +56,17 @@ it('recovers from corrupted persisted preferences', async () => {
   localStorage.setItem('matchdeck.settings', '{invalid');
   expect((await new BrowserRuntime().read()).settings.opacity).toBe(0.9);
 });
+
+it('migrates legacy game settings and keeps application preferences separate', async () => {
+  localStorage.setItem('matchdeck.settings', JSON.stringify({ ...defaultSettings, autoUpdate: true, x: -600 }));
+  const runtime = new BrowserRuntime();
+  const initial = await runtime.read();
+  expect(initial.preferences.autoUpdate).toBe(true);
+  await runtime.configureApp({ ...initial.preferences, onboardingComplete: true, closeAction: 'exit' });
+  await runtime.configure({ ...initial.settings, x: 300 });
+  const restored = await new BrowserRuntime().read();
+  expect(restored.settings.x).toBe(300);
+  expect(restored.preferences).toMatchObject({ autoUpdate: true, onboardingComplete: true, closeAction: 'exit' });
+  localStorage.setItem('matchdeck.preferences', '{bad json');
+  expect((await new BrowserRuntime().read()).settings.x).toBe(300);
+});

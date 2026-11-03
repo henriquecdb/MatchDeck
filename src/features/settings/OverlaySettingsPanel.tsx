@@ -45,6 +45,11 @@ export function OverlaySettingsPanel({ settings, desktop, shortcutAvailable, onC
     <p>Desmarque para manter visível no Alt+Tab. A demonstração aparece mesmo fora do jogo.</p>
     <label><input type="checkbox" checked={settings.showProjection} onChange={event => onChange({ showProjection: event.target.checked })} /> Exibir projeção não oficial de ganho/perda de rating</label>
     <p>Controla os valores estimados com ~ durante a partida. O resultado real confirmado de uma partida concluída continua visível. Estimativas exigem uma fila 1v1 reconhecida e os ratings dos dois jogadores.</p>
+    <label><input type="checkbox" checked={settings.showRating} onChange={event => onChange({ showRating: event.target.checked })} /> Exibir rating</label>
+    <label><input type="checkbox" checked={settings.showRecord} onChange={event => onChange({ showRecord: event.target.checked })} /> Exibir vitórias e derrotas</label>
+    <label><input type="checkbox" checked={settings.showWinRate} onChange={event => onChange({ showWinRate: event.target.checked })} /> Exibir porcentagem de vitórias</label>
+    <p>No modo compacto, vitórias, derrotas e porcentagem aparecem nas dicas dos jogadores.</p>
+    <label><input type="checkbox" checked={settings.highlightSelf} onChange={event => onChange({ highlightSelf: event.target.checked })} /> Destacar meu jogador</label>
     <label><input type="checkbox" checked={settings.locked} onChange={event => onChange({ locked: event.target.checked })} /> Travar overlay e passar cliques para o jogo</label>
     <p>Destrave por este painel para arrastar o overlay. {desktop && (shortcutAvailable ? 'Ctrl+Shift+O também alterna a trava.' : 'Ctrl+Shift+O está indisponível; use a opção acima.')}</p>
     <button onClick={() => onChange({ x: defaultSettings.x, y: defaultSettings.y, opacity: defaultSettings.opacity, scale: 1, monitorId: null, anchor: 'manual', locked: false })}>Restaurar posição, escala e opacidade</button>

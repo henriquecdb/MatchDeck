@@ -92,7 +92,7 @@ input[type=number] { width: 110px; }
 .app-version { display: flex; align-items: flex-end; flex-direction: column; gap: 7px; color: #8fa1b8; font-size: 11px; }
 .connection-badge { background: #25303e; border: 1px solid #3d4c60; padding: 4px 9px; border-radius: 12px; color: #afbfce; }
 .connection-badge.is-active { border-color: #2c795c; color: #5bdfa0; background: #18362e; }
-.app-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 5px; background: #101720; border: 1px solid #303d50; border-radius: 8px; margin: 20px 0 24px; }
+.app-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 5px; background: #101720; border: 1px solid #303d50; border-radius: 8px; margin: 20px 0 24px; }
 .app-tabs button { border: 1px solid transparent; background: transparent; padding: 10px 4px; color: #94a6be; }
 .app-tabs button[aria-selected=true] { background: #24374b; color: #dff7ff; border-color: #3c6a84; }
 .app-tabs button:focus-visible { outline: 2px solid #50c9e9; outline-offset: 2px; }
@@ -124,3 +124,11 @@ input[type=number] { width: 110px; }
 .linear-footer { display: flex; justify-content: space-between; color: #7e90a6; font-size: 8px; line-height: 12px; height: 12px; margin-top: 4px; }
 .overlay-window .linear-overlay { cursor: move; }
 @media (max-width: 560px) { .app-shell { padding: 0 12px 24px; } .app-tabs button { font-size: 12px; } }
+.onboarding { border: 1px solid #37647a; border-radius: 8px; padding: 18px; background: #192c3c; margin-bottom: 20px; }
+.onboarding p { margin-top: 8px; }
+.modal-backdrop { position: fixed; inset: 0; z-index: 110; padding: 24px; background: #080e18e8; display: grid; place-items: center; }
+.modal-card { width: 100%; max-width: 620px; max-height: 85vh; overflow: auto; border: 1px solid #4b607b; border-radius: 10px; padding: 24px; background: #192332; }
+.modal-card .boot-screen { min-height: 280px; }
+.diagnostic-preview { max-height: 420px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; background: #101720; border: 1px solid #36475c; border-radius: 6px; padding: 14px; font-size: 12px; line-height: 1.6; }
+.player.is-self, .linear-player.is-self { outline: 1px solid #83dff4; outline-offset: -1px; background-color: #1c3445; }
+.self-marker { color: #83dff4; font-size: 9px; white-space: nowrap; }

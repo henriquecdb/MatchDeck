@@ -1,6 +1,7 @@
 import { modeLabels, type MatchSnapshot } from './match';
 
 const queues: Record<string, string> = {
+  unranked: 'Lobby personalizado · não ranqueado',
   rm_1v1: 'Ranqueada · Mapa aleatório 1v1', rm_team: 'Ranqueada · Mapa aleatório equipes',
   ew_1v1: 'Ranqueada · Empire Wars 1v1', ew_team: 'Ranqueada · Empire Wars equipes',
   dm_1v1: 'Ranqueada · Death Match 1v1', dm_team: 'Ranqueada · Death Match equipes',
@@ -14,7 +15,7 @@ export function queueLabel(match: MatchSnapshot): string {
 }
 
 export function ratingLabel(match: MatchSnapshot): string {
-  return match.mode === 'quick' ? 'Rating de partidas rápidas' : match.mode === 'ranked' ? 'Rating ranqueado' : 'Rating';
+  return match.mode === 'quick' ? 'Rating de partidas rápidas' : match.mode === 'ranked' ? 'Rating ranqueado' : match.mode === 'custom' ? 'Rating não ranqueado' : 'Rating';
 }
 
 export function syncLabel(match: MatchSnapshot): string {

@@ -2,6 +2,36 @@
 
 As mudanças relevantes são registradas por versão. O projeto usa Semantic Versioning e Conventional Commits.
 
+## [0.4.0] - 2026-11-03
+
+### Adicionado
+
+- Ícone na bandeja para reabrir o painel, controlar a detecção, mostrar/ocultar o overlay, testar a última partida e sair.
+- Inicialização opcional com Windows, abertura minimizada e escolha entre perguntar, continuar na bandeja ou encerrar ao fechar a janela.
+- Proteção contra múltiplas instâncias e recuperação de acesso ao painel ao abrir o aplicativo novamente.
+- Configuração guiada com perfil, posicionamento e demonstração, acessível novamente pelas configurações.
+- Abas Configurações e Diagnóstico, com relatório revisável e download local sem nomes, IDs, pastas ou respostas completas da API.
+- Resumo da última partida com resultado e variação de rating confirmados pela fonte, preservando o rating inicial.
+- Escolha de exibição de rating, vitórias/derrotas e porcentagem de vitórias, além de destaque do próprio jogador.
+
+### Melhorado
+
+- Tela de carregamento com tratamento de erro da interface, aviso de inicialização demorada, nova tentativa e prévia manual nas configurações, sem atraso artificial na abertura.
+- Tempo de inicialização da interface disponível nas configurações e no diagnóstico.
+- Retomada da fotografia da mesma partida após reinício e recuperação do resultado de uma partida encerrada enquanto o app estava fechado.
+- Consulta manual para retomar o monitoramento após falhas, mantendo a partida atual até confirmação positiva do fim.
+- Preferências gerais separadas das configurações, perfil e partida salva do Age 2; arquivos antigos continuam sendo lidos na migração.
+- Gravações atômicas de configuração e gravação de posição após o arraste, reduzindo operações de disco.
+- Registro de integrações e capacidades, com arte e demonstração fornecidas pelo adaptador do jogo; somente Age 2 está disponível nesta versão.
+- Nomes em português para as 56 civilizações e suas unidades, com origem fixada e verificação dos arquivos de imagem locais.
+
+### Compatibilidade
+
+- Mantidas as correções de ocultação da 0.3.1, os atalhos Ctrl+Shift+H e Ctrl+Shift+O e a assinatura do atualizador.
+- Início com Windows é opcional e só pode ser alterado na versão instalada; opções de bandeja são desativadas se o ícone não estiver disponível.
+- Ranqueadas e partidas rápidas continuam dependendo da API. Lobbies personalizados, especialmente contra IA, não têm cobertura garantida; skirmish offline permanece adiado.
+- Diagnóstico registra eventos limitados à execução atual; não envia dados automaticamente.
+
 ## [0.3.1] - 2026-11-02
 
 ### Corrigido
@@ -115,3 +145,4 @@ As mudanças relevantes são registradas por versão. O projeto usa Semantic Ver
 [0.2.1]: https://github.com/henriquecdb/MatchDeck/compare/v0.2.0...v0.2.1
 [0.3.0]: https://github.com/henriquecdb/MatchDeck/compare/v0.2.1...v0.3.0
 [0.3.1]: https://github.com/henriquecdb/MatchDeck/compare/v0.3.0...v0.3.1
+[0.4.0]: https://github.com/henriquecdb/MatchDeck/compare/v0.3.1...v0.4.0

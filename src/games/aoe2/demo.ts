@@ -8,6 +8,7 @@ export function createDemoMatch(mode: MatchMode): MatchSnapshot {
     mode,
     map: 'Arabia',
     source: 'demo',
+    selfPlayerId: 'demo-1',
     queueId: mode === 'ranked' ? 'rm_1v1' : mode === 'quick' ? 'qp_rm_1v1' : null,
     players: [
       { id: 'demo-1', name: 'Jogador 1', teamId: 1, civilization: 'Francos', civilizationId: 'franks', color: 1, colorHex: '#405BFF', uniqueUnits: ['Lançador de machados'], symbol: '⚔', rating: ranked ? 1250 : null, wins: ranked ? 120 : null, losses: ranked ? 100 : null },

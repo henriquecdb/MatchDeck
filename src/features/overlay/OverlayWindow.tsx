@@ -15,5 +15,5 @@ export function OverlayWindow({ runtime }: { runtime: OverlayRuntime }) {
       }
       await getCurrentWindow().startDragging();
     })().catch(console.error);
-  }}><MatchOverlay match={state.match} layout={state.settings.layout} showProjection={state.settings.showProjection} /></div>;
+  }}><MatchOverlay match={state.match} layout={state.settings.layout} showProjection={state.settings.showProjection} display={state.settings} /></div>;
 }

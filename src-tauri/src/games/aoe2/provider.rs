@@ -193,6 +193,11 @@ impl Aoe2Provider {
                             } else {
                                 None
                             },
+                            won: if remote.is_finished() {
+                                player.won
+                            } else {
+                                None
+                            },
                         },
                         warning,
                     )
@@ -210,8 +215,10 @@ impl Aoe2Provider {
                 )
             }) {
                 MatchMode::Ranked
-            } else {
+            } else if queue.is_some_and(|queue| queue.starts_with("qp_")) {
                 MatchMode::Quick
+            } else {
+                MatchMode::Custom
             },
             map: remote
                 .map_name
@@ -228,6 +235,7 @@ impl Aoe2Provider {
             replay_of: None,
             queue_id: remote.leaderboard.clone(),
             finished_at: remote.finished.as_str().map(str::to_owned),
+            self_player_id: None,
         }
     }
 }

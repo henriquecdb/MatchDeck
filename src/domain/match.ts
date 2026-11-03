@@ -1,9 +1,10 @@
-export type MatchMode = 'ranked' | 'quick' | 'skirmish';
+export type MatchMode = 'ranked' | 'quick' | 'skirmish' | 'custom';
 
 export const modeLabels: Record<MatchMode, string> = {
   ranked: 'Ranqueada',
   quick: 'Multiplayer rápido',
   skirmish: 'Skirmish',
+  custom: 'Lobby personalizado',
 };
 
 export interface Player {
@@ -20,6 +21,7 @@ export interface Player {
   losses: number | null;
   ratingChange?: number | null;
   teamId?: number | null;
+  won?: boolean | null;
 }
 
 export interface MatchSnapshot {
@@ -35,6 +37,7 @@ export interface MatchSnapshot {
   syncedAt?: string | null;
   replayOf?: string | null;
   finishedAt?: string | null;
+  selfPlayerId?: string | null;
 }
 
 export function replayMatch(match: MatchSnapshot): MatchSnapshot {

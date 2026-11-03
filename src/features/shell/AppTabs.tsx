@@ -5,6 +5,8 @@ export const appTabs = [
   { id: 'overlay', label: 'Overlay' },
   { id: 'demo', label: 'Demonstração' },
   { id: 'updates', label: 'Atualizações' },
+  { id: 'settings', label: 'Configurações' },
+  { id: 'diagnostics', label: 'Diagnóstico' },
 ] as const;
 
 export type AppTab = typeof appTabs[number]['id'];

@@ -1,0 +1,366 @@
+{
+  "danes": {
+    "name": "Dinamarqueses",
+    "units": [
+      "Viquingue de Jomsburgo"
+    ]
+  },
+  "saxons": {
+    "name": "Saxões",
+    "units": [
+      "Tropa da Forja"
+    ]
+  },
+  "varangians": {
+    "name": "Varangianos",
+    "units": [
+      "Jarl"
+    ]
+  },
+  "mapuche": {
+    "name": "Mapuches",
+    "units": [
+      "Kona",
+      "Cavaleiro Boleador"
+    ]
+  },
+  "muisca": {
+    "name": "Chibchas",
+    "units": [
+      "Guerreiro Guecha",
+      "Guarda do Templo"
+    ]
+  },
+  "tupi": {
+    "name": "Tupi",
+    "units": [
+      "Arqueiro Tupi",
+      "Guerreiro Ibirapema"
+    ]
+  },
+  "armenians": {
+    "name": "Armênios",
+    "units": [
+      "Arqueiro de Arco Composto",
+      "Sacerdote Guerreiro"
+    ]
+  },
+  "aztecs": {
+    "name": "Astecas",
+    "units": [
+      "Guerreiro Jaguar"
+    ]
+  },
+  "bengalis": {
+    "name": "Bengalis",
+    "units": [
+      "Ratha"
+    ]
+  },
+  "dravidians": {
+    "name": "Dravidianos",
+    "units": [
+      "Espadachim Urumi",
+      "Thirisadai"
+    ]
+  },
+  "gurjaras": {
+    "name": "Os gurjares",
+    "units": [
+      "Lançador de Chakram",
+      "Cavaleiro com Shrivamsha",
+      "Batedor a Camelo"
+    ]
+  },
+  "berbers": {
+    "name": "Berberes",
+    "units": [
+      "Arqueiro a Camelo",
+      "Genitour"
+    ]
+  },
+  "bohemians": {
+    "name": "Boêmios",
+    "units": [
+      "Carroça Hussita",
+      "Obuseiro"
+    ]
+  },
+  "britons": {
+    "name": "Bretões",
+    "units": [
+      "Arqueiro de Arco Longo"
+    ]
+  },
+  "bulgarians": {
+    "name": "Búlgaros",
+    "units": [
+      "Konnik"
+    ]
+  },
+  "burgundians": {
+    "name": "Borgonheses",
+    "units": [
+      "Coustillier",
+      "Milícia Flamenga"
+    ]
+  },
+  "burmese": {
+    "name": "Birmaneses",
+    "units": [
+      "Arambai"
+    ]
+  },
+  "byzantines": {
+    "name": "Bizantinos",
+    "units": [
+      "Catafractário"
+    ]
+  },
+  "celts": {
+    "name": "Celtas",
+    "units": [
+      "Saqueador Azul"
+    ]
+  },
+  "chinese": {
+    "name": "Chineses",
+    "units": [
+      "Chu Ko Nu",
+      "Barco Dragão"
+    ]
+  },
+  "cumans": {
+    "name": "Cumanos",
+    "units": [
+      "Quipchaco"
+    ]
+  },
+  "ethiopians": {
+    "name": "Etíopes",
+    "units": [
+      "Guerreiro de Shotel"
+    ]
+  },
+  "franks": {
+    "name": "Francos",
+    "units": [
+      "Lançador de Machado"
+    ]
+  },
+  "georgians": {
+    "name": "Georgianos",
+    "units": [
+      "Monaspa"
+    ]
+  },
+  "goths": {
+    "name": "Godos",
+    "units": [
+      "Huscarl"
+    ]
+  },
+  "huns": {
+    "name": "Hunos",
+    "units": [
+      "Tarkan"
+    ]
+  },
+  "incas": {
+    "name": "Incas",
+    "units": [
+      "Kamayuk",
+      "Fundeiro"
+    ]
+  },
+  "hindustanis": {
+    "name": "Hindustânis",
+    "units": [
+      "Ghulam",
+      "Cameleiro Imperial"
+    ]
+  },
+  "italians": {
+    "name": "Italianos",
+    "units": [
+      "Besteiro Genovês",
+      "Condotiero"
+    ]
+  },
+  "japanese": {
+    "name": "Japoneses",
+    "units": [
+      "Samurai"
+    ]
+  },
+  "jurchens": {
+    "name": "Jurchéns",
+    "units": [
+      "Pagode de Ferro",
+      "Granadeiro"
+    ]
+  },
+  "khitans": {
+    "name": "Quitais",
+    "units": [
+      "Liao Dao",
+      "Trabuco Montado"
+    ]
+  },
+  "shu": {
+    "name": "Shu",
+    "units": [
+      "Guarda da Pluma Branca",
+      "Biga de Guerra",
+      "Liu Bei"
+    ]
+  },
+  "wei": {
+    "name": "Wei",
+    "units": [
+      "Cavalaria Tigre",
+      "Invasor Xianbei",
+      "Cao Cao"
+    ]
+  },
+  "wu": {
+    "name": "Wu",
+    "units": [
+      "Arqueiro de Fogo",
+      "Espadachim de Jian",
+      "Sun Jian"
+    ]
+  },
+  "khmer": {
+    "name": "Khmers",
+    "units": [
+      "Elefante Balista"
+    ]
+  },
+  "koreans": {
+    "name": "Coreanos",
+    "units": [
+      "Carroça de Guerra",
+      "Navio Tartaruga"
+    ]
+  },
+  "lithuanians": {
+    "name": "Lituanos",
+    "units": [
+      "Leitis"
+    ]
+  },
+  "magyars": {
+    "name": "Magiares",
+    "units": [
+      "Hussardo Magiar"
+    ]
+  },
+  "malay": {
+    "name": "Malaios",
+    "units": [
+      "Guerreiro de Karambit"
+    ]
+  },
+  "malians": {
+    "name": "Malineses",
+    "units": [
+      "Gbeto"
+    ]
+  },
+  "mayans": {
+    "name": "Maias",
+    "units": [
+      "Arqueiro Plumado"
+    ]
+  },
+  "mongols": {
+    "name": "Mongóis",
+    "units": [
+      "Mangudai"
+    ]
+  },
+  "persians": {
+    "name": "Persas",
+    "units": [
+      "Elefante de Guerra"
+    ]
+  },
+  "poles": {
+    "name": "Poloneses",
+    "units": [
+      "Obuch",
+      "Hussardo Alado"
+    ]
+  },
+  "portuguese": {
+    "name": "Portugueses",
+    "units": [
+      "Rabadoquim",
+      "Caravela"
+    ]
+  },
+  "romans": {
+    "name": "Romanos",
+    "units": [
+      "Centurião",
+      "Legionário"
+    ]
+  },
+  "saracens": {
+    "name": "Sarracenos",
+    "units": [
+      "Mameluco"
+    ]
+  },
+  "sicilians": {
+    "name": "Sicilianos",
+    "units": [
+      "Sargento"
+    ]
+  },
+  "slavs": {
+    "name": "Eslavos",
+    "units": [
+      "Boiardo"
+    ]
+  },
+  "spanish": {
+    "name": "Espanhóis",
+    "units": [
+      "Conquistador",
+      "Missionário"
+    ]
+  },
+  "tatars": {
+    "name": "Tártaros",
+    "units": [
+      "Keshik",
+      "Camelo Flamejante"
+    ]
+  },
+  "teutons": {
+    "name": "Teutões",
+    "units": [
+      "Cavaleiro Teutão"
+    ]
+  },
+  "turks": {
+    "name": "Turcos",
+    "units": [
+      "Janízaro"
+    ]
+  },
+  "vietnamese": {
+    "name": "Vietnamitas",
+    "units": [
+      "Arqueiro de Rattan"
+    ]
+  },
+  "vikings": {
+    "name": "Vikings",
+    "units": [
+      "Berserker"
+    ]
+  }
+}
