@@ -3,9 +3,13 @@ import type { OverlaySettings } from '../../domain/settings';
 import { anchorLabels, defaultSettings } from '../../domain/settings';
 import type { DisplayMonitor } from '../../application/runtime';
 import { defaultHotkeys, hotkeyLabel } from '../../domain/hotkeys';
+import type { MatchSnapshot } from '../../domain/match';
+import { isDuel } from '../../domain/teams';
+import { resolveOverlayLayout } from '../../domain/overlay-layout';
 
 interface Props {
   settings: OverlaySettings;
+  match?: MatchSnapshot | null;
   desktop: boolean;
   shortcutAvailable: boolean;
   lockShortcut?: string | null;
@@ -15,13 +19,15 @@ interface Props {
   monitorError: string | null;
 }
 
-export function OverlaySettingsPanel({ settings, desktop, shortcutAvailable, lockShortcut = defaultHotkeys.lockOverlay, onChange, monitors, onRefreshMonitors, monitorError }: Props) {
+export function OverlaySettingsPanel({ settings, match = null, desktop, shortcutAvailable, lockShortcut = defaultHotkeys.lockOverlay, onChange, monitors, onRefreshMonitors, monitorError }: Props) {
   const { t } = useI18n();
+  const activeLayout = match ? resolveOverlayLayout(settings.layout, match) : settings.layout;
   return <fieldset>
     <legend>{t('Aparência e posição')}</legend>
-    <label>{t('Modo de exibição')} <select value={settings.layout} onChange={event => onChange({ layout: event.target.value as OverlaySettings['layout'] })}>
-      <option value="detailed">{t('Completo · cards com unidades')}</option><option value="compact">{t('Compacto · faixa por equipes')}</option><option value="stacked">{t('Compacto vertical · jogadores empilhados')}</option>
+    <label>{t('Modo de exibição')} <select value={activeLayout} onChange={event => onChange({ layout: event.target.value as OverlaySettings['layout'] })}>
+      <option value="detailed" disabled={!!match && !isDuel(match)}>{t('Completo · apenas 1v1')}</option><option value="compact">{t('Compacto · faixa por equipes')}</option><option value="stacked">{t('Compacto vertical · jogadores empilhados')}</option>
     </select></label>
+    <p>{t('O modo completo é exclusivo para 1v1. Nos demais formatos, essa preferência usa automaticamente o compacto vertical e volta ao completo no próximo 1v1.')}</p>
     <p>{t('O compacto horizontal mantém as equipes lado a lado. O vertical empilha os jogadores e usa metade da largura. Ambos usam emblemas das civilizações.')}</p>
     <label>{t('Opacidade:')} {Math.round(settings.opacity * 100)}%
       <input type="range" min="0.2" max="1" step="0.05" value={settings.opacity} onChange={event => onChange({ opacity: Number(event.target.value) })} />

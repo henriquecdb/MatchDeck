@@ -4,7 +4,7 @@ Aplicativo modular de overlays para jogos. Primeira integração: Age of Empires
 
 ## Instalar no Windows
 
-Baixe o instalador **MatchDeck_0.4.3_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, siga a configuração guiada, identifique seu perfil na aba **Partida** e ative a detecção com o AoE2 em janela sem bordas.
+Baixe o instalador **MatchDeck_0.4.4_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, siga a configuração guiada, identifique seu perfil na aba **Partida** e ative a detecção com o AoE2 em janela sem bordas.
 
 Veja o [changelog da versão](CHANGELOG.md). O aplicativo verifica novas versões ao abrir e mostra as notas e o progresso da atualização. A instalação automática é opcional e exige que a detecção esteja desligada e não haja partida de demonstração ativa. Pacotes de atualização são verificados por assinatura. O executável ainda não possui certificado Authenticode de editor Windows.
 
@@ -18,7 +18,7 @@ No navegador há uma prévia simulada. No Tauri há uma janela transparente, sem
 
 Em **Configurações → Atalhos globais**, altere os modificadores e a tecla de cada ação, desative uma combinação ou restaure os padrões. **Salvar atalhos** aplica e persiste a mudança. Combinações duplicadas são rejeitadas; conflitos com outros aplicativos ou falhas ao salvar restauram os atalhos anteriores. Os controles do painel e da bandeja continuam disponíveis.
 
-O modo **Compacto vertical** usa 360 px de largura e empilha os jogadores; o compacto horizontal existente usa 720 px e mantém as equipes lado a lado. Em duelos 1v1, os dois compactos dispensam os títulos de equipe. Os overlays não exibem horários de sincronização; a data continua disponível nos dados da demonstração e no diagnóstico.
+O modo **Completo** é exclusivo de 1v1. Quando essa preferência está salva, partidas de outros formatos usam automaticamente o compacto vertical; o completo retorna no próximo duelo. O modo **Compacto vertical** usa 360 px de largura e empilha os jogadores; o compacto horizontal existente usa 720 px e mantém as equipes lado a lado. Em duelos 1v1, os dois compactos dispensam os títulos de equipe. Os overlays não exibem horários de sincronização; a data continua disponível nos dados da demonstração e no diagnóstico.
 
 Por padrão, partidas reais aparecem somente com o executável do Age 2 DE em primeiro plano. Desmarque essa opção em **Overlay** para continuar vendo os dados ao usar Alt+Tab. A demonstração permanece visível fora do jogo. Ocultar uma partida não encerra a detecção e não oculta automaticamente a próxima.
 

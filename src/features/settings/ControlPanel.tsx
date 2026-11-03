@@ -59,7 +59,7 @@ function ControlPanelContent({ runtime, desktop, runtimeState }: { runtime: Over
       </>}
       {tab.id === 'overlay' && <>
         <div className="section-heading"><h2>{t('Do seu jeito')}</h2><p>{t('Ajuste o visual e escolha onde as informações aparecem.')}</p></div>
-        <OverlaySettingsPanel settings={settings} desktop={desktop} shortcutAvailable={state.shortcutAvailable} lockShortcut={state.preferences.hotkeys.lockOverlay} onChange={configure} monitors={monitors} onRefreshMonitors={refreshMonitors} monitorError={monitorError} />
+        <OverlaySettingsPanel settings={settings} match={match} desktop={desktop} shortcutAvailable={state.shortcutAvailable} lockShortcut={state.preferences.hotkeys.lockOverlay} onChange={configure} monitors={monitors} onRefreshMonitors={refreshMonitors} monitorError={monitorError} />
         <OverlayPreview match={preview} settings={settings} />
       </>}
       {tab.id === 'demo' && <><div className="section-heading"><h2>{t('Experimente o overlay')}</h2><p>{t('Teste as informações e a posição antes de jogar.')}</p></div><DemoPanel runtime={runtime} state={state} desktop={desktop} perform={perform} /></>}
