@@ -27,7 +27,7 @@ jobs:
       - if: steps.audit-cache.outputs.cache-hit != 'true'
         run: cargo install cargo-audit --locked --version 0.22.2
       - run: cargo audit --file src-tauri/Cargo.lock
-      - run: node --test scripts/check-rust-audit.test.mjs
+      - run: npx --no vitest run scripts/check-rust-audit.test.mjs
       - name: Check RustSec warnings against the Windows build
         run: |
           cargo audit --file src-tauri/Cargo.lock --json > rust-audit.json
