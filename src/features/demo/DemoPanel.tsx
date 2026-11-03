@@ -42,7 +42,7 @@ export function DemoPanel({ runtime, state, desktop, perform }: Props) {
         {[1, 2, 3, 4].map(size => <option key={size} value={size}>{size}v{size}</option>)}
       </select></label>}
       <div className="actions">
-        <button disabled={!!match || (source === 'synced' && !lastSynced && (!desktop || !detection.config.profile))} onClick={() => run(async () => {
+        <button className="primary-action" disabled={!!match || (source === 'synced' && !lastSynced && (!desktop || !detection.config.profile))} onClick={() => run(async () => {
           if (source === 'fictional') { await runtime.start(gameIntegration('aoe2-de')!.demo(mode, teamSize)); return; }
           if (!lastSynced) await runtime.syncLatest();
           const latest = (await runtime.read()).lastSynced;

@@ -19,6 +19,7 @@ As mudanças relevantes são registradas por versão. O projeto usa Semantic Ver
 
 ### Melhorado
 
+- Painel com navegação lateral recolhível, ícones, seleção em destaque, adaptação a janelas menores e preferência de navegação preservada entre aberturas.
 - Removidos os horários de sincronização dos overlays e os títulos de equipe em duelos 1v1.
 - Textos de ajuda exibem as combinações configuradas pelo usuário.
 

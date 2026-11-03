@@ -342,5 +342,10 @@
   "Atalho da trava indisponível ou desativado; use a opção acima.": "Lock hotkey unavailable or disabled; use the option above.",
   "Compacto vertical · jogadores empilhados": "Compact vertical · stacked players",
   "O compacto horizontal mantém as equipes lado a lado. O vertical empilha os jogadores e usa metade da largura. Ambos usam emblemas das civilizações.": "Horizontal compact keeps teams side by side. Vertical compact stacks players and uses half the width. Both use civilization emblems.",
-  "Formato da demonstração": "Demo format"
+  "Formato da demonstração": "Demo format",
+  "Navegação principal": "Main navigation",
+  "Expandir navegação": "Expand navigation",
+  "Recolher navegação": "Collapse navigation",
+  "Recolher": "Collapse",
+  "Integração ativa": "Active integration"
 }

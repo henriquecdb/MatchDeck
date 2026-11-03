@@ -26,6 +26,8 @@ Estatísticas e rating vêm da fila correspondente à partida, sem substituir po
 
 Em **Configurações → Idioma**, escolha português brasileiro ou inglês para a interface. O idioma de **Civilizações e unidades** é independente e começa em inglês, inclusive com a interface em português. As alterações são imediatas na prévia e no overlay e ficam salvas para a próxima abertura. A troca usa os catálogos locais e preserva os dados sincronizados da partida.
 
+O painel usa navegação lateral recolhível, com ícones e a seção ativa em destaque. A barra se adapta à largura da janela, lembra sua escolha e permite navegar com as setas do teclado sem encerrar a demonstração ou a detecção.
+
 ## Demonstração com dados sincronizados
 
 As funcionalidades ficam nas abas **Partida**, **Overlay**, **Demonstração**, **Atualizações**, **Configurações** e **Diagnóstico**. Trocar de aba não encerra a partida nem o monitoramento. A página de carregamento acompanha a inicialização e permite nova tentativa em caso de falha ou demora. Ela pode desaparecer rapidamente em uma abertura normal; não existe espera artificial. Em Configurações, use **Visualizar tela de carregamento** para inspecioná-la e consulte o tempo de inicialização da interface.

@@ -36,13 +36,13 @@ export function DetectionPanel({ runtime, status, desktop, ready }: Props) {
         setInput(profile.profileId.toString());
         setIdentifiedName(profile.name);
       })}>{t('Identificar perfil local')}</button>
-      <button disabled={status.config.enabled || !profileInput.trim()} onClick={() => void perform(() => runtime.configureDetection(true, profileInput))}>{t('Ativar detecção')}</button>
+      <button className="primary-action" disabled={status.config.enabled || !profileInput.trim()} onClick={() => void perform(() => runtime.configureDetection(true, profileInput))}>{t('Ativar detecção')}</button>
       <button disabled={!status.config.enabled} onClick={() => void perform(() => runtime.configureDetection(false, profileInput))}>{t('Desativar detecção')}</button>
       <button disabled={!status.config.enabled} onClick={() => void perform(() => runtime.retryDetection())}>{t('Consultar agora')}</button>
     </div>
     {identifiedName && !status.config.enabled && <p>{t('Perfil identificado:')} {identifiedName}{t('. Clique em Ativar detecção.')}</p>}
     {status.config.profile && <p>{t('Perfil configurado:')} <strong>{status.config.profile.name}</strong> · {status.config.profile.profileId}</p>}
-    <p role="status">{busy ? t('Processando…') : status.message}</p>
+    <p role="status">{busy ? t('Processando…') : t(status.message)}</p>
     {status.lastChecked && <p>{t('Última consulta bem-sucedida:')} {new Date(status.lastChecked).toLocaleTimeString(language)}</p>}
     {error && <p role="alert" className="error">{t(error)}</p>}
     <p>{t('Consultas a cada 20 segundos, com intervalo progressivo após falhas. Ranqueadas e partidas rápidas dependem da publicação pela fonte. Lobbies personalizados, especialmente contra IA, não têm cobertura garantida. Skirmish offline e campanhas não são detectados.')}</p>

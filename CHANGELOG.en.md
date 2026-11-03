@@ -17,6 +17,7 @@
 
 ### Improved
 
+- Collapsible sidebar navigation with icons, active section highlighting, smaller-window support and a remembered navigation preference.
 - Removed synchronization timestamps from overlays and team headings from 1v1 duels.
 - Shortcut help reflects the user's saved bindings.
 

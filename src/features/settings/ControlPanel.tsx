@@ -8,11 +8,11 @@ import { gameIntegration, installedGames } from '../../games/registry';
 import { DetectionPanel } from '../detection/DetectionPanel';
 import { UpdatePanel } from '../updates/UpdatePanel';
 import { DemoPanel } from '../demo/DemoPanel';
-import { AppTabs, appTabs, type AppTab } from '../shell/AppTabs';
+import { appTabs, type AppTab } from '../shell/AppTabs';
 import { LoadingScreen } from '../shell/LoadingScreen';
 import { OverlaySettingsPanel } from './OverlaySettingsPanel';
 import { OverlayPreview } from '../overlay/OverlayPreview';
-import metadata from '../../../package.json';
+import { AppLayout } from '../shell/AppLayout';
 import { GeneralSettings } from './GeneralSettings';
 import { CloseDialog } from './CloseDialog';
 import { DiagnosticsPanel } from '../diagnostics/DiagnosticsPanel';
@@ -41,13 +41,8 @@ function ControlPanelContent({ runtime, desktop, runtimeState }: { runtime: Over
 
   if (!ready) return <LoadingScreen error={error} onRetry={retry} />;
 
-  return <main className="app-shell">
-    <header className="app-heading">
-      <div><h1>Match<span>Deck</span></h1><p>{installedGames[0].name}</p></div>
-      <div className="app-version"><span className={`connection-badge ${match ? 'is-active' : ''}`}>{match ? (match.source === 'demo' ? t('Em demonstração') : t('Em partida')) : t('Pronto')}</span><small>v{metadata.version}</small></div>
-    </header>
+  return <AppLayout active={activeTab} onChange={setActiveTab} gameName={installedGames[0].name} status={match ? match.source === 'demo' ? t('Em demonstração') : t('Em partida') : t('Pronto')} sessionActive={!!match}>
     {!desktop && <p className="notice">{t('Prévia no navegador. O overlay sobre o jogo funciona no aplicativo Windows.')}</p>}
-    <AppTabs active={activeTab} onChange={setActiveTab} />
     {!state.preferences.onboardingComplete && <Onboarding state={state} runtime={runtime} onStep={setActiveTab} perform={perform} />}
     {error && <p role="alert" className="error">{t(error)}</p>}
     {state.appError && <div role="alert" className="error">{t(state.appError)} <button onClick={() => void perform(() => runtime.dismissAppError())}>{t('Fechar aviso')}</button></div>}
@@ -72,5 +67,5 @@ function ControlPanelContent({ runtime, desktop, runtimeState }: { runtime: Over
       {tab.id === 'settings' && <GeneralSettings state={state} runtime={runtime} desktop={desktop} perform={perform} />}
       {tab.id === 'diagnostics' && <DiagnosticsPanel state={state} runtime={runtime} />}
     </section>)}
-  </main>;
+  </AppLayout>;
 }
