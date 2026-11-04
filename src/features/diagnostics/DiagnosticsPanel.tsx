@@ -22,6 +22,6 @@ export function DiagnosticsPanel({ state, runtime }: { state: AppState; runtime:
     <p>{t('A fonte é o AoE II Companion. Ranqueadas e partidas rápidas dependem da publicação dos dados; lobbies personalizados e partidas contra IA não têm cobertura garantida.')}</p>
     <div className="actions"><button disabled={busy} onClick={() => void refresh()}>{busy ? t('Coletando…') : t('Preparar diagnóstico')}</button><button disabled={!report || busy} onClick={download}>{t('Baixar diagnóstico revisado')}</button></div>
     {error && <p role="alert" className="error">{t(error)}</p>}
-    {report && <><p>{t('Confira o conteúdo abaixo antes de baixar ou compartilhar. O relatório omite nomes, IDs de perfil e partida, pastas, credenciais e respostas completas da API. Os eventos são limitados a esta execução.')}</p><pre className="diagnostic-preview" tabIndex={0} aria-label={t('Prévia do diagnóstico')}>{JSON.stringify(report, null, 2)}</pre></>}
+    {report && <><p>{t('Revise antes de compartilhar. Sem nomes, IDs, pastas, credenciais ou respostas completas da API. Eventos só desta execução.')}</p><pre className="diagnostic-preview" tabIndex={0} aria-label={t('Prévia do diagnóstico')}>{JSON.stringify(report, null, 2)}</pre></>}
   </fieldset>;
 }

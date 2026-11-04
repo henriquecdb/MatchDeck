@@ -19,6 +19,7 @@ import { DiagnosticsPanel } from '../diagnostics/DiagnosticsPanel';
 import { Onboarding } from '../onboarding/Onboarding';
 import { LastResult } from '../match/LastResult';
 import { hotkeyLabel } from '../../domain/hotkeys';
+import { ProfilePanel } from '../profile/ProfilePanel';
 
 export function ControlPanel({ runtime, desktop }: { runtime: OverlayRuntime; desktop: boolean }) {
   const runtimeState = useRuntime(runtime);
@@ -49,20 +50,21 @@ function ControlPanelContent({ runtime, desktop, runtimeState }: { runtime: Over
     {state.closeRequested && <CloseDialog state={state} runtime={runtime} perform={perform} />}
     {appTabs.map(tab => <section key={tab.id} role="tabpanel" id={`panel-${tab.id}`} aria-labelledby={`tab-${tab.id}`} hidden={activeTab !== tab.id} className="app-panel">
       {tab.id === 'match' && <>
-        <div className="section-heading"><h2>{t('Conecte sua partida')}</h2><p>{t('Escolha seu perfil e deixe o MatchDeck acompanhar o multiplayer.')}</p></div>
+        <div className="section-heading"><h2>{t('Partida')}</h2></div>
         <DetectionPanel runtime={runtime} status={state.detection} desktop={desktop} ready={ready} />
-        {match && <div className="session-summary"><strong>{match.map}</strong><span>{match.players.map(player => player.name).join(' × ')}</span><p>{state.hiddenMatchId === match.id ? t('Overlay oculto nesta partida. A detecção continua ativa.') : settings.focusOnly && match.source === 'live' ? t("O overlay acompanha o foco do Age 2.") : t('O overlay permanece visível ao trocar de janela.')}</p>
+        {match && <div className="session-summary"><strong>{match.map}</strong><span>{match.players.map(player => player.name).join(' × ')}</span><p>{state.hiddenMatchId === match.id ? t('Overlay oculto; detecção ativa.') : settings.focusOnly && match.source === 'live' ? t("Visível com o Age 2 em foco.") : t('Visível ao trocar de janela.')}</p>
           <button onClick={() => void perform(() => runtime.toggleVisibility())}>{state.hiddenMatchId === match.id ? t('Mostrar nesta partida') : t('Ocultar nesta partida')}</button></div>}
-        <p>{state.preferences.hotkeys.toggleOverlay ? state.visibilityShortcutAvailable ? t('{0} mostra ou oculta o overlay nesta partida.', { 0: hotkeyLabel(state.preferences.hotkeys.toggleOverlay) }) : t('Atalho de visibilidade indisponível. Use o botão da partida para mostrar ou ocultar.') : t('Atalho de visibilidade desativado. Use o botão da partida.')}</p>
+        {match && <p>{state.preferences.hotkeys.toggleOverlay ? state.visibilityShortcutAvailable ? t('Mostrar/ocultar: {0}', { 0: hotkeyLabel(state.preferences.hotkeys.toggleOverlay) }) : t('Atalho indisponível. Use o botão da partida.') : t('Atalho desativado. Use o botão da partida.')}</p>}
         {match?.warnings?.map(warning => <p role="status" key={warning}>{t(warning)}</p>)}
         <LastResult match={state.lastSynced} />
       </>}
+      {tab.id === 'profile' && <ProfilePanel runtime={runtime} profile={state.detection.config.profile} desktop={desktop} visible={activeTab === 'profile'} onLink={() => setActiveTab('match')} />}
       {tab.id === 'overlay' && <>
-        <div className="section-heading"><h2>{t('Do seu jeito')}</h2><p>{t('Ajuste o visual e escolha onde as informações aparecem.')}</p></div>
+        <div className="section-heading"><h2>{t('Overlay')}</h2><p>{t('Aparência e posição do overlay.')}</p></div>
         <OverlaySettingsPanel settings={settings} match={match} desktop={desktop} shortcutAvailable={state.shortcutAvailable} lockShortcut={state.preferences.hotkeys.lockOverlay} onChange={configure} monitors={monitors} onRefreshMonitors={refreshMonitors} monitorError={monitorError} />
         <OverlayPreview match={preview} settings={settings} />
       </>}
-      {tab.id === 'demo' && <><div className="section-heading"><h2>{t('Experimente o overlay')}</h2><p>{t('Teste as informações e a posição antes de jogar.')}</p></div><DemoPanel runtime={runtime} state={state} desktop={desktop} perform={perform} /></>}
+      {tab.id === 'demo' && <><div className="section-heading"><h2>{t('Demonstração')}</h2><p>{t('Teste sem entrar no jogo.')}</p></div><DemoPanel runtime={runtime} state={state} desktop={desktop} perform={perform} /></>}
       {tab.id === 'updates' && <UpdatePanel desktop={desktop} visible={activeTab === 'updates'} busy={!!match || state.detection.config.enabled} autoUpdate={state.preferences.autoUpdate} onAutoUpdateChange={autoUpdate => void perform(() => runtime.configureApp({ ...state.preferences, autoUpdate }))} />}
       {tab.id === 'settings' && <GeneralSettings state={state} runtime={runtime} desktop={desktop} perform={perform} />}
       {tab.id === 'diagnostics' && <DiagnosticsPanel state={state} runtime={runtime} />}

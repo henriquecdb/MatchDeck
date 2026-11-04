@@ -8,7 +8,7 @@ export function LastResult({ match }: { match: MatchSnapshot | null }) {
   return <section className="session-summary" aria-label={t('Último resultado confirmado')}><h2>{t('Último resultado confirmado')}</h2><strong>{match.map} · {t(queueLabel(match))}</strong>
     <span>{new Date(match.finishedAt).toLocaleString(language)}</span>
     <ul>{match.players.map(player => <li key={player.id}>{player.id === match.selfPlayerId && <strong>{t('Você ·')} </strong>}{player.name}: {player.won === true ? t('vitória') : player.won === false ? t('derrota') : t('resultado não informado')}  {t('· Rating inicial')} {player.rating ?? '—'}  {t('· Variação')} {player.ratingChange == null ? t('não informada') : `${player.ratingChange >= 0 ? '+' : ''}${player.ratingChange}`}</li>)}</ul>
-    <p>{t('Resultado informado pela fonte. O rating inicial foi preservado; a variação é a confirmada para esta partida.')}</p>
+    <p>{t('Variação confirmada pela fonte; rating inicial preservado.')}</p>
     {match.warnings?.map(warning => <p role="status" key={warning}>{t(warning)}</p>)}
   </section>;
 }

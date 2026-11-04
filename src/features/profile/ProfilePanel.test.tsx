@@ -1,0 +1,94 @@
+// @vitest-environment happy-dom
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { afterEach, expect, it, vi } from 'vitest';
+import { BrowserRuntime } from '../../infrastructure/browser-runtime';
+import { ProfilePanel } from './ProfilePanel';
+import type { ProfileOverview } from '../../domain/profile';
+import { profileWinRate } from '../../domain/profile';
+import { LanguageProvider } from '../../i18n/LanguageProvider';
+import { defaultPreferences } from '../../domain/preferences';
+
+afterEach(() => { cleanup(); vi.restoreAllMocks(); });
+
+const overview: ProfileOverview = {
+  profileId: 42, name: 'Player', fetchedAt: '2026-11-03T10:00:00Z',
+  leaderboards: [
+    { leaderboardId: 'rm_1v1', rating: 1500, wins: 30, losses: 10 },
+    { leaderboardId: 'qp_rm_1v1', rating: 1100, wins: null, losses: 0 },
+  ],
+  recentMatches: Array.from({ length: 5 }, (_, index) => ({
+    id: String(index), startedAt: '2026-11-03T09:00:00Z', queueId: 'qp_rm_1v1', map: 'Arabia',
+    civilizationId: 'franks', civilization: 'Franks', won: index === 0 ? null : index % 2 === 0,
+    ratingChange: index === 0 ? null : index % 2 === 0 ? 12 : -8,
+  })),
+};
+
+it('loads only when visible, separates queues and reuses its cache after a manual refresh', async () => {
+  const runtime = new BrowserRuntime();
+  const load = vi.spyOn(runtime, 'profileOverview').mockResolvedValue(overview);
+  const props = { runtime, profile: { profileId: 42, name: 'Player' }, desktop: true, onLink: vi.fn() };
+  const view = render(<ProfilePanel {...props} visible={false} />);
+  expect(load).not.toHaveBeenCalled();
+  view.rerender(<ProfilePanel {...props} visible />);
+  await screen.findByText('1100');
+  expect(screen.queryByText('1500')).toBeNull();
+  fireEvent.change(screen.getByRole('combobox', { name: 'Modalidade' }), { target: { value: 'rm_1v1' } });
+  expect(screen.getByText('1500')).toBeTruthy();
+  expect(screen.getByText('75%')).toBeTruthy();
+  const history = screen.getByRole('region', { name: 'Últimas 5 partidas' });
+  expect(within(history).getAllByRole('listitem')).toHaveLength(5);
+  expect(within(history).getByText('Sem resultado')).toBeTruthy();
+  expect(within(history).getAllByText('Derrota')).toHaveLength(2);
+  expect(within(history).getAllByText('Vitória')).toHaveLength(2);
+  expect(within(history).getAllByText('Franks')).toHaveLength(5);
+  fireEvent.click(screen.getByRole('button', { name: 'Atualizar perfil' }));
+  await waitFor(() => expect(load).toHaveBeenCalledTimes(2));
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Atualizar perfil' })).toHaveProperty('disabled', false));
+  view.rerender(<ProfilePanel {...props} visible={false} />);
+  view.rerender(<ProfilePanel {...props} visible />);
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Atualizar perfil' })).toHaveProperty('disabled', false));
+  expect(load).toHaveBeenCalledTimes(2);
+  expect(profileWinRate(overview.leaderboards[1])).toBeNull();
+  expect(profileWinRate({ leaderboardId: 'rm_1v1', rating: 1000, wins: 0, losses: 0 })).toBeNull();
+});
+
+it('retains previous data with a visible error when refresh fails', async () => {
+  const runtime = new BrowserRuntime();
+  vi.spyOn(runtime, 'profileOverview').mockResolvedValueOnce(overview).mockRejectedValueOnce(new Error('Offline'));
+  render(<ProfilePanel runtime={runtime} profile={{ profileId: 42, name: 'Player' }} desktop visible onLink={vi.fn()} />);
+  await screen.findByText('1100');
+  fireEvent.click(screen.getByRole('button', { name: 'Atualizar perfil' }));
+  expect((await screen.findByRole('alert')).textContent).toContain('Offline');
+  expect(screen.getByText('1100')).toBeTruthy();
+});
+
+it('does not show a previous profile while a new request is pending', async () => {
+  const runtime = new BrowserRuntime();
+  vi.spyOn(runtime, 'profileOverview').mockResolvedValueOnce(overview).mockImplementation(() => new Promise(() => {}));
+  const props = { runtime, desktop: true, visible: true, onLink: vi.fn() };
+  const view = render(<ProfilePanel {...props} profile={{ profileId: 42, name: 'Player' }} />);
+  await screen.findByText('1100');
+  view.rerender(<ProfilePanel {...props} profile={{ profileId: 99, name: 'Other player' }} />);
+  expect(screen.queryByText('1100')).toBeNull();
+  expect(screen.getByText('Other player')).toBeTruthy();
+});
+
+it('supports English interface and independent Portuguese civilization names', async () => {
+  const runtime = new BrowserRuntime();
+  vi.spyOn(runtime, 'profileOverview').mockResolvedValue(overview);
+  render(<LanguageProvider preferences={{ ...defaultPreferences, language: 'en', gameLanguage: 'pt-BR' }}><ProfilePanel runtime={runtime} profile={{ profileId: 42, name: 'Player' }} desktop visible onLink={vi.fn()} /></LanguageProvider>);
+  await screen.findByRole('region', { name: 'Last 5 matches' });
+  expect(screen.getAllByText('Francos')).toHaveLength(5);
+  expect(screen.getByText('Unknown result')).toBeTruthy();
+  expect(screen.getAllByText('Loss')).toHaveLength(2);
+});
+
+it('guides unlinked users without issuing requests', () => {
+  const runtime = new BrowserRuntime();
+  const load = vi.spyOn(runtime, 'profileOverview');
+  const onLink = vi.fn();
+  render(<ProfilePanel runtime={runtime} profile={null} desktop visible onLink={onLink} />);
+  fireEvent.click(screen.getByRole('button', { name: 'Vincular perfil' }));
+  expect(onLink).toHaveBeenCalledOnce();
+  expect(load).not.toHaveBeenCalled();
+});

@@ -133,6 +133,7 @@ fn main() {
             commands::finish_match,
             commands::configure_overlay,
             commands::identify_local_profile,
+            commands::profile_overview,
             commands::configure_detection,
             commands::sync_latest_match,
             commands::toggle_overlay_visibility,

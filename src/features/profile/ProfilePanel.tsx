@@ -1,0 +1,81 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { OverlayRuntime } from '../../application/runtime';
+import { ProfileRepository } from '../../application/profile-repository';
+import type { PlayerProfile } from '../../domain/detection';
+import { profileWinRate, type ProfileOverview } from '../../domain/profile';
+import { profileQueueLabel } from '../../domain/match-labels';
+import { useI18n } from '../../i18n/LanguageProvider';
+import { unitArtwork } from '../../games/aoe2/artwork';
+import { CivilizationEmblem } from '../overlay/CivilizationEmblem';
+
+interface Props {
+  runtime: OverlayRuntime;
+  profile: PlayerProfile | null;
+  visible: boolean;
+  desktop: boolean;
+  onLink(): void;
+}
+
+export function ProfilePanel({ runtime, profile, visible, desktop, onLink }: Props) {
+  const { t, language, gameLanguage } = useI18n();
+  const repository = useMemo(() => new ProfileRepository(() => runtime.profileOverview()), [runtime]);
+  const [refresh, setRefresh] = useState(0);
+  const [queue, setQueue] = useState<string | null>(null);
+  const lastRefresh = useRef(0);
+  const [view, setView] = useState<{ id: number; data: ProfileOverview | null; busy: boolean; error: string | null } | null>(null);
+  const profileId = profile?.profileId;
+  useEffect(() => {
+    if (!visible || !desktop || !profileId) return;
+    let disposed = false;
+    const force = refresh !== lastRefresh.current;
+    lastRefresh.current = refresh;
+    setView({ id: profileId, data: repository.peek(profileId), busy: true, error: null });
+    void repository.load(profileId, force).then(data => {
+      if (!disposed) setView({ id: profileId, data, busy: false, error: null });
+    }).catch(cause => {
+      if (!disposed) setView({ id: profileId, data: repository.peek(profileId), busy: false, error: cause instanceof Error ? cause.message : String(cause) });
+    });
+    return () => { disposed = true; };
+  }, [repository, profileId, visible, desktop, refresh]);
+
+  const current = view?.id === profileId ? view : null;
+  const data = current?.data;
+  const selectedBoard = data?.leaderboards.find(board => board.leaderboardId === queue)
+    ?? data?.leaderboards.find(board => board.leaderboardId === data.recentMatches[0]?.queueId)
+    ?? data?.leaderboards[0];
+  const winRate = selectedBoard ? profileWinRate(selectedBoard) : null;
+  return <>
+    <div className="section-heading"><h2>{t('Perfil')}</h2></div>
+    {!desktop ? <p>{t('Estatísticas disponíveis no aplicativo Windows.')}</p> : !profile ? <div className="session-summary"><p>{t('Vincule seu perfil para ver estatísticas e partidas recentes.')}</p><button onClick={onLink}>{t('Vincular perfil')}</button></div> : <>
+      <div className="profile-heading"><div><strong>{data?.name ?? profile.name}</strong><small>ID {profile.profileId}</small></div>
+        <button disabled={current?.busy} onClick={() => setRefresh(value => value + 1)}>{t(current?.busy ? 'Atualizando…' : 'Atualizar perfil')}</button></div>
+      {current?.busy && <p role="status">{t('Carregando estatísticas…')}</p>}
+      {current?.error && <p role="alert" className="error">{t('Não foi possível atualizar o perfil.')} {t(current.error)}</p>}
+      {data && <>
+        <section aria-label={t('Estatísticas por modalidade')}><h3>{t('Estatísticas por modalidade')}</h3>
+          {selectedBoard ? <article className="profile-board"><label>{t('Modalidade')} <select value={selectedBoard.leaderboardId} onChange={event => setQueue(event.target.value)}>
+            {data.leaderboards.map(board => <option key={board.leaderboardId} value={board.leaderboardId}>{t(profileQueueLabel(board.leaderboardId))}</option>)}
+          </select></label><dl>
+              <div><dt>Rating</dt><dd>{selectedBoard.rating ?? '—'}</dd></div>
+              <div><dt>{t('Vitórias')}</dt><dd>{selectedBoard.wins ?? '—'}</dd></div>
+              <div><dt>{t('Derrotas')}</dt><dd>{selectedBoard.losses ?? '—'}</dd></div>
+              <div><dt>{t('Aproveitamento')}</dt><dd>{winRate == null ? '—' : `${winRate.toLocaleString(language, { maximumFractionDigits: 1 })}%`}</dd></div>
+            </dl></article> : <p>{t('Sem estatísticas publicadas para este perfil.')}</p>}
+        </section>
+        <section aria-label={t('Últimas 5 partidas')}><h3>{t('Últimas 5 partidas')}</h3>
+          {data.recentMatches.length ? <ol className="profile-history">{data.recentMatches.map(match => {
+            const artwork = unitArtwork({ civilizationId: match.civilizationId ?? undefined, civilization: match.civilization ?? '', uniqueUnits: [] }, gameLanguage);
+            const civilization = artwork?.name ?? match.civilization ?? t('Civilização indisponível');
+            return <li key={match.id} className={`history-match ${match.won === true ? 'is-win' : match.won === false ? 'is-loss' : 'is-unknown'}`}>
+              <span className="history-result">{t(match.won === true ? 'Vitória' : match.won === false ? 'Derrota' : 'Sem resultado')}</span>
+              <div className="history-details"><strong>{t(match.map)}</strong><small>{t(profileQueueLabel(match.queueId))}</small><time dateTime={match.startedAt}>{new Date(match.startedAt).toLocaleString(language, { dateStyle: 'short', timeStyle: 'short' })}</time></div>
+              <div className="history-civilization"><CivilizationEmblem image={artwork?.emblem} civilization={civilization} /><span>{civilization}</span></div>
+              <span className="history-rating" title={t('Variação de rating')} aria-label={t('Variação de rating: {0}', { 0: match.ratingChange == null ? '—' : `${match.ratingChange > 0 ? '+' : ''}${match.ratingChange}` })}>{match.ratingChange == null ? '—' : `${match.ratingChange > 0 ? '+' : ''}${match.ratingChange}`}</span>
+            </li>;
+          })}</ol> : <p>{t('Nenhuma partida encerrada publicada.')}</p>}
+        </section>
+        <details className="help-details"><summary>{t('Sobre estes dados')}</summary><p>{t('Fonte: AoE2 Companion. Até 5 partidas encerradas, da mais recente para a mais antiga. Resultados podem demorar a aparecer.')}</p><p>{t('Ratings e estatísticas são separados por modalidade. — indica dado indisponível; não significa zero.')}</p><p>{t('Cache de 1 minuto ao abrir esta aba. Use Atualizar perfil para consultar agora.')}</p><p>{t('Atualizado em {0}', { 0: new Date(data.fetchedAt).toLocaleString(language) })}</p></details>
+      </>}
+    </>}
+  </>;
+}

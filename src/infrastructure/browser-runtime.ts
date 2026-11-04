@@ -5,6 +5,7 @@ import { defaultSettings, parseSettings, type OverlaySettings } from '../domain/
 import { defaultDetection, type PlayerProfile } from '../domain/detection';
 import { defaultPreferences, parsePreferences, type AppPreferences } from '../domain/preferences';
 import metadata from '../../package.json';
+import type { ProfileOverview } from '../domain/profile';
 
 export class BrowserRuntime implements OverlayRuntime {
   private state: AppState = { match: null, settings: { ...defaultSettings }, detection: structuredClone(defaultDetection), shortcutAvailable: false, visibilityShortcutAvailable: false, hiddenMatchId: null, lastSynced: null, preferences: { ...defaultPreferences }, autostart: false, trayAvailable: false, closeRequested: false, startupMs: null, appError: null };
@@ -30,6 +31,10 @@ export class BrowserRuntime implements OverlayRuntime {
 
   async syncLatest(): Promise<void> {
     throw new Error('A sincronização de partidas está disponível no aplicativo Windows.');
+  }
+
+  async profileOverview(): Promise<ProfileOverview> {
+    throw new Error('Estatísticas disponíveis no aplicativo Windows.');
   }
 
   async identifyLocalProfile(): Promise<PlayerProfile> {

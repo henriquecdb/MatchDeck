@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.5] - 2026-11-03
+
+### Added
+
+- Profile tab with queue-specific rating, wins, losses and win rate for the linked player.
+- The latest five available completed multiplayer matches, with result, map, civilization and confirmed rating change.
+- One-minute cache on opening the profile, manual refresh, error recovery and explicit missing values. No additional periodic requests.
+
+### Improved
+
+- Concise Portuguese and English copy across Match, Overlay, Demo, Settings, Updates and Diagnostics.
+- Expandable detection and layout help keeps limitations, warnings and controls accessible.
+
 ## [0.4.4] - 2026-11-03
 
 ### Fixed

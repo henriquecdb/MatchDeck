@@ -100,7 +100,7 @@ pub struct RemoteProfile {
     pub leaderboards: Vec<Leaderboard>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Leaderboard {
     pub leaderboard_id: String,

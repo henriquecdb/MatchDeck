@@ -3,6 +3,7 @@ import { useRef, type KeyboardEvent } from 'react';
 
 export const appTabs = [
   { id: 'match', label: 'Partida' },
+  { id: 'profile', label: 'Perfil' },
   { id: 'overlay', label: 'Overlay' },
   { id: 'demo', label: 'Demonstração' },
   { id: 'updates', label: 'Atualizações' },
@@ -13,6 +14,7 @@ export const appTabs = [
 export type AppTab = typeof appTabs[number]['id'];
 
 const iconPaths: Record<AppTab, string> = {
+  profile: 'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM4 21v-2a8 8 0 0 1 16 0v2',
   match: 'M6 4h12v4a6 6 0 0 1-12 0V4Zm0 1H3v3a4 4 0 0 0 4 4m11-7h3v3a4 4 0 0 1-4 4m-5 2v6m-4 0h8',
   overlay: 'M3 4h18v13H3V4Zm5 17h8m-4-4v4M6 7h6v5H6V7Z',
   demo: 'm9 5 11 7-11 7V5Z',

@@ -16,7 +16,7 @@ export function HotkeySettings({ state, runtime, desktop, perform }: { state: Ap
     { key: 'toggleOverlay', label: 'Mostrar/ocultar overlay', available: state.visibilityShortcutAvailable },
   ];
   return <fieldset disabled={busy}><legend>{t('Atalhos globais')}</legend>
-    <p>{t('Escolha os modificadores e a tecla de cada ação. Os atalhos funcionam mesmo durante a partida.')}</p>
+    <p>{t('Atalhos globais, inclusive durante a partida.')}</p>
     {actions.map(action => {
       const value = draft[action.key];
       const parts = value?.split('+') ?? [];
@@ -36,6 +36,6 @@ export function HotkeySettings({ state, runtime, desktop, perform }: { state: Ap
       <button onClick={() => setDraft({ ...defaultHotkeys })}>{t('Restaurar atalhos padrão')}</button>
       <button disabled={!changed} onClick={() => setDraft(state.preferences.hotkeys)}>{t('Descartar alterações')}</button>
     </div>
-    <p>{t('Se uma combinação estiver em uso por outro aplicativo, os atalhos anteriores serão preservados.')}</p>
+    <p>{t('Combinação em uso? Os atalhos anteriores são mantidos.')}</p>
   </fieldset>;
 }

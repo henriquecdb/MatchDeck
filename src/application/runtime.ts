@@ -2,6 +2,7 @@ import type { MatchSnapshot } from '../domain/match';
 import type { OverlaySettings } from '../domain/settings';
 import type { DetectionStatus, PlayerProfile } from '../domain/detection';
 import type { AppPreferences } from '../domain/preferences';
+import type { ProfileOverview } from '../domain/profile';
 
 export interface AppState {
   match: MatchSnapshot | null;
@@ -29,6 +30,7 @@ export interface OverlayRuntime {
   finish(): Promise<void>;
   configure(settings: OverlaySettings): Promise<void>;
   identifyLocalProfile(): Promise<PlayerProfile>;
+  profileOverview(): Promise<ProfileOverview>;
   configureDetection(enabled: boolean, profileInput: string): Promise<void>;
   syncLatest(): Promise<void>;
   listMonitors(): Promise<DisplayMonitor[]>;

@@ -147,6 +147,23 @@ pub async fn identify_local_profile(
 }
 
 #[tauri::command]
+pub async fn profile_overview(
+    controller: State<'_, DetectionController>,
+    state: State<'_, SharedState>,
+) -> Result<crate::games::aoe2::profile::ProfileOverview, String> {
+    let profile_id = state
+        .lock()
+        .map_err(|error| error.to_string())?
+        .detection
+        .config
+        .profile
+        .as_ref()
+        .map(|profile| profile.profile_id)
+        .ok_or("Vincule um perfil na aba Partida")?;
+    controller.provider.profile_overview(profile_id).await
+}
+
+#[tauri::command]
 pub async fn configure_detection(
     app: tauri::AppHandle,
     controller: State<'_, DetectionController>,

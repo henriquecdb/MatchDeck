@@ -13,7 +13,7 @@ interface UnitArtwork {
 const catalog: Record<string, UnitArtwork> = catalogData;
 const localized: Record<string, { name: string; units: string[] }> = translations;
 
-export function unitArtwork(player: Player, language: Language = 'en'): UnitArtwork | undefined {
+export function unitArtwork(player: Pick<Player, 'civilizationId' | 'civilization' | 'uniqueUnits'>, language: Language = 'en'): UnitArtwork | undefined {
   const key = (player.civilizationId ?? player.civilization).toLowerCase();
   const entry = catalog[key] ?? Object.values(catalog).find(entry => entry.units.some(unit => player.uniqueUnits.includes(unit)));
   if (!entry) return undefined;

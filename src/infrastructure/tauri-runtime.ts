@@ -5,6 +5,7 @@ import type { AppPreferences } from '../domain/preferences';
 import type { MatchSnapshot } from '../domain/match';
 import type { OverlaySettings } from '../domain/settings';
 import type { PlayerProfile } from '../domain/detection';
+import type { ProfileOverview } from '../domain/profile';
 
 export class TauriRuntime implements OverlayRuntime {
   read() { return invoke<AppState>('read_state'); }
@@ -22,6 +23,7 @@ export class TauriRuntime implements OverlayRuntime {
   retryDetection() { return invoke<void>('retry_detection'); }
   dismissAppError() { return invoke<void>('dismiss_app_error'); }
   identifyLocalProfile() { return invoke<PlayerProfile>('identify_local_profile'); }
+  profileOverview() { return invoke<ProfileOverview>('profile_overview'); }
   configureDetection(enabled: boolean, profileInput: string) {
     return invoke<void>('configure_detection', { enabled, profileInput });
   }

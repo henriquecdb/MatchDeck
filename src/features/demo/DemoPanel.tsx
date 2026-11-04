@@ -30,7 +30,7 @@ export function DemoPanel({ runtime, state, desktop, perform }: Props) {
 
   return <>
     <fieldset disabled={detection.config.enabled || busy}>
-      <legend>{t('Testar sem entrar no jogo')}</legend>
+      <legend>{t('Dados de teste')}</legend>
       <label>{t('Dados da demonstração')} <select disabled={!!match} value={source} onChange={event => setSource(event.target.value as typeof source)}>
         <option value="fictional">{t('Jogadores fictícios')}</option><option value="synced">{t('Última partida sincronizada')}</option>
       </select></label>
@@ -53,8 +53,8 @@ export function DemoPanel({ runtime, state, desktop, perform }: Props) {
         <button disabled={!!match || !desktop || !detection.config.profile} onClick={() => run(() => runtime.syncLatest())}>{t('Atualizar últimos dados')}</button>
       </div>
     </fieldset>
-    <p role="status">{detection.config.enabled ? t('Desative a detecção na aba Partida para iniciar um teste.') : match ? t('Demonstração em andamento. Você pode trocar de aba sem encerrar o overlay.') : t('Pronto para testar o overlay.')}</p>
-    <p>{source === 'fictional' ? t('Jogadores fictícios não consultam a API nem substituem seus dados salvos.') : lastSynced ? t('O teste reutiliza os dados salvos, sem consultar a API.') : desktop && detection.config.profile ? t('O primeiro teste busca a última partida do seu perfil.') : t('Configure um perfil no aplicativo Windows e sincronize uma partida, ou selecione jogadores fictícios.')}</p>
+    <p role="status">{detection.config.enabled ? t('Desative a detecção na aba Partida para iniciar um teste.') : match ? t('Demonstração ativa. Trocar de aba mantém o overlay.') : t('Pronto para testar o overlay.')}</p>
+    <p>{source === 'fictional' ? t('Dados fictícios; seus dados salvos são preservados.') : lastSynced ? t('Usando dados salvos, sem nova consulta.') : desktop && detection.config.profile ? t('O primeiro teste busca sua última partida.') : t('Configure um perfil no aplicativo Windows e sincronize uma partida, ou selecione jogadores fictícios.')}</p>
     <OverlayPreview match={match} settings={settings} />
   </>;
 }
