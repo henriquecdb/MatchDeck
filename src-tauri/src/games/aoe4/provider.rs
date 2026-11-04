@@ -17,7 +17,23 @@ pub struct Aoe4Provider {
 #[derive(Deserialize)]
 pub struct RemoteProfile {
     pub profile_id: u64,
+    pub steam_id: Option<String>,
     pub name: String,
+}
+
+impl RemoteProfile {
+    fn resolve(self, requested_id: u64) -> Result<Profile, String> {
+        let requested = requested_id.to_string();
+        let matches_steam =
+            requested.len() == 17 && self.steam_id.as_deref() == Some(requested.as_str());
+        if self.profile_id == 0 || (self.profile_id != requested_id && !matches_steam) {
+            return Err("A fonte retornou um perfil diferente do solicitado".into());
+        }
+        Ok(Profile {
+            profile_id: self.profile_id,
+            name: self.name,
+        })
+    }
 }
 
 #[derive(Clone, Deserialize)]
@@ -227,13 +243,7 @@ impl Aoe4Provider {
             .get(&format!("/players/{id}"))
             .await?
             .ok_or("Perfil não encontrado no AoE4 World")?;
-        if profile.profile_id != id {
-            return Err("A fonte retornou um perfil diferente do solicitado".into());
-        }
-        Ok(Profile {
-            profile_id: id,
-            name: profile.name,
-        })
+        profile.resolve(id)
     }
 
     pub async fn last_game(
@@ -291,6 +301,51 @@ mod tests {
     use super::*;
     use serde_json::json;
 
+    #[test]
+    fn profile_links_and_steam_aliases_resolve_to_the_canonical_profile() {
+        let steam = "76561198000000042";
+        for input in [
+            "42".to_string(),
+            "https://aoe4world.com/players/42-player".to_string(),
+            steam.to_string(),
+            format!("https://aoe4world.com/players/{steam}"),
+        ] {
+            let remote: RemoteProfile = serde_json::from_value(json!({
+                "profile_id":42,"steam_id":steam,"name":"Player"
+            }))
+            .unwrap();
+            let resolved = remote.resolve(profile_id(&input).unwrap()).unwrap();
+            assert_eq!(resolved.profile_id, 42);
+            assert_eq!(resolved.name, "Player");
+        }
+    }
+
+    #[test]
+    fn aliases_do_not_allow_unrelated_or_invalid_profile_responses() {
+        for (requested, response) in [
+            (
+                99,
+                json!({"profile_id":42,"steam_id":"76561198000000042","name":"Player"}),
+            ),
+            (
+                76561198000000043,
+                json!({"profile_id":42,"steam_id":"76561198000000042","name":"Player"}),
+            ),
+            (76561198000000042, json!({"profile_id":42,"name":"Player"})),
+            (
+                76561198000000042,
+                json!({"profile_id":0,"steam_id":"76561198000000042","name":"Player"}),
+            ),
+            (43, json!({"profile_id":42,"steam_id":"43","name":"Player"})),
+        ] {
+            let remote: RemoteProfile = serde_json::from_value(response).unwrap();
+            assert!(remote.resolve(requested).is_err());
+        }
+        let remote: RemoteProfile =
+            serde_json::from_value(json!({"profile_id":42,"name":"Player"})).unwrap();
+        assert_eq!(remote.resolve(42).unwrap().profile_id, 42);
+    }
+
     #[tokio::test]
     #[ignore = "requires public AoE4 World APIs"]
     async fn live_api_smoke_test() {
@@ -298,7 +353,10 @@ mod tests {
         let input =
             std::env::var("MATCHDECK_TEST_AOE4_PROFILE").unwrap_or_else(|_| "4635035".into());
         let profile = provider.resolve_profile(&input).await.unwrap();
-        assert_eq!(profile.profile_id.to_string(), input);
+        assert!(profile.profile_id > 0);
+        if input.len() < 17 {
+            assert_eq!(profile.profile_id.to_string(), input);
+        }
         for stats in [false, true] {
             if let Some(game) = provider.last_game(profile.profile_id, stats).await.unwrap() {
                 assert!(game.includes(profile.profile_id));

@@ -4,7 +4,7 @@ Aplicativo modular de overlays para jogos. Integrações: Age of Empires II: Def
 
 ## Instalar no Windows
 
-Baixe o instalador **MatchDeck_0.5.0_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, siga a configuração guiada, identifique seu perfil na aba **Partida** e ative a detecção com o AoE2 em janela sem bordas.
+Baixe o instalador **MatchDeck_0.5.1_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, siga a configuração guiada, identifique seu perfil na aba **Partida** e ative a detecção com o AoE2 em janela sem bordas.
 
 Veja o [changelog da versão](CHANGELOG.md). O aplicativo verifica novas versões ao abrir e mostra as notas e o progresso da atualização. A instalação automática é opcional e exige que a detecção esteja desligada e não haja partida de demonstração ativa. Pacotes de atualização são verificados por assinatura. O executável ainda não possui certificado Authenticode de editor Windows.
 
@@ -16,7 +16,7 @@ Escolha um cartão na tela inicial ou use o ícone do jogo na lateral para troca
 
 ## Age of Empires IV · experimental
 
-Primeira integração de 1v1 ranqueado e rápido de PC via [AoE4 World](https://aoe4world.com/api). Informe o ID ou link do perfil na aba Partida e ative a detecção. O overlay usa uma faixa horizontal de 900 × 64 px, ajustável em posição, escala e opacidade. A demonstração permite conferir o formato sem entrar no jogo.
+Primeira integração de 1v1 ranqueado e rápido de PC via [AoE4 World](https://aoe4world.com/api). Informe o ID do AoE4 World, o Steam ID ou o link do perfil na aba Partida e ative a detecção. O overlay usa uma faixa horizontal de 900 × 64 px, ajustável em posição, escala e opacidade. A demonstração permite conferir o formato sem entrar no jogo.
 
 A detecção depende da publicação dos dados pela fonte. As consultas leves ocorrem a cada 20 segundos, com intervalo progressivo após falhas; as estatísticas completas são capturadas ao iniciar uma nova partida. Pontos ranqueados e MMR são dados distintos. Dados ausentes aparecem como —. Equipes, partidas personalizadas, campanhas, aba Perfil e histórico do Age 4 ficam para outras iterações.
 
@@ -158,3 +158,7 @@ Teste manual desktop: iniciar uma partida; mover a janela; ajustar opacidade; tr
 1. Validar no uso real a bandeja, o início com Windows, partidas consecutivas, equipes, monitores e atualização da 0.4.
 2. Repetir a prova de conceito de lobby personalizado com dois humanos; o teste com um humano e IA não produziu confirmação de partida em andamento.
 3. Investigar as integrações de Age IV e StarCraft II; skirmish offline está adiado.
+
+## Próximas versões
+
+A linha **0.5.x** consolida o Age 4: validação de partidas reais, correções e expansão de perfil e histórico. A **0.6.0** fica reservada ao início da integração do StarCraft II.
