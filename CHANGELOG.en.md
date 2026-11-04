@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.1] - 2026-11-04
+
+### Fixed
+
+- Age 4 profile linking with Steam IDs and AoE4 World profile URLs containing a Steam ID.
+- MatchDeck verifies the Steam ID in the source response and saves the canonical profile ID for match detection. Unrelated profile responses remain rejected.
+- Regression tests cover canonical IDs, Steam IDs, profile URLs and invalid responses.
+
 ## [0.5.0] - 2026-11-04
 
 ### Added

@@ -2,6 +2,14 @@
 
 As mudanças relevantes são registradas por versão. O projeto usa Semantic Versioning e Conventional Commits.
 
+## [0.5.1] - 2026-11-04
+
+### Corrigido
+
+- Vinculação de perfis do Age 4 por Steam ID ou por links do AoE4 World que usam o Steam ID.
+- O aplicativo agora confirma o Steam ID na resposta da fonte e salva o ID interno para detectar partidas corretamente. Respostas de perfis diferentes continuam sendo rejeitadas.
+- Testes de regressão para IDs internos, Steam IDs, links e respostas inválidas.
+
 ## [0.5.0] - 2026-11-04
 
 ### Adicionado
