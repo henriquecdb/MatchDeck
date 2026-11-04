@@ -4,11 +4,17 @@ Aplicativo modular de overlays para jogos. Primeira integração: Age of Empires
 
 ## Instalar no Windows
 
-Baixe o instalador **MatchDeck_0.4.4_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, siga a configuração guiada, identifique seu perfil na aba **Partida** e ative a detecção com o AoE2 em janela sem bordas.
+Baixe o instalador **MatchDeck_0.4.5_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, siga a configuração guiada, identifique seu perfil na aba **Partida** e ative a detecção com o AoE2 em janela sem bordas.
 
 Veja o [changelog da versão](CHANGELOG.md). O aplicativo verifica novas versões ao abrir e mostra as notas e o progresso da atualização. A instalação automática é opcional e exige que a detecção esteja desligada e não haja partida de demonstração ativa. Pacotes de atualização são verificados por assinatura. O executável ainda não possui certificado Authenticode de editor Windows.
 
 Para contribuir, consulte [CONTRIBUTING.md](CONTRIBUTING.md). Para publicar versões, consulte [docs/releases.md](docs/releases.md).
+
+## Perfil
+
+A aba **Perfil** mostra rating, vitórias, derrotas e aproveitamento por modalidade, além das últimas cinco partidas multiplayer encerradas disponíveis na fonte. Selecione a modalidade sem misturar estatísticas de filas distintas. Resultados desconhecidos e estatísticas ausentes são indicados; zero não substitui dados ausentes. Os nomes das civilizações seguem o idioma de jogo configurado.
+
+Os dados são consultados somente ao abrir a aba ou clicar em **Atualizar perfil**, com cache em memória de um minuto, sem consulta periódica adicional durante a partida. É necessário vincular um perfil na aba **Partida**; a detecção pode permanecer desligada depois. Dados dependem da publicação pelo AoE2 Companion e podem atrasar.
 
 ## Estado atual
 

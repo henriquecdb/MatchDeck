@@ -16,6 +16,10 @@ export function queueLabel(match: MatchSnapshot): string {
   return (match.queueId && queues[match.queueId]) || match.queue || modeLabels[match.mode];
 }
 
+export function profileQueueLabel(queueId: string | null): string {
+  return queueId ? queues[queueId] ?? queueId : 'Modalidade indisponível';
+}
+
 export function ratingLabel(match: MatchSnapshot): string {
   return match.mode === 'quick' ? 'Rating de partidas rápidas' : match.mode === 'ranked' ? 'Rating ranqueado' : match.mode === 'custom' ? 'Rating não ranqueado' : 'Rating';
 }

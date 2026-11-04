@@ -55,13 +55,13 @@ function DesktopUpdates({ busy, autoUpdate, onAutoUpdateChange, visible = true }
       <legend>{t('Atualizações · versão')} {metadata.version}</legend>
       {previousVersion && previousVersion !== metadata.version && <p role="status">{t('Atualizado de')} {previousVersion}  {t('para')} {metadata.version}.</p>}
       <label><input type="checkbox" checked={autoUpdate} onChange={event => onAutoUpdateChange(event.target.checked)} />  {t('Instalar automaticamente com a detecção desativada')}</label>
-      <p>{t('A versão instalada verifica novidades ao abrir e a cada quatro horas. Nenhuma instalação começa com uma partida ou detecção ativa.')}</p>
+      <p>{t('Verifica ao abrir e a cada 4 h. Instala só sem partida e com a detecção desativada.')}</p>
       {import.meta.env.DEV && <p>{t('Na versão de desenvolvimento, a instalação automática fica desativada.')}</p>}
       <div className="actions">
         <button disabled={state.phase === 'checking'} onClick={() => void manager.check()}>{state.phase === 'checking' ? t('Verificando…') : t('Verificar atualizações')}</button>
         {state.available && <button disabled={busy || import.meta.env.DEV || state.phase === 'checking'} onClick={() => void manager.install()}>{t('Instalar versão')} {state.available.version}</button>}
       </div>
-      {state.phase === 'current' && <p role="status">{t('Você está na versão mais recente.')}</p>}
+      {state.phase === 'current' && <p role="status">{t('App atualizado.')}</p>}
       {state.available && <p>{t('Versão')} {state.available.currentVersion} → {state.available.version}</p>}
       {visible && <Suspense fallback={<p role="status">{t('Carregando notas da versão…')}</p>}><ReleaseNotes
         notes={state.available?.notes ?? (language === 'en' ? installedEnglishNotes : installedNotes)} version={state.available?.version ?? metadata.version}

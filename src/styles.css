@@ -167,3 +167,25 @@ input[type=number] { width: 110px; }
 .diagnostic-preview { max-height: 420px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; background: #101720; border: 1px solid #36475c; border-radius: 6px; padding: 14px; font-size: 12px; line-height: 1.6; }
 .player.is-self, .linear-player.is-self { outline: 1px solid #83dff4; outline-offset: -1px; background-color: #1c3445; }
 .self-marker { color: #83dff4; font-size: 9px; white-space: nowrap; }
+.help-details { margin: 14px 0; font-size: 12px; color: #a9b8c9; }
+.help-details summary { cursor: pointer; color: #b8d9e8; }
+.profile-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 20px 0; }
+.profile-heading strong { font-size: 20px; overflow-wrap: anywhere; }
+.profile-heading small { display: block; color: #9cabbc; margin-top: 4px; }
+.profile-board { min-width: 0; border: 1px solid #304050; border-radius: 8px; background: #192430; padding: 16px; }
+.profile-board dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 14px 12px; margin: 16px 0 0; }
+.profile-board dt { color: #9cabbc; font-size: 12px; }
+.profile-board dd { margin: 4px 0 0; font-size: 20px; font-variant-numeric: tabular-nums; }
+.profile-history { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.history-match { display: grid; grid-template-columns: 82px minmax(0, 1fr) minmax(80px, 120px) 40px; align-items: center; gap: 12px; padding: 14px; border: 1px solid #304050; border-left: 3px solid #8191a4; border-radius: 7px; background: #192430; }
+.history-match.is-win { border-left-color: #64d4a0; }
+.history-match.is-loss { border-left-color: #f18489; }
+.history-result { font-size: 12px; font-weight: 600; }
+.is-win .history-result { color: #64d4a0; }
+.is-loss .history-result { color: #f18489; }
+.history-details { min-width: 0; overflow-wrap: anywhere; }
+.history-details strong, .history-details small, .history-details time { display: block; }
+.history-details small, .history-details time { color: #9cabbc; font-size: 11px; margin-top: 4px; }
+.history-civilization { display: flex; align-items: center; gap: 6px; font-size: 12px; overflow-wrap: anywhere; min-width: 0; }
+.history-rating { text-align: right; font-variant-numeric: tabular-nums; color: #b8d9e8; }
+@media (max-width: 700px) { .history-match { grid-template-columns: 72px minmax(0, 1fr) 36px; gap: 8px; } .history-civilization { grid-column: 2; grid-row: 2; } .history-rating { grid-column: 3; grid-row: 1; } }

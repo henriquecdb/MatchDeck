@@ -17,7 +17,7 @@ it('remembers collapsed navigation without changing an active match and supports
   fireEvent.click(collapse);
   expect(screen.getByRole('button', { name: 'Expandir navegação' }).getAttribute('aria-expanded')).toBe('false');
   fireEvent.keyDown(screen.getByRole('tab', { name: 'Partida' }), { key: 'ArrowDown' });
-  expect(screen.getByRole('tab', { name: 'Overlay' }).getAttribute('aria-selected')).toBe('true');
+  expect(screen.getByRole('tab', { name: 'Perfil' }).getAttribute('aria-selected')).toBe('true');
   expect((await runtime.read()).match).toEqual(snapshot);
   view.unmount();
   render(<ControlPanel runtime={runtime} desktop={false} />);

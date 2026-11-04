@@ -130,6 +130,21 @@ impl Aoe2Provider {
         .await
     }
 
+    pub async fn profile_overview(
+        &self,
+        profile_id: u64,
+    ) -> Result<super::profile::ProfileOverview, String> {
+        let url = format!("{COMPANION}/profiles/{profile_id}");
+        let (profile, feed) = tokio::try_join!(
+            self.get::<RemoteProfile>(&url, &[]),
+            self.matches(profile_id)
+        )?;
+        if profile.profile_id != profile_id {
+            return Err("A fonte retornou um perfil diferente do solicitado".into());
+        }
+        Ok(super::profile::overview(profile, feed))
+    }
+
     pub async fn snapshot(&self, remote: &RemoteMatch) -> MatchSnapshot {
         let queue = remote.leaderboard.as_deref();
         let results = join_all(

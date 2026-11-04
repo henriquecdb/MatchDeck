@@ -2,6 +2,19 @@
 
 As mudanças relevantes são registradas por versão. O projeto usa Semantic Versioning e Conventional Commits.
 
+## [0.4.5] - 2026-11-03
+
+### Adicionado
+
+- Aba Perfil com rating, vitórias, derrotas e aproveitamento por modalidade do usuário vinculado.
+- Histórico das últimas cinco partidas multiplayer encerradas disponíveis, com resultado, mapa, civilização e variação confirmada de rating.
+- Cache de um minuto ao abrir o perfil, atualização manual, recuperação de falhas e indicação de dados ausentes. Sem consultas periódicas adicionais.
+
+### Melhorado
+
+- Textos mais objetivos em Partida, Overlay, Demonstração, Configurações, Atualizações e Diagnóstico, em português e inglês.
+- Explicações de detecção e layouts em seções expansíveis. Avisos, limitações e controles permanecem acessíveis.
+
 ## [0.4.4] - 2026-11-03
 
 ### Corrigido

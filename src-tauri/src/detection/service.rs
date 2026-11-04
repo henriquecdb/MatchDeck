@@ -194,9 +194,9 @@ async fn cycle(
         let active = state.current_match.is_some();
         state.detection.phase = if active { "in-match" } else { "waiting" }.into();
         state.detection.message = if active {
-            "Partida em andamento · dados fixos; aguardando confirmação de término".into()
+            "Partida em andamento · dados do início".into()
         } else {
-            "Aguardando partida multiplayer publicada pela fonte AoE2".into()
+            "Aguardando partida publicada pela fonte".into()
         };
         state.clone()
     };

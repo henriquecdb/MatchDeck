@@ -22,7 +22,7 @@ export function GeneralSettings({ state, runtime, desktop, perform }: { state: A
       <label>{t('Civilizações e unidades')} <select value={preferences.gameLanguage} onChange={event => configure({ gameLanguage: event.target.value as typeof preferences.gameLanguage })}>
         <option value="en">English</option><option value="pt-BR">Português (Brasil)</option>
       </select></label>
-      <p>{t('Os nomes das civilizações e unidades usam inglês por padrão, independentemente do idioma da interface.')}</p>
+      <p>{t('Padrão: inglês, independente do idioma da interface.')}</p>
     </fieldset>
     <fieldset disabled={busy}><legend>{t('Aplicativo e Windows')}</legend>
       <label><input type="checkbox" disabled={!desktop} checked={state.autostart} onChange={event => {
@@ -33,11 +33,11 @@ export function GeneralSettings({ state, runtime, desktop, perform }: { state: A
       <label>{t('Ao fechar a janela')} <select disabled={!desktop} value={preferences.closeAction} onChange={event => configure({ closeAction: event.target.value as typeof preferences.closeAction })}>
         <option value="ask">{t('Perguntar o que fazer')}</option><option value="minimize" disabled={!state.trayAvailable}>{t('Continuar na bandeja')}</option><option value="exit">{t('Encerrar o aplicativo')}</option>
       </select></label>
-      <p>{state.trayAvailable ? t('Use o ícone da bandeja para reabrir o painel, controlar a detecção ou sair.') : t('A bandeja está indisponível nesta execução; a janela continuará acessível.')}</p>
+      <p>{state.trayAvailable ? t('Na bandeja: abrir painel, controlar detecção ou sair.') : t('Bandeja indisponível; use a janela do app.')}</p>
       <button disabled={!desktop || !state.trayAvailable} onClick={() => void perform(() => runtime.closeApp('minimize'))}>{t('Minimizar para a bandeja')}</button>
     </fieldset>
     <fieldset><legend>{t('Carregamento e configuração inicial')}</legend>
-      <p>{state.startupMs == null ? t('O tempo de abertura será informado ao concluir a inicialização.') : t('Interface pronta em {0} ms nesta execução.', { 0: state.startupMs })}  {t('A tela de carregamento pode aparecer brevemente quando a abertura é rápida.')}</p>
+      <p>{state.startupMs == null ? t('O tempo de abertura será informado ao concluir a inicialização.') : t('Interface pronta em {0} ms.', { 0: state.startupMs })}  {t('A abertura rápida pode tornar o carregamento imperceptível.')}</p>
       <div className="actions"><button onClick={() => setPreview(true)}>{t('Visualizar tela de carregamento')}</button><button onClick={() => configure({ onboardingComplete: false })}>{t('Reabrir configuração guiada')}</button></div>
     </fieldset>
     {preview && <Modal title={t('Prévia do carregamento')} onClose={() => setPreview(false)}><LoadingScreen /><button onClick={() => setPreview(false)}>{t('Fechar prévia')}</button></Modal>}
