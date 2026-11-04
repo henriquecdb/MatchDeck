@@ -8,6 +8,7 @@ import { isDuel } from '../../domain/teams';
 import { resolveOverlayLayout } from '../../domain/overlay-layout';
 
 interface Props {
+  gameId?: string;
   settings: OverlaySettings;
   match?: MatchSnapshot | null;
   desktop: boolean;
@@ -19,16 +20,16 @@ interface Props {
   monitorError: string | null;
 }
 
-export function OverlaySettingsPanel({ settings, match = null, desktop, shortcutAvailable, lockShortcut = defaultHotkeys.lockOverlay, onChange, monitors, onRefreshMonitors, monitorError }: Props) {
+export function OverlaySettingsPanel({ gameId = 'aoe2-de', settings, match = null, desktop, shortcutAvailable, lockShortcut = defaultHotkeys.lockOverlay, onChange, monitors, onRefreshMonitors, monitorError }: Props) {
   const { t } = useI18n();
   const activeLayout = match ? resolveOverlayLayout(settings.layout, match) : settings.layout;
   return <fieldset>
     <legend>{t('Aparência e posição')}</legend>
-    <label>{t('Modo de exibição')} <select value={activeLayout} onChange={event => onChange({ layout: event.target.value as OverlaySettings['layout'] })}>
+    {gameId === 'aoe4' ? <p>{t('Age 4 · faixa horizontal 1v1')}</p> : <><label>{t('Modo de exibição')} <select value={activeLayout} onChange={event => onChange({ layout: event.target.value as OverlaySettings['layout'] })}>
       <option value="detailed" disabled={!!match && !isDuel(match)}>{t('Completo · apenas 1v1')}</option><option value="compact">{t('Compacto horizontal')}</option><option value="stacked">{t('Compacto vertical')}</option>
     </select></label>
     <details className="help-details"><summary>{t('Sobre os layouts')}</summary><p>{t('Completo só em 1v1. Nos demais formatos, usa o vertical e retorna no próximo duelo.')}</p>
-    <p>{t('Horizontal: equipes lado a lado. Vertical: jogadores empilhados, com metade da largura. Ambos usam emblemas.')}</p></details>
+    <p>{t('Horizontal: equipes lado a lado. Vertical: jogadores empilhados, com metade da largura. Ambos usam emblemas.')}</p></details></>}
     <label>{t('Opacidade:')} {Math.round(settings.opacity * 100)}%
       <input type="range" min="0.2" max="1" step="0.05" value={settings.opacity} onChange={event => onChange({ opacity: Number(event.target.value) })} />
     </label>
@@ -51,10 +52,10 @@ export function OverlaySettingsPanel({ settings, match = null, desktop, shortcut
       <label>{t('Posição Y')} <input type="number" min="-32000" max="32000" disabled={settings.anchor !== 'manual'} value={settings.y} onChange={event => onChange({ y: Number(event.target.value) })} /></label>
     </div>
     <p>{t('A posição se ajusta ao monitor. Arrastar ativa o modo manual. Conteúdo maior que a tela permite rolagem.')}</p>
-    <label><input type="checkbox" checked={settings.focusOnly} onChange={event => onChange({ focusOnly: event.target.checked })} />  {t('Mostrar partidas reais somente com o Age 2 em primeiro plano')}</label>
+    <label><input type="checkbox" checked={settings.focusOnly} onChange={event => onChange({ focusOnly: event.target.checked })} />  {t(gameId === 'aoe4' ? 'Mostrar partidas reais somente com o Age 4 em primeiro plano' : 'Mostrar partidas reais somente com o Age 2 em primeiro plano')}</label>
     <p>{t('Desmarque para exibir no Alt+Tab. Demonstrações aparecem fora do jogo.')}</p>
-    <label><input type="checkbox" checked={settings.showProjection} onChange={event => onChange({ showProjection: event.target.checked })} />  {t('Exibir projeção não oficial de ganho/perda de rating')}</label>
-    <p>{t('~ indica estimativa: exige fila 1v1 compatível e ambos os ratings. Resultados confirmados continuam visíveis.')}</p>
+    {gameId !== 'aoe4' && <><label><input type="checkbox" checked={settings.showProjection} onChange={event => onChange({ showProjection: event.target.checked })} />  {t('Exibir projeção não oficial de ganho/perda de rating')}</label>
+    <p>{t('~ indica estimativa: exige fila 1v1 compatível e ambos os ratings. Resultados confirmados continuam visíveis.')}</p></>}
     <label><input type="checkbox" checked={settings.showRating} onChange={event => onChange({ showRating: event.target.checked })} />  {t('Exibir rating')}</label>
     <label><input type="checkbox" checked={settings.showRecord} onChange={event => onChange({ showRecord: event.target.checked })} />  {t('Exibir vitórias e derrotas')}</label>
     <label><input type="checkbox" checked={settings.showWinRate} onChange={event => onChange({ showWinRate: event.target.checked })} />  {t('Exibir porcentagem de vitórias')}</label>

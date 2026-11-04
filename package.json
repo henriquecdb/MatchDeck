@@ -1,7 +1,7 @@
 {
   "name": "matchdeck",
   "private": true,
-  "version": "0.4.5",
+  "version": "0.5.0",
   "type": "module",
   "engines": {
     "node": ">=22.12.0"
@@ -12,6 +12,7 @@
     "test": "vitest run",
     "desktop": "tauri dev",
     "desktop:build": "tauri build",
+    "desktop:local": "tauri build --debug --no-bundle --config src-tauri/tauri.local.conf.json",
     "commit": "czg",
     "prepare": "git config core.hooksPath .githooks",
     "release:notes": "node scripts/release-notes.mjs"

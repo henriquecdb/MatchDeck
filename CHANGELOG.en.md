@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.5.0] - 2026-11-04
+
+### Added
+
+- Experimental Age of Empires IV integration for ranked and quick-play 1v1 matches published by AoE4 World.
+- Horizontal Age 4 overlay with civilization, league, player name, leaderboard rank, ranked points/rating, wins, losses and win rate. Icons and flags are bundled locally.
+- Profile linking by AoE4 World ID or URL and a fictional 1v1 demo. Teams, custom lobbies and Age 4 match history are outside this release.
+- Game selection cards, a sidebar game picker and an option to open the last used game.
+- Separate profiles, settings and cache for each game. Switching stops the previous monitor and is blocked during matches and demos.
+- MatchDeck Local build with data isolated from the regular installation for development tests.
+
+### Improved
+
+- Update checking stays active on the game library and across navigation without restarting its service.
+- Detection is paused when opening the game library. Last-game startup can be enabled in settings.
+- Existing Age 2 data and settings remain compatible.
+
+### Limitations
+
+- Age 4 depends on AoE4 World coverage and publication delays. Missing values appear as — without borrowing stats from another queue.
+- The main number in ranked Age 4 is ranked points, not matchmaking MMR.
+
 ## [0.4.5] - 2026-11-03
 
 ### Added

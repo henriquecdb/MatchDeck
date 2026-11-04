@@ -4,6 +4,7 @@ import { captureMatch, type MatchSnapshot } from '../domain/match';
 import { defaultSettings, parseSettings, type OverlaySettings } from '../domain/settings';
 import { defaultDetection, type PlayerProfile } from '../domain/detection';
 import { defaultPreferences, parsePreferences, type AppPreferences } from '../domain/preferences';
+import { gameIntegration } from '../games/registry';
 import metadata from '../../package.json';
 import type { ProfileOverview } from '../domain/profile';
 
@@ -12,8 +13,10 @@ export class BrowserRuntime implements OverlayRuntime {
   private listeners = new Set<(state: AppState) => void>();
 
   constructor() {
+    const savedGame = localStorage.getItem('matchdeck.activeGame');
+    this.state.detection.config.gameId = savedGame && gameIntegration(savedGame) ? savedGame : 'aoe2-de';
     try {
-      this.state.settings = parseSettings(JSON.parse(localStorage.getItem('matchdeck.games.aoe2-de.settings') ?? localStorage.getItem('matchdeck.settings') ?? 'null'));
+      this.state.settings = parseSettings(JSON.parse(localStorage.getItem(`matchdeck.games.${this.state.detection.config.gameId}.settings`) ?? (this.state.detection.config.gameId === 'aoe2-de' ? localStorage.getItem('matchdeck.settings') : null) ?? 'null'));
     } catch {
       this.state.settings = { ...defaultSettings };
     }
@@ -45,7 +48,21 @@ export class BrowserRuntime implements OverlayRuntime {
     throw new Error('A detecção real está disponível no aplicativo Windows. Execute npm run desktop.');
   }
 
+  async selectGame(gameId: string) {
+    if (!gameIntegration(gameId)) throw new Error('Integração de jogo indisponível');
+    if (this.state.detection.config.gameId === gameId) return;
+    if (this.state.match) throw new Error('Desative a detecção e encerre a demonstração para trocar de jogo');
+    localStorage.setItem('matchdeck.activeGame', gameId);
+    try { this.state.settings = parseSettings(JSON.parse(localStorage.getItem(`matchdeck.games.${gameId}.settings`) ?? 'null')); }
+    catch { this.state.settings = { ...defaultSettings }; }
+    this.state.detection = structuredClone(defaultDetection);
+    this.state.detection.config.gameId = gameId;
+    this.state.lastSynced = null; this.state.hiddenMatchId = null;
+    this.publish();
+  }
+
   async start(match: MatchSnapshot) {
+    if (match.gameId !== this.state.detection.config.gameId) throw new Error('A demonstração deve corresponder ao jogo selecionado');
     this.state.match = captureMatch(this.state.match, match);
     this.publish();
   }
@@ -64,9 +81,10 @@ export class BrowserRuntime implements OverlayRuntime {
     this.publish();
   }
 
-  async configure(settings: OverlaySettings) {
+  async configure(settings: OverlaySettings, gameId?: string) {
+    if (gameId && gameId !== this.state.detection.config.gameId) throw new Error('O jogo foi alterado; tente novamente');
     const normalized = parseSettings(settings);
-    localStorage.setItem('matchdeck.games.aoe2-de.settings', JSON.stringify(normalized));
+    localStorage.setItem(`matchdeck.games.${this.state.detection.config.gameId}.settings`, JSON.stringify(normalized));
     this.state.settings = normalized;
     this.publish();
   }

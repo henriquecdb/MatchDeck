@@ -1,5 +1,9 @@
 #[cfg(windows)]
-pub fn game_is_foreground(overlay: &tauri::WebviewWindow, allow_overlay: bool) -> bool {
+pub fn game_is_foreground(
+    overlay: &tauri::WebviewWindow,
+    allow_overlay: bool,
+    game_id: &str,
+) -> bool {
     use windows_sys::Win32::{
         Foundation::CloseHandle,
         System::Threading::{
@@ -29,12 +33,16 @@ pub fn game_is_foreground(overlay: &tauri::WebviewWindow, allow_overlay: bool) -
             return false;
         }
         let path = String::from_utf16_lossy(&path[..length as usize]);
-        is_aoe2_executable(&path)
+        if game_id == "aoe4" {
+            is_aoe4_executable(&path)
+        } else {
+            is_aoe2_executable(&path)
+        }
     }
 }
 
 #[cfg(not(windows))]
-pub fn game_is_foreground(_: &tauri::WebviewWindow, _: bool) -> bool {
+pub fn game_is_foreground(_: &tauri::WebviewWindow, _: bool, _: &str) -> bool {
     false
 }
 
@@ -42,6 +50,14 @@ pub fn game_is_foreground(_: &tauri::WebviewWindow, _: bool) -> bool {
 fn is_aoe2_executable(path: &str) -> bool {
     path.rsplit(['\\', '/']).next().is_some_and(|name| {
         name.eq_ignore_ascii_case("AoE2DE_s.exe") || name.eq_ignore_ascii_case("AoE2DE.exe")
+    })
+}
+
+#[cfg(any(windows, test))]
+fn is_aoe4_executable(path: &str) -> bool {
+    path.rsplit(['\\', '/']).next().is_some_and(|name| {
+        name.eq_ignore_ascii_case("RelicCardinal.exe")
+            || name.eq_ignore_ascii_case("RelicCardinal_ws.exe")
     })
 }
 
@@ -53,5 +69,9 @@ mod tests {
         assert!(is_aoe2_executable(r"C:\Games\AOE2DE_S.EXE"));
         assert!(!is_aoe2_executable(r"C:\Games\AoE2DE_s.exe.backup"));
         assert!(!is_aoe2_executable("MatchDeck.exe"));
+        assert!(is_aoe4_executable(r"C:\Games\RelicCardinal.exe"));
+        assert!(is_aoe4_executable(r"C:\Games\RELICCARDINAL_WS.EXE"));
+        assert!(!is_aoe4_executable(r"C:\Games\RelicCardinal.exe.bak"));
+        assert!(!is_aoe4_executable(r"C:\Games\AoE2DE.exe"));
     }
 }

@@ -20,6 +20,7 @@ export function DemoPanel({ runtime, state, desktop, perform }: Props) {
   const [busy, setBusy] = useState(false);
   const [source, setSource] = useState<'synced' | 'fictional'>(state.lastSynced || state.detection.config.profile ? 'synced' : 'fictional');
   const { match, lastSynced, detection, settings } = state;
+  const gameId = detection.config.gameId ?? 'aoe2-de';
 
   function run(action: () => Promise<void>) {
     void perform(async () => {
@@ -36,14 +37,14 @@ export function DemoPanel({ runtime, state, desktop, perform }: Props) {
       </select></label>
       {source === 'synced' && lastSynced && <p>{t('Última partida:')} <strong>{lastSynced.map}</strong> · {lastSynced.players.map(player => player.name).join(' × ')}{lastSynced.syncedAt ? ` · ${new Date(lastSynced.syncedAt).toLocaleString(language)}` : ''}.</p>}
       {source === 'fictional' && <label>{t('Modalidade fictícia')} <select disabled={!!match} value={mode} onChange={event => setMode(event.target.value as MatchMode)}>
-          {Object.entries(modeLabels).map(([value, label]) => <option key={value} value={value}>{t(label)}</option>)}
+          {Object.entries(modeLabels).filter(([value]) => gameId !== 'aoe4' || value === 'ranked' || value === 'quick').map(([value, label]) => <option key={value} value={value}>{t(label)}</option>)}
         </select></label>}
-      {source === 'fictional' && <label>{t('Formato da demonstração')} <select disabled={!!match} value={teamSize} onChange={event => setTeamSize(Number(event.target.value) as DemoTeamSize)}>
+      {source === 'fictional' && gameId !== 'aoe4' && <label>{t('Formato da demonstração')} <select disabled={!!match} value={teamSize} onChange={event => setTeamSize(Number(event.target.value) as DemoTeamSize)}>
         {[1, 2, 3, 4].map(size => <option key={size} value={size}>{size}v{size}</option>)}
       </select></label>}
       <div className="actions">
         <button className="primary-action" disabled={!!match || (source === 'synced' && !lastSynced && (!desktop || !detection.config.profile))} onClick={() => run(async () => {
-          if (source === 'fictional') { await runtime.start(gameIntegration('aoe2-de')!.demo(mode, teamSize)); return; }
+          if (source === 'fictional') { await runtime.start(gameIntegration(gameId)!.demo(mode, teamSize)); return; }
           if (!lastSynced) await runtime.syncLatest();
           const latest = (await runtime.read()).lastSynced;
           if (!latest) throw new Error('Nenhuma partida sincronizada disponível. Selecione jogadores fictícios ou sincronize seu perfil.');

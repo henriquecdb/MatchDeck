@@ -43,21 +43,32 @@ fn main() {
         .manage(hotkeys::ConfigurationLock(Mutex::new(())))
         .setup(|app| {
             let handle = app.handle().clone();
+            if let Some(window) = app.get_webview_window("main") {
+                window.set_title(app.config().product_name.as_deref().unwrap_or("MatchDeck"))?;
+            }
             let provider = games::aoe2::provider::Aoe2Provider::new()?;
-            let config = storage::load_detection(&handle);
+            let aoe4 = games::aoe4::provider::Aoe4Provider::new()?;
+            let game_id = storage::selected_game(&handle);
+            let preferences = storage::load_preferences(&handle);
+            let mut config = storage::load_detection(&handle, &game_id);
+            if !preferences.open_last_game && config.enabled {
+                config.enabled = false;
+                storage::save_detection(&handle, &config)?;
+            }
             let (updates, receiver) = tokio::sync::watch::channel(config.clone());
             app.manage(detection::service::DetectionController {
                 provider: provider.clone(),
+                aoe4: aoe4.clone(),
                 updates,
             });
             {
                 let state = app.state::<SharedState>();
                 let mut state = state.lock().map_err(|error| error.to_string())?;
-                state.settings = storage::load(&handle);
-                state.preferences = storage::load_preferences(&handle);
+                state.settings = storage::load(&handle, &game_id);
+                state.preferences = preferences;
                 use tauri_plugin_autostart::ManagerExt;
                 state.autostart = handle.autolaunch().is_enabled().unwrap_or(false);
-                state.last_synced = storage::load_last_match(&handle);
+                state.last_synced = storage::load_last_match(&handle, &game_id);
                 if let Some(snapshot) = &mut state.last_synced {
                     if snapshot.self_player_id.is_none() {
                         snapshot.self_player_id = config
@@ -114,6 +125,7 @@ fn main() {
             tauri::async_runtime::spawn(detection::service::run(
                 app.handle().clone(),
                 provider,
+                aoe4,
                 receiver,
             ));
             tauri::async_runtime::spawn(overlay::watch_desktop(app.handle().clone()));
@@ -129,6 +141,7 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::read_state,
+            commands::select_game,
             commands::start_match,
             commands::finish_match,
             commands::configure_overlay,

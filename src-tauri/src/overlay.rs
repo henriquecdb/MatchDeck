@@ -53,7 +53,12 @@ fn refresh_visibility(
         && state.settings.focus_only;
     let visible = should_show(
         state,
-        !needs_focus || crate::focus::game_is_foreground(window, !state.settings.locked),
+        !needs_focus
+            || crate::focus::game_is_foreground(
+                window,
+                !state.settings.locked,
+                &state.detection.config.game_id,
+            ),
     );
     if window.is_visible().map_err(|error| error.to_string())? == visible
         && (!visible || (!raise && is_topmost(window)?))

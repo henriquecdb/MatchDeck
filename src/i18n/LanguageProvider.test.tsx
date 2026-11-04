@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { beforeEach } from 'vitest';
+
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it } from 'vitest';
 import { LanguageProvider, startupPreferences } from './LanguageProvider';
@@ -76,3 +78,5 @@ it('selects bilingual release notes and preserves older single-language releases
   expect(localizedReleaseNotes(notes, 'pt-BR')).toBe('## Adicionado\nPortuguês');
   expect(localizedReleaseNotes('Older notes', 'en')).toBe('Older notes');
 });
+
+beforeEach(() => { localStorage.setItem('matchdeck.preferences', JSON.stringify({ openLastGame: true })); });

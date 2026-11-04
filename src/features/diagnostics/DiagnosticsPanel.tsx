@@ -19,7 +19,7 @@ export function DiagnosticsPanel({ state, runtime }: { state: AppState; runtime:
   return <fieldset><legend>{t('Diagnóstico e suporte')}</legend>
     <p>{t('Estado:')} <strong>{state.detection.phase}</strong> · {t(state.detection.message)}</p>
     <p>{t('Última consulta bem-sucedida:')} {state.detection.lastChecked ? new Date(state.detection.lastChecked).toLocaleString(language) : t('nenhuma nesta execução')}.</p>
-    <p>{t('A fonte é o AoE II Companion. Ranqueadas e partidas rápidas dependem da publicação dos dados; lobbies personalizados e partidas contra IA não têm cobertura garantida.')}</p>
+    <p>{t(state.detection.config.gameId === 'aoe4' ? 'Fonte: AoE4 World. Esta iteração detecta apenas 1v1 ranqueado e rápido.' : 'A fonte é o AoE II Companion. Ranqueadas e partidas rápidas dependem da publicação dos dados; lobbies personalizados e partidas contra IA não têm cobertura garantida.')}</p>
     <div className="actions"><button disabled={busy} onClick={() => void refresh()}>{busy ? t('Coletando…') : t('Preparar diagnóstico')}</button><button disabled={!report || busy} onClick={download}>{t('Baixar diagnóstico revisado')}</button></div>
     {error && <p role="alert" className="error">{t(error)}</p>}
     {report && <><p>{t('Revise antes de compartilhar. Sem nomes, IDs, pastas, credenciais ou respostas completas da API. Eventos só desta execução.')}</p><pre className="diagnostic-preview" tabIndex={0} aria-label={t('Prévia do diagnóstico')}>{JSON.stringify(report, null, 2)}</pre></>}

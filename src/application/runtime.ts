@@ -26,9 +26,10 @@ export interface DisplayMonitor { id: string; name: string; width: number; heigh
 
 export interface OverlayRuntime {
   read(): Promise<AppState>;
+  selectGame(gameId: string): Promise<void>;
   start(match: MatchSnapshot): Promise<void>;
   finish(): Promise<void>;
-  configure(settings: OverlaySettings): Promise<void>;
+  configure(settings: OverlaySettings, gameId?: string): Promise<void>;
   identifyLocalProfile(): Promise<PlayerProfile>;
   profileOverview(): Promise<ProfileOverview>;
   configureDetection(enabled: boolean, profileInput: string): Promise<void>;

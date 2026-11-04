@@ -27,7 +27,7 @@ pub fn dismiss_app_error(
 
 fn exit_app(app: &tauri::AppHandle) {
     if let Ok(state) = app.state::<SharedState>().lock() {
-        let _ = storage::save(app, &state.settings);
+        let _ = storage::save(app, &state.settings, &state.detection.config.game_id);
     }
     app.exit(0);
 }

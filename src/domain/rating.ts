@@ -8,6 +8,7 @@ export interface RatingProjection {
 const supportedQueues = new Set(['rm_1v1', 'ew_1v1', 'dm_1v1', 'qp_rm_1v1', 'qp_ew_1v1', 'qp_dm_1v1']);
 
 export function projectRating(match: MatchSnapshot, player: Player): RatingProjection | null {
+  if (match.gameId !== 'aoe2-de') return null;
   if (!match.queueId || !supportedQueues.has(match.queueId) || match.players.length !== 2) return null;
   const opponent = match.players.find(candidate => candidate.id !== player.id);
   const rating = player.rating;

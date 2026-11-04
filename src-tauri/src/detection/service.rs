@@ -14,6 +14,7 @@ use tokio::sync::watch;
 
 pub struct DetectionController {
     pub provider: Aoe2Provider,
+    pub aoe4: crate::games::aoe4::provider::Aoe4Provider,
     pub updates: watch::Sender<DetectionConfig>,
 }
 
@@ -222,6 +223,7 @@ fn can_resume(cached: &crate::model::MatchSnapshot, remote: &RemoteMatch, profil
 pub async fn run(
     app: tauri::AppHandle,
     provider: Aoe2Provider,
+    aoe4: crate::games::aoe4::provider::Aoe4Provider,
     mut updates: watch::Receiver<DetectionConfig>,
 ) {
     let mut failures = 0;
@@ -240,7 +242,10 @@ pub async fn run(
                 failures = 0;
                 continue;
             }
-            result = cycle(&app, &provider, &config) => {
+            result = async {
+                if config.game_id == "aoe4" { crate::games::aoe4::service::cycle(&app, &aoe4, &config).await }
+                else { cycle(&app, &provider, &config).await }
+            } => {
                 match result {
                     Ok(()) => failures = 0,
                     Err(error) => {

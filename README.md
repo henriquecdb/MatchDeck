@@ -1,16 +1,28 @@
 # MatchDeck
 
-Aplicativo modular de overlays para jogos. Primeira integração: Age of Empires II: Definitive Edition. Nome provisório, sem pesquisa de marca.
+Aplicativo modular de overlays para jogos. Integrações: Age of Empires II: Definitive Edition e Age of Empires IV (experimental). Nome provisório, sem pesquisa de marca.
 
 ## Instalar no Windows
 
-Baixe o instalador **MatchDeck_0.4.5_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, siga a configuração guiada, identifique seu perfil na aba **Partida** e ative a detecção com o AoE2 em janela sem bordas.
+Baixe o instalador **MatchDeck_0.5.0_x64-setup.exe** na [página de releases](https://github.com/henriquecdb/MatchDeck/releases/latest) e execute-o. O usuário final não precisa instalar Node, Rust ou Visual Studio. Depois, siga a configuração guiada, identifique seu perfil na aba **Partida** e ative a detecção com o AoE2 em janela sem bordas.
 
 Veja o [changelog da versão](CHANGELOG.md). O aplicativo verifica novas versões ao abrir e mostra as notas e o progresso da atualização. A instalação automática é opcional e exige que a detecção esteja desligada e não haja partida de demonstração ativa. Pacotes de atualização são verificados por assinatura. O executável ainda não possui certificado Authenticode de editor Windows.
 
 Para contribuir, consulte [CONTRIBUTING.md](CONTRIBUTING.md). Para publicar versões, consulte [docs/releases.md](docs/releases.md).
 
-## Perfil
+## Seleção de jogos
+
+Escolha um cartão na tela inicial ou use o ícone do jogo na lateral para trocar. A troca encerra o monitoramento anterior e fica bloqueada durante partidas e demonstrações. Perfis, configurações e cache ficam separados por jogo. Marque **Abrir no último jogo usado** na tela inicial ou em Configurações para pular a seleção ao abrir.
+
+## Age of Empires IV · experimental
+
+Primeira integração de 1v1 ranqueado e rápido de PC via [AoE4 World](https://aoe4world.com/api). Informe o ID ou link do perfil na aba Partida e ative a detecção. O overlay usa uma faixa horizontal de 900 × 64 px, ajustável em posição, escala e opacidade. A demonstração permite conferir o formato sem entrar no jogo.
+
+A detecção depende da publicação dos dados pela fonte. As consultas leves ocorrem a cada 20 segundos, com intervalo progressivo após falhas; as estatísticas completas são capturadas ao iniciar uma nova partida. Pontos ranqueados e MMR são dados distintos. Dados ausentes aparecem como —. Equipes, partidas personalizadas, campanhas, aba Perfil e histórico do Age 4 ficam para outras iterações.
+
+Veja [como testar localmente](docs/aoe4-local.md). Créditos dos ícones e imagens em [public/games/NOTICE.md](public/games/NOTICE.md) e [public/aoe4/NOTICE.md](public/aoe4/NOTICE.md).
+
+## Perfil · Age 2
 
 A aba **Perfil** mostra rating, vitórias, derrotas e aproveitamento por modalidade, além das últimas cinco partidas multiplayer encerradas disponíveis na fonte. Selecione a modalidade sem misturar estatísticas de filas distintas. Resultados desconhecidos e estatísticas ausentes são indicados; zero não substitui dados ausentes. Os nomes das civilizações seguem o idioma de jogo configurado.
 

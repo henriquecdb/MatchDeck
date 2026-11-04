@@ -2,6 +2,27 @@
   {
     "id": "aoe2-de",
     "name": "Age of Empires II: Definitive Edition",
-    "capabilities": { "liveMultiplayer": true, "offline": false, "customLobbies": "unverified" }
+    "capabilities": {
+      "liveMultiplayer": true,
+      "offline": false,
+      "customLobbies": "unverified"
+    },
+    "shortName": "Age of Empires II",
+    "subtitle": "Definitive Edition",
+    "icon": "/games/aoe2-de.ico",
+    "experimental": false
+  },
+  {
+    "id": "aoe4",
+    "name": "Age of Empires IV",
+    "capabilities": {
+      "liveMultiplayer": true,
+      "offline": false,
+      "customLobbies": "unverified"
+    },
+    "shortName": "Age of Empires IV",
+    "subtitle": "Integração em teste",
+    "icon": "/games/aoe4.ico",
+    "experimental": true
   }
 ]

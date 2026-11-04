@@ -2,6 +2,28 @@
 
 As mudanças relevantes são registradas por versão. O projeto usa Semantic Versioning e Conventional Commits.
 
+## [0.5.0] - 2026-11-04
+
+### Adicionado
+
+- Integração experimental de Age of Empires IV para 1v1 ranqueado e rápido, quando publicado pelo AoE4 World.
+- Overlay horizontal do Age 4 com civilização, liga, nome, posição no ranking, pontos/rating, vitórias, derrotas e aproveitamento. Ícones e bandeiras são distribuídos localmente.
+- Vinculação por ID ou link do AoE4 World e demonstração fictícia 1v1. Equipes, lobbies personalizados e histórico do Age 4 ficam fora desta versão.
+- Tela inicial com cartões dos jogos, troca rápida pela lateral e preferência para abrir no último jogo usado.
+- Perfis, configurações e cache separados por jogo. A troca encerra o monitoramento anterior e fica bloqueada durante partidas e demonstrações.
+- Build MatchDeck Local com dados separados da instalação normal para testes de desenvolvimento.
+
+### Melhorado
+
+- Verificação de atualizações preservada na tela inicial e durante a navegação, sem reiniciar o serviço ao trocar de tela.
+- Detecção desativada ao abrir a seleção inicial. A retomada do último jogo pode ser habilitada nas configurações.
+- Compatibilidade com os dados e as configurações existentes do Age 2.
+
+### Limitações
+
+- A integração do Age 4 depende da cobertura e do tempo de publicação do AoE4 World. Dados ausentes aparecem como —, sem usar estatísticas de outra modalidade.
+- No Age 4 ranqueado, o número principal representa pontos ranqueados; não é o MMR de pareamento.
+
 ## [0.4.5] - 2026-11-03
 
 ### Adicionado
