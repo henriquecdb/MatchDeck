@@ -28,8 +28,8 @@ Quer experimentar antes? Na aba **Demonstração**, use jogadores fictícios ou 
 
 | Jogo | Disponível |
 | --- | --- |
-| **Age of Empires II: DE** | Multiplayer ranqueado e rápido, rating por modalidade, vitórias, derrotas, civilizações e unidades únicas. A aba Perfil reúne estatísticas e as últimas cinco partidas disponíveis. |
-| **Age of Empires IV** · experimental | Multiplayer ranqueado e rápido de PC em 1v1. Faixa compacta com civilizações, liga, posição no ranking, rating/pontos e resultados. |
+| **Age of Empires II: DE** | Multiplayer ranqueado e rápido, rating por modalidade, vitórias, derrotas, civilizações e unidades únicas. A aba Perfil reúne estatísticas, últimas cinco partidas disponíveis e gráfico de rating para filas 1v1. |
+| **Age of Empires IV** · experimental | Multiplayer ranqueado e rápido de PC em 1v1. Faixa compacta com civilizações, liga, posição no ranking, rating/pontos e resultados. Perfil com estatísticas, últimas cinco partidas disponíveis e gráfico recente de rating/MMR. |
 
 Campanhas e skirmish offline não têm detecção. Lobbies personalizados do Age 2 dependem da cobertura da fonte e ainda precisam de validação; equipes e partidas personalizadas do Age 4 ainda não são suportadas.
 

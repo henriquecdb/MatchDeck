@@ -1,5 +1,6 @@
 pub mod aoe2;
 pub mod aoe4;
+pub mod profile;
 
 pub const AOE2_ID: &str = "aoe2-de";
 

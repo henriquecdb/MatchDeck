@@ -98,6 +98,24 @@ pub struct RemoteProfile {
     pub name: String,
     #[serde(default)]
     pub leaderboards: Vec<Leaderboard>,
+    #[serde(default)]
+    pub ratings: Vec<RatingLeaderboard>,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RatingLeaderboard {
+    pub leaderboard_id: String,
+    #[serde(default)]
+    pub ratings: Vec<RatingRecord>,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RatingRecord {
+    pub profile_id: Option<u64>,
+    pub date: Option<String>,
+    pub rating: Option<u32>,
 }
 
 #[derive(Deserialize, serde::Serialize)]

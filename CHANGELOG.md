@@ -2,6 +2,27 @@
 
 As mudanças relevantes são registradas por versão. O projeto usa Semantic Versioning e Conventional Commits.
 
+## [0.5.2] - 2026-11-04
+
+### Adicionado
+
+- Gráfico no perfil do Age 2 para filas 1v1 ranqueadas e rápidas, usando o histórico publicado de cada modalidade, sem consultas adicionais.
+- Aba Perfil do Age 4 com estatísticas por modalidade e até cinco partidas multiplayer encerradas, reutilizando a estrutura e o cache do Age 2.
+- Gráfico de evolução com até 30 registros recentes de rating publicados pelo AoE4 World, datas e valores ao passar o mouse ou navegar pelo teclado. Pontos ranqueados, MMR e modalidades permanecem separados; a temporada é indicada quando disponível.
+
+### Corrigido
+
+- Classificação geral não ranqueada identificada como Não ranqueado, sem atribuí-la exclusivamente a lobbies personalizados.
+
+- Seletor de jogos da barra lateral sobrepondo corretamente os botões do painel, inclusive na navegação recolhida.
+- Leitura de jogadores encapsulados no campo player e de partidas com estado processed retornados pelo AoE4 World.
+
+### Limitações
+
+- O gráfico usa o histórico recente incluído na resposta do perfil, sem buscar todo o histórico da conta. Não há consultas extras durante a partida.
+- As cinco partidas são selecionadas entre as dez mais recentes publicadas. Partidas privadas, em andamento, descartadas e modalidades não suportadas não entram na lista.
+- O overlay ao vivo do Age 4 continua limitado a 1v1; consultar estatísticas de equipes não habilita sua detecção.
+
 ## [0.5.1] - 2026-11-04
 
 ### Corrigido

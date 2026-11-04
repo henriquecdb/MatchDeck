@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.5.2] - 2026-11-04
+
+### Added
+
+- Age 2 rating history chart for ranked and quick 1v1 queues, using each queue’s published history without additional requests.
+- Age 4 Profile tab with statistics by queue and up to five completed multiplayer matches, reusing the Age 2 layout and cache.
+- Rating progression chart with up to 30 recent records published by AoE4 World, dates and values on hover or keyboard focus. Ranked points, MMR and queues remain separate; the season is shown when available.
+
+### Fixed
+
+- General unranked rating labeled as Unranked, without attributing it exclusively to custom lobbies.
+
+- Sidebar game picker appearing beneath panel buttons, including with collapsed navigation.
+- Parsing of wrapped player entries and processed games returned by AoE4 World.
+
+### Limitations
+
+- The chart uses recent history included in the profile response, without fetching the entire account history or adding in-match polling.
+- Recent matches are selected from the ten latest published games. Private, ongoing, discarded and unsupported games are excluded.
+- The Age 4 live overlay remains limited to 1v1; team statistics do not enable live team detection.
+
 ## [0.5.1] - 2026-11-04
 
 ### Fixed

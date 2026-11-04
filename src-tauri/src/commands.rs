@@ -217,27 +217,23 @@ pub async fn identify_local_profile(
 pub async fn profile_overview(
     controller: State<'_, DetectionController>,
     state: State<'_, SharedState>,
-) -> Result<crate::games::aoe2::profile::ProfileOverview, String> {
-    if state
-        .lock()
-        .map_err(|error| error.to_string())?
-        .detection
-        .config
-        .game_id
-        != "aoe2-de"
-    {
-        return Err("Estatísticas de perfil do Age 4 estarão disponíveis em outra iteração".into());
+) -> Result<crate::games::profile::ProfileOverview, String> {
+    let (game_id, profile_id) = {
+        let state = state.lock().map_err(|error| error.to_string())?;
+        let profile_id = state
+            .detection
+            .config
+            .profile
+            .as_ref()
+            .map(|profile| profile.profile_id)
+            .ok_or("Vincule um perfil na aba Partida")?;
+        (state.detection.config.game_id.clone(), profile_id)
+    };
+    match game_id.as_str() {
+        "aoe4" => controller.aoe4.profile_overview(profile_id).await,
+        "aoe2-de" => controller.provider.profile_overview(profile_id).await,
+        _ => Err("Integração de jogo indisponível".into()),
     }
-    let profile_id = state
-        .lock()
-        .map_err(|error| error.to_string())?
-        .detection
-        .config
-        .profile
-        .as_ref()
-        .map(|profile| profile.profile_id)
-        .ok_or("Vincule um perfil na aba Partida")?;
-    controller.provider.profile_overview(profile_id).await
 }
 
 #[tauri::command]

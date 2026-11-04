@@ -19,6 +19,8 @@ pub struct RemoteProfile {
     pub profile_id: u64,
     pub steam_id: Option<String>,
     pub name: String,
+    #[serde(default)]
+    pub modes: HashMap<String, super::profile::ProfileMode>,
 }
 
 impl RemoteProfile {
@@ -45,6 +47,7 @@ pub struct RemoteGame {
     pub state: String,
     pub kind: String,
     pub map: String,
+    #[serde(deserialize_with = "deserialize_teams")]
     pub teams: Vec<Vec<RemotePlayer>>,
 }
 
@@ -86,7 +89,7 @@ impl RemoteGame {
             && self.teams.iter().all(|team| team.len() == 1)
     }
     pub fn finished(&self) -> bool {
-        !self.ongoing && matches!(self.state.as_str(), "finished" | "discarded")
+        !self.ongoing && matches!(self.state.as_str(), "finished" | "processed" | "discarded")
     }
     pub fn fresh(&self, now: DateTime<Utc>) -> bool {
         (-120..=43200).contains(&now.signed_duration_since(self.started_at).num_seconds())
@@ -191,7 +194,30 @@ impl RemoteGame {
     }
 }
 
-fn result(value: Option<&str>) -> Option<bool> {
+fn deserialize_teams<'de, D>(deserializer: D) -> Result<Vec<Vec<RemotePlayer>>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum Entry {
+        Wrapped { player: RemotePlayer },
+        Direct(RemotePlayer),
+    }
+    let teams = Vec::<Vec<Entry>>::deserialize(deserializer)?;
+    Ok(teams
+        .into_iter()
+        .map(|team| {
+            team.into_iter()
+                .map(|entry| match entry {
+                    Entry::Wrapped { player } | Entry::Direct(player) => player,
+                })
+                .collect()
+        })
+        .collect())
+}
+
+pub(super) fn result(value: Option<&str>) -> Option<bool> {
     match value {
         Some("win") => Some(true),
         Some("loss") => Some(false),
@@ -244,6 +270,26 @@ impl Aoe4Provider {
             .await?
             .ok_or("Perfil não encontrado no AoE4 World")?;
         profile.resolve(id)
+    }
+
+    pub async fn profile_overview(
+        &self,
+        profile_id: u64,
+    ) -> Result<crate::games::profile::ProfileOverview, String> {
+        let profile_path = format!("/players/{profile_id}");
+        let games_path = format!("/players/{profile_id}/games?limit=10&include_alts=false");
+        let (profile, games) = tokio::try_join!(
+            self.get::<RemoteProfile>(&profile_path),
+            self.get::<super::profile::GameFeed>(&games_path)
+        )?;
+        let profile = profile.ok_or("Perfil não encontrado no AoE4 World")?;
+        if profile.profile_id != profile_id {
+            return Err("A fonte retornou um perfil diferente do solicitado".into());
+        }
+        Ok(super::profile::overview(
+            profile,
+            games.ok_or("Histórico indisponível no AoE4 World")?,
+        ))
     }
 
     pub async fn last_game(
