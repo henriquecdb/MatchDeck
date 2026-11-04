@@ -30,7 +30,7 @@ fn report(state: &AppState) -> serde_json::Value {
     let failures = state.detection.failures;
     serde_json::json!({
         "version": env!("CARGO_PKG_VERSION"), "platform": std::env::consts::OS,
-        "source": "AoE II Companion · HTTP por perfil; cobertura de lobbies não garantida",
+        "source": if state.detection.config.game_id == "aoe4" { "AoE4 World · 1v1" } else { "AoE II Companion · HTTP por perfil; cobertura de lobbies não garantida" },
         "detection": { "enabled": state.detection.config.enabled, "phase": state.detection.phase, "lastChecked": state.detection.last_checked, "failures": failures, "retrySeconds": crate::detection::model::retry_delay(failures) },
         "startupMs": state.startup_ms, "trayAvailable": state.tray_available,
         "shortcuts": {"lock": state.shortcut_available, "visibility": state.visibility_shortcut_available},

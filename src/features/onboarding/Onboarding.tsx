@@ -7,7 +7,7 @@ export function Onboarding({ state, runtime, onStep, perform }: { state: AppStat
   const [step, setStep] = useState(0);
   const steps = [
     { title: '1. Confira seu perfil', text: 'Identifique seu perfil na aba Partida e confira o nome.', tab: 'match' },
-    { title: '2. Ajuste a posição', text: 'Ajuste monitor, posição e escala em Overlay. Use o Age 2 em janela sem bordas.', tab: 'overlay' },
+    { title: '2. Ajuste a posição', text: 'Ajuste monitor, posição e escala em Overlay. Use o jogo em janela sem bordas.', tab: 'overlay' },
     { title: '3. Teste antes de jogar', text: 'Teste em Demonstração; depois ative a detecção em Partida. Lobbies com IA podem não ser publicados.', tab: 'demo' },
   ] as const;
   return <section className="onboarding" aria-label={t('Configuração guiada')}>

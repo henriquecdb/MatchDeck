@@ -25,6 +25,7 @@ export function GeneralSettings({ state, runtime, desktop, perform }: { state: A
       <p>{t('Padrão: inglês, independente do idioma da interface.')}</p>
     </fieldset>
     <fieldset disabled={busy}><legend>{t('Aplicativo e Windows')}</legend>
+      <label><input type="checkbox" checked={preferences.openLastGame} onChange={event => configure({ openLastGame: event.target.checked })} /> {t('Abrir no último jogo usado')}</label>
       <label><input type="checkbox" disabled={!desktop} checked={state.autostart} onChange={event => {
         const enabled = event.target.checked;
         void perform(async () => { setBusy(true); try { await runtime.setAutostart(enabled); } finally { setBusy(false); } });

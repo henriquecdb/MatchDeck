@@ -6,7 +6,7 @@ import labels from './aoe2/pt-BR.json';
 import { createDemoMatch } from './aoe2/demo';
 
 it('registers only installed integrations and preserves explicit capability limits', () => {
-  expect(installedGames.map(game => game.id)).toEqual(['aoe2-de']);
+  expect(installedGames.map(game => game.id)).toEqual(['aoe2-de', 'aoe4']);
   expect(gameIntegration('sc2')).toBeUndefined();
   expect(gameIntegration('aoe2-de')?.capabilities).toMatchObject({ offline: false, customLobbies: 'unverified' });
   expect(gameIntegration('aoe2-de')?.artwork(createDemoMatch('ranked').players[0])?.units[0]).toBe('Throwing Axeman');

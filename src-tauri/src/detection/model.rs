@@ -7,9 +7,11 @@ pub struct Profile {
     pub name: String,
 }
 
-#[derive(Clone, Default, Deserialize, Serialize, PartialEq)]
+#[derive(Clone, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct DetectionConfig {
+    #[serde(default = "default_game")]
+    pub game_id: String,
     pub enabled: bool,
     pub profile: Option<Profile>,
 }
@@ -36,6 +38,20 @@ impl Default for DetectionStatus {
     }
 }
 
+fn default_game() -> String {
+    "aoe2-de".into()
+}
+
+impl Default for DetectionConfig {
+    fn default() -> Self {
+        Self {
+            game_id: default_game(),
+            enabled: false,
+            profile: None,
+        }
+    }
+}
+
 pub fn retry_delay(failures: u32) -> u64 {
     if failures == 0 {
         20
@@ -50,6 +66,9 @@ mod tests {
 
     #[test]
     fn retries_back_off_with_a_cap() {
+        let legacy: DetectionConfig =
+            serde_json::from_str(r#"{"enabled":false,"profile":null}"#).unwrap();
+        assert_eq!(legacy.game_id, "aoe2-de");
         assert_eq!(retry_delay(0), 20);
         assert_eq!(retry_delay(1), 40);
         assert_eq!(retry_delay(20), 120);

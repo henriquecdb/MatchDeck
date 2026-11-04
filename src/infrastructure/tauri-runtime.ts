@@ -9,9 +9,10 @@ import type { ProfileOverview } from '../domain/profile';
 
 export class TauriRuntime implements OverlayRuntime {
   read() { return invoke<AppState>('read_state'); }
+  selectGame(gameId: string) { return invoke<void>('select_game', { gameId }); }
   start(match: MatchSnapshot) { return invoke<void>('start_match', { incoming: match }); }
   finish() { return invoke<void>('finish_match'); }
-  configure(settings: OverlaySettings) { return invoke<void>('configure_overlay', { settings }); }
+  configure(settings: OverlaySettings, gameId?: string) { return invoke<void>('configure_overlay', { settings, gameId }); }
   syncLatest() { return invoke<void>('sync_latest_match'); }
   listMonitors() { return invoke<DisplayMonitor[]>('list_monitors'); }
   toggleVisibility() { return invoke<void>('toggle_overlay_visibility'); }

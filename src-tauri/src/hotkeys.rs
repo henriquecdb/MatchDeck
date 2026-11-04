@@ -206,7 +206,7 @@ pub fn handle(app: &tauri::AppHandle, shortcut: &Shortcut, event: ShortcutEvent)
     if matches(&state.preferences.hotkeys.lock_overlay) {
         let mut settings = state.settings.clone();
         settings.locked = !settings.locked;
-        if let Err(error) = storage::save(app, &settings) {
+        if let Err(error) = storage::save(app, &settings, &state.detection.config.game_id) {
             eprintln!("{error}");
             return;
         }

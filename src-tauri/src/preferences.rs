@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 pub struct AppPreferences {
+    pub open_last_game: bool,
     pub hotkeys: crate::hotkeys::Hotkeys,
     pub language: InterfaceLanguage,
     pub game_language: GameLanguage,
@@ -52,6 +53,10 @@ mod tests {
         assert!(old.language == InterfaceLanguage::Portuguese);
         assert!(old.game_language == GameLanguage::English);
         assert!(old.auto_update);
+        assert!(!old.open_last_game);
+        let resume: AppPreferences = serde_json::from_str(r#"{"openLastGame":true}"#).unwrap();
+        assert!(resume.open_last_game);
+        assert_eq!(serde_json::to_value(resume).unwrap()["openLastGame"], true);
         let selected: AppPreferences =
             serde_json::from_str(r#"{"language":"en","gameLanguage":"pt-BR"}"#).unwrap();
         assert!(selected.language == InterfaceLanguage::English);

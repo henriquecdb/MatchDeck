@@ -21,7 +21,7 @@ pub fn schedule_position_save(app: &tauri::AppHandle) {
             return;
         }
         if let Ok(state) = app.state::<crate::commands::SharedState>().lock() {
-            if let Err(error) = save(&app, &state.settings) {
+            if let Err(error) = save(&app, &state.settings, &state.detection.config.game_id) {
                 eprintln!("{error}");
             }
         };
@@ -31,10 +31,15 @@ pub fn schedule_position_save(app: &tauri::AppHandle) {
 fn read_game_at<T: serde::de::DeserializeOwned>(
     directory: &std::path::Path,
     name: &str,
+    game_id: &str,
 ) -> Option<T> {
     [
-        directory.join("games/aoe2-de").join(name),
-        directory.join(name),
+        directory.join("games").join(game_id).join(name),
+        if game_id == "aoe2-de" {
+            directory.join(name)
+        } else {
+            directory.join("games").join(game_id).join(name)
+        },
     ]
     .into_iter()
     .find_map(|path| {
@@ -44,8 +49,12 @@ fn read_game_at<T: serde::de::DeserializeOwned>(
     })
 }
 
-fn read_game<T: serde::de::DeserializeOwned>(app: &tauri::AppHandle, name: &str) -> Option<T> {
-    read_game_at(&app.path().app_config_dir().ok()?, name)
+fn read_game<T: serde::de::DeserializeOwned>(
+    app: &tauri::AppHandle,
+    name: &str,
+    game_id: &str,
+) -> Option<T> {
+    read_game_at(&app.path().app_config_dir().ok()?, name, game_id)
 }
 
 fn write_atomic<T: serde::Serialize>(
@@ -67,12 +76,14 @@ fn write_game<T: serde::Serialize>(
     app: &tauri::AppHandle,
     name: &str,
     value: &T,
+    game_id: &str,
 ) -> Result<(), String> {
     let directory = app
         .path()
         .app_config_dir()
         .map_err(|error| error.to_string())?
-        .join("games/aoe2-de");
+        .join("games")
+        .join(game_id);
     write_atomic(&directory, name, value)
 }
 
@@ -84,7 +95,7 @@ pub fn load_preferences(app: &tauri::AppHandle) -> crate::preferences::AppPrefer
         Ok(data) => serde_json::from_slice(&data).unwrap_or_default(),
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
             crate::preferences::AppPreferences {
-                auto_update: load(app).auto_update,
+                auto_update: load(app, "aoe2-de").auto_update,
                 ..Default::default()
             }
         }
@@ -103,32 +114,58 @@ pub fn save_preferences(
     write_atomic(&directory, "preferences.json", preferences)
 }
 
-pub fn load_last_match(app: &tauri::AppHandle) -> Option<MatchSnapshot> {
-    read_game::<MatchSnapshot>(app, "last-match.json").filter(|snapshot| {
-        snapshot.game_id == "aoe2-de" && !snapshot.players.is_empty() && snapshot.players.len() <= 8
+pub fn load_last_match(app: &tauri::AppHandle, game_id: &str) -> Option<MatchSnapshot> {
+    read_game::<MatchSnapshot>(app, "last-match.json", game_id).filter(|snapshot| {
+        snapshot.game_id == game_id && !snapshot.players.is_empty() && snapshot.players.len() <= 8
     })
 }
 
 pub fn save_last_match(app: &tauri::AppHandle, snapshot: &MatchSnapshot) -> Result<(), String> {
-    write_game(app, "last-match.json", snapshot)
+    write_game(app, "last-match.json", snapshot, &snapshot.game_id)
 }
 
-pub fn load_detection(app: &tauri::AppHandle) -> DetectionConfig {
-    read_game(app, "detection.json").unwrap_or_default()
+pub fn load_detection(app: &tauri::AppHandle, game_id: &str) -> DetectionConfig {
+    let mut config: DetectionConfig = read_game(app, "detection.json", game_id).unwrap_or_default();
+    config.game_id = game_id.into();
+    config
 }
 
 pub fn save_detection(app: &tauri::AppHandle, config: &DetectionConfig) -> Result<(), String> {
-    write_game(app, "detection.json", config)
+    write_game(app, "detection.json", config, &config.game_id)
 }
 
-pub fn load(app: &tauri::AppHandle) -> OverlaySettings {
-    read_game::<OverlaySettings>(app, "settings.json")
+pub fn load(app: &tauri::AppHandle, game_id: &str) -> OverlaySettings {
+    read_game::<OverlaySettings>(app, "settings.json", game_id)
         .unwrap_or_default()
         .normalize()
 }
 
-pub fn save(app: &tauri::AppHandle, settings: &OverlaySettings) -> Result<(), String> {
-    write_game(app, "settings.json", settings)
+pub fn save(
+    app: &tauri::AppHandle,
+    settings: &OverlaySettings,
+    game_id: &str,
+) -> Result<(), String> {
+    write_game(app, "settings.json", settings, game_id)
+}
+
+pub fn selected_game(app: &tauri::AppHandle) -> String {
+    app.path()
+        .app_config_dir()
+        .ok()
+        .and_then(|dir| fs::read(dir.join("active-game.json")).ok())
+        .and_then(|data| serde_json::from_slice::<String>(&data).ok())
+        .filter(|id| crate::games::supports(id))
+        .unwrap_or_else(|| "aoe2-de".into())
+}
+
+pub fn save_selected_game(app: &tauri::AppHandle, game_id: &str) -> Result<(), String> {
+    write_atomic(
+        &app.path()
+            .app_config_dir()
+            .map_err(|error| error.to_string())?,
+        "active-game.json",
+        &game_id,
+    )
 }
 
 #[cfg(test)]
@@ -148,8 +185,9 @@ mod tests {
             ..Default::default()
         };
         write_atomic(&directory, "settings.json", &legacy).unwrap();
+        assert!(read_game_at::<OverlaySettings>(&directory, "settings.json", "aoe4").is_none());
         assert_eq!(
-            read_game_at::<OverlaySettings>(&directory, "settings.json")
+            read_game_at::<OverlaySettings>(&directory, "settings.json", "aoe2-de")
                 .unwrap()
                 .x,
             -900
@@ -162,7 +200,7 @@ mod tests {
         )
         .unwrap();
         assert_eq!(
-            read_game_at::<OverlaySettings>(&directory, "settings.json")
+            read_game_at::<OverlaySettings>(&directory, "settings.json", "aoe2-de")
                 .unwrap()
                 .x,
             140
@@ -177,7 +215,7 @@ mod tests {
         )
         .unwrap();
         assert_eq!(
-            read_game_at::<OverlaySettings>(&directory, "settings.json")
+            read_game_at::<OverlaySettings>(&directory, "settings.json", "aoe2-de")
                 .unwrap()
                 .x,
             200

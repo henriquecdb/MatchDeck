@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { beforeEach } from 'vitest';
+
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it } from 'vitest';
 import { BrowserRuntime } from '../../infrastructure/browser-runtime';
@@ -25,3 +27,5 @@ it('remembers collapsed navigation without changing an active match and supports
   fireEvent.click(screen.getByRole('button', { name: 'Expandir navegação' }));
   await waitFor(() => expect(localStorage.getItem('matchdeck.navigationCollapsed')).toBe('false'));
 });
+
+beforeEach(() => { localStorage.setItem('matchdeck.preferences', JSON.stringify({ openLastGame: true })); });

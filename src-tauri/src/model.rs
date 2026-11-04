@@ -129,6 +129,12 @@ pub enum MatchSource {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Player {
+    #[serde(default)]
+    pub rank: Option<u32>,
+    #[serde(default)]
+    pub rank_level: Option<String>,
+    #[serde(default)]
+    pub mmr: Option<u32>,
     pub id: String,
     pub name: String,
     pub civilization: String,

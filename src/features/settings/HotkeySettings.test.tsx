@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { beforeEach } from 'vitest';
+
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, expect, it } from 'vitest';
 import { BrowserRuntime } from '../../infrastructure/browser-runtime';
@@ -39,3 +41,5 @@ it('rejects invalid browser settings without replacing saved preferences', async
   await expect(runtime.configureApp({ ...original, hotkeys: { lockOverlay: 'Ctrl+H', toggleOverlay: 'Ctrl+H' } })).rejects.toThrow('diferente');
   expect((await runtime.read()).preferences).toEqual(original);
 });
+
+beforeEach(() => { localStorage.setItem('matchdeck.preferences', JSON.stringify({ openLastGame: true })); });

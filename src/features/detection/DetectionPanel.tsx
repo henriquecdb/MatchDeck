@@ -12,6 +12,7 @@ interface Props {
 
 export function DetectionPanel({ runtime, status, desktop, ready }: Props) {
   const { t, language } = useI18n();
+  const aoe4 = status.config.gameId === 'aoe4';
   const [input, setInput] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,15 +28,15 @@ export function DetectionPanel({ runtime, status, desktop, ready }: Props) {
   return <fieldset disabled={!desktop || !ready || busy}>
     <legend>{t('Detecção multiplayer')}</legend>
     {!desktop && <p>{t('Disponível no aplicativo Windows.')}</p>}
-    <label>{t('Profile ID do AoE2 ou Steam ID')} <input className="profile-input" type="text" inputMode="numeric" autoComplete="off" value={profileInput}
+    <label>{t(aoe4 ? 'ID ou link do perfil no AoE4 World' : 'Profile ID do AoE2 ou Steam ID')} <input className="profile-input" type="text" inputMode={aoe4 ? 'url' : 'numeric'} autoComplete="off" value={profileInput}
         disabled={status.config.enabled} onChange={event => { setInput(event.target.value); setIdentifiedName(null); }} placeholder={t('ID numérico')} />
     </label>
     <div className="actions">
-      <button disabled={status.config.enabled} onClick={() => void perform(async () => {
+      {!aoe4 && <button disabled={status.config.enabled} onClick={() => void perform(async () => {
         const profile = await runtime.identifyLocalProfile();
         setInput(profile.profileId.toString());
         setIdentifiedName(profile.name);
-      })}>{t('Identificar perfil local')}</button>
+      })}>{t('Identificar perfil local')}</button>}
       <button className="primary-action" disabled={status.config.enabled || !profileInput.trim()} onClick={() => void perform(() => runtime.configureDetection(true, profileInput))}>{t('Ativar detecção')}</button>
       <button disabled={!status.config.enabled} onClick={() => void perform(() => runtime.configureDetection(false, profileInput))}>{t('Desativar detecção')}</button>
       <button disabled={!status.config.enabled} onClick={() => void perform(() => runtime.retryDetection())}>{t('Consultar agora')}</button>
@@ -46,7 +47,7 @@ export function DetectionPanel({ runtime, status, desktop, ready }: Props) {
     {error && <p role="alert" className="error">{t(error)}</p>}
     <details className="help-details"><summary>{t('Como funciona')}</summary>
       <p>{t('Consultas a cada 20 s; o intervalo aumenta após falhas.')}</p>
-      <p>{t('Ranqueadas e partidas rápidas dependem da fonte. Lobbies personalizados e IA não têm cobertura garantida. Sem suporte a skirmish offline ou campanhas.')}</p>
+      <p>{t(aoe4 ? 'Age 4: apenas 1v1 ranqueado e rápido, publicado pelo AoE4 World. Equipes, lobbies personalizados e campanhas ficam fora desta iteração.' : 'Ranqueadas e partidas rápidas dependem da fonte. Lobbies personalizados e IA não têm cobertura garantida. Sem suporte a skirmish offline ou campanhas.')}</p>
       {status.lastChecked && <p>{t('Última consulta:')} {new Date(status.lastChecked).toLocaleTimeString(language)}</p>}
     </details>
   </fieldset>;

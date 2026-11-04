@@ -8,6 +8,9 @@ export const modeLabels: Record<MatchMode, string> = {
 };
 
 export interface Player {
+  rank?: number | null;
+  rankLevel?: string | null;
+  mmr?: number | null;
   id: string;
   name: string;
   civilization: string;

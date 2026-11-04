@@ -183,6 +183,9 @@ impl Aoe2Provider {
                     let units = catalog::unique_units(player.civ.as_deref().unwrap_or(""));
                     (
                         Player {
+                            rank: None,
+                            rank_level: None,
+                            mmr: None,
                             id: player
                                 .human_profile_id()
                                 .map(|id| id.to_string())

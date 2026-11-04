@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { beforeEach } from 'vitest';
+
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { BrowserRuntime } from '../../infrastructure/browser-runtime';
@@ -80,3 +82,5 @@ it('separates features and preserves an active demonstration and preferences acr
   expect(screen.getByRole('tab', { name: 'Overlay' }).getAttribute('aria-selected')).toBe('true');
   expect((screen.getByRole('combobox', { name: 'Modo de exibição' }) as HTMLSelectElement).value).toBe('compact');
 });
+
+beforeEach(() => { localStorage.setItem('matchdeck.preferences', JSON.stringify({ openLastGame: true })); });

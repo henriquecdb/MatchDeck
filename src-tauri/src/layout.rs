@@ -2,6 +2,9 @@ use crate::model::{MatchSnapshot, OverlayLayout};
 use std::collections::BTreeMap;
 
 pub fn overlay_size(snapshot: &MatchSnapshot, layout: &OverlayLayout) -> (f64, f64) {
+    if snapshot.game_id == "aoe4" {
+        return (900.0, 64.0);
+    }
     let duel = snapshot.players.len() == 2
         && !snapshot
             .queue_id

@@ -17,7 +17,7 @@ function OverlayContent({ runtime, state, error }: { runtime: OverlayRuntime; st
     if (!state.settings.locked && event.button === 0) void (async () => {
       if (state.settings.anchor !== 'manual' || state.settings.monitorId) {
         const position = await getCurrentWindow().outerPosition();
-        await runtime.configure({ ...state.settings, x: position.x, y: position.y, anchor: 'manual', monitorId: null });
+        await runtime.configure({ ...state.settings, x: position.x, y: position.y, anchor: 'manual', monitorId: null }, state.detection.config.gameId);
       }
       await getCurrentWindow().startDragging();
     })().catch(console.error);

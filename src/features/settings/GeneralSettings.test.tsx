@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { beforeEach } from 'vitest';
+
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { BrowserRuntime } from '../../infrastructure/browser-runtime';
@@ -59,3 +61,5 @@ it('can complete and reopen the onboarding without changing overlay preferences'
   fireEvent.click(screen.getByRole('button', { name: 'Reabrir configuração guiada' }));
   await screen.findByRole('region', { name: 'Configuração guiada' });
 });
+
+beforeEach(() => { localStorage.setItem('matchdeck.preferences', JSON.stringify({ openLastGame: true })); });

@@ -4,6 +4,7 @@ export interface PlayerProfile {
 }
 
 export interface DetectionConfig {
+  gameId?: string;
   enabled: boolean;
   profile: PlayerProfile | null;
 }
@@ -17,7 +18,7 @@ export interface DetectionStatus {
 }
 
 export const defaultDetection: DetectionStatus = {
-  config: { enabled: false, profile: null },
+  config: { enabled: false, profile: null, gameId: 'aoe2-de' },
   phase: 'disabled',
   message: 'Detecção desativada',
   lastChecked: null,

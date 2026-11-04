@@ -13,6 +13,7 @@ const queues: Record<string, string> = {
 };
 
 export function queueLabel(match: MatchSnapshot): string {
+  if (match.gameId === 'aoe4') return match.queue ?? (match.mode === 'ranked' ? 'RM 1v1' : 'QM 1v1');
   return (match.queueId && queues[match.queueId]) || match.queue || modeLabels[match.mode];
 }
 
