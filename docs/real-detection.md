@@ -38,3 +38,11 @@ Na prova de conceito de 02/11/2026, um lobby público com um humano e IA foi enc
 No encerramento confirmado, o monitor acrescenta `ratingDiff` de cada jogador à fotografia salva. O rating inicial é preservado. A projeção exibida durante um 1v1 usa Elo genérico K=32, divisor 400, com arredondamento para pontos inteiros; não representa uma garantia do matchmaking de AoE2. Partidas rápidas e calibração podem divergir significativamente. O resultado confirmado da API tem prioridade sobre projeções na demonstração de partidas concluídas.
 
 O teste automatizado com a API valida conexão, esquema, participantes e carregamento de estatísticas de um perfil público; ele não substitui o teste completo de início e fim dentro do jogo.
+
+## Histórico de rating · 0.5.2
+
+A aba Perfil mostra o gráfico para as filas de 1v1 ranqueadas e rápidas. O histórico vem do campo ratings da resposta de perfil do AoE2 Companion, separado pelo identificador exato da fila. Rating não ranqueado geral não substitui o rating de partidas rápidas.
+
+São exibidos até 30 registros recentes publicados, em ordem cronológica, com o período real indicado. A fonte pode retornar registros de vários anos, poucos registros ou nenhum; não há garantia de cobertura desde a primeira partida. Equipes ficam fora do gráfico nesta versão, preservando suas estatísticas existentes.
+
+A consulta e o cache de um minuto são os mesmos da aba Perfil; não há requisição adicional de histórico nem consulta periódica durante a partida. Use Atualizar perfil para buscar dados novos. Valores ausentes não são estimados nem preenchidos com dados de outra modalidade.

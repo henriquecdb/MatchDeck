@@ -96,7 +96,7 @@ function ControlPanelContent({ runtime, desktop, runtimeState }: { runtime: Over
         {match?.warnings?.map(warning => <p role="status" key={warning}>{t(warning)}</p>)}
         <LastResult match={state.lastSynced} />
       </>}
-      {tab.id === 'profile' && (gameId === 'aoe2-de' ? <ProfilePanel runtime={runtime} profile={state.detection.config.profile} desktop={desktop} visible={!!entered && activeTab === 'profile'} onLink={() => setActiveTab('match')} /> : <p>{t('Estatísticas de perfil do Age 4 estarão disponíveis em outra iteração')}</p>)}
+      {tab.id === 'profile' && <ProfilePanel key={gameId} gameId={gameId} runtime={runtime} profile={state.detection.config.profile} desktop={desktop} visible={!!entered && activeTab === 'profile'} onLink={() => setActiveTab('match')} />}
       {tab.id === 'overlay' && <>
         <div className="section-heading"><h2>{t('Overlay')}</h2><p>{t('Aparência e posição do overlay.')}</p></div>
         <OverlaySettingsPanel gameId={gameId} settings={settings} match={match} desktop={desktop} shortcutAvailable={state.shortcutAvailable} lockShortcut={state.preferences.hotkeys.lockOverlay} onChange={configure} monitors={monitors} onRefreshMonitors={refreshMonitors} monitorError={monitorError} />

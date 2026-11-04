@@ -3,7 +3,7 @@ import type { Language } from './preferences';
 import { translate } from '../i18n/translate';
 
 const queues: Record<string, string> = {
-  unranked: 'Lobby personalizado · não ranqueado',
+  unranked: 'Não ranqueado',
   rm_1v1: 'Ranqueada · Mapa aleatório 1v1', rm_team: 'Ranqueada · Mapa aleatório equipes',
   ew_1v1: 'Ranqueada · Empire Wars 1v1', ew_team: 'Ranqueada · Empire Wars equipes',
   dm_1v1: 'Ranqueada · Death Match 1v1', dm_team: 'Ranqueada · Death Match equipes',
@@ -17,8 +17,22 @@ export function queueLabel(match: MatchSnapshot): string {
   return (match.queueId && queues[match.queueId]) || match.queue || modeLabels[match.mode];
 }
 
-export function profileQueueLabel(queueId: string | null): string {
-  return queueId ? queues[queueId] ?? queueId : 'Modalidade indisponível';
+const aoe4Queues: Record<string, string> = {
+  rm_solo: 'Ranqueada · Solo', rm_team: 'Ranqueada · Equipes',
+  qm_1v1: 'Partida rápida · 1v1', qm_2v2: 'Partida rápida · 2v2',
+  qm_3v3: 'Partida rápida · 3v3', qm_4v4: 'Partida rápida · 4v4',
+  rm_1v1_elo: 'MMR ranqueado · 1v1', rm_2v2_elo: 'MMR ranqueado · 2v2',
+  rm_3v3_elo: 'MMR ranqueado · 3v3', rm_4v4_elo: 'MMR ranqueado · 4v4',
+};
+
+export function profileQueueLabel(queueId: string | null, gameId = 'aoe2-de'): string {
+  return queueId ? (gameId === 'aoe4' ? aoe4Queues : queues)[queueId] ?? queueId : 'Modalidade indisponível';
+}
+
+export function profileRatingLabel(queueId: string, gameId: string): string {
+  if (gameId !== 'aoe4') return 'Rating';
+  if (queueId.endsWith('_elo')) return 'MMR';
+  return queueId.startsWith('rm_') ? 'Pontos ranqueados' : 'Rating';
 }
 
 export function ratingLabel(match: MatchSnapshot): string {

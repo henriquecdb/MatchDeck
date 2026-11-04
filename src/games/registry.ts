@@ -16,7 +16,7 @@ export interface GameIntegration {
   experimental: boolean;
   capabilities: { liveMultiplayer: boolean; offline: boolean; customLobbies: 'unverified' | 'supported'; };
   demo(mode: MatchMode, teamSize?: DemoTeamSize): ReturnType<typeof createDemoMatch>;
-  artwork(player: Player, language?: Language): FactionArtwork | undefined;
+  artwork(player: Pick<Player, 'civilizationId' | 'civilization' | 'uniqueUnits'>, language?: Language): FactionArtwork | undefined;
 }
 
 const integrations: GameIntegration[] = [{ ...games[0], capabilities: { ...games[0].capabilities, customLobbies: 'unverified' }, demo: createDemoMatch, artwork: unitArtwork }, { ...games[1], capabilities: { ...games[1].capabilities, customLobbies: 'unverified' }, demo: createAoe4Demo, artwork: civilizationArtwork }];

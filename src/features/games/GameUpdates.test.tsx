@@ -17,7 +17,7 @@ afterEach(() => { cleanup(); localStorage.clear(); counts.mounted = 0; counts.un
 it('keeps update checking mounted on the game library and across game navigation', async () => {
   render(<ControlPanel runtime={new BrowserRuntime()} desktop={false} />);
   await screen.findByRole('heading', { name: 'Escolha seu jogo' });
-  expect(counts.mounted).toBe(1);
+  await waitFor(() => expect(counts.mounted).toBe(1));
   expect(screen.getByTestId('update-visibility').textContent).toBe('false');
   fireEvent.click(screen.getByRole('button', { name: 'Age of Empires IV Integração em teste' }));
   fireEvent.click(await screen.findByRole('tab', { name: 'Atualizações' }));

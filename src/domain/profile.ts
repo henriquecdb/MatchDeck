@@ -3,6 +3,13 @@ export interface ProfileLeaderboard {
   rating: number | null;
   wins: number | null;
   losses: number | null;
+  season?: number | null;
+  ratingHistory?: RatingPoint[];
+}
+
+export interface RatingPoint {
+  recordedAt: string;
+  rating: number;
 }
 
 export interface RecentMatch {
