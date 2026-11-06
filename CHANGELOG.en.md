@@ -25,7 +25,7 @@
 - The first iteration targets two-human 1v1 games. Replays, AI and larger formats do not activate the overlay. The local API does not expose teams, map or queue; ranked, unranked and custom games are not claimed to be distinguishable.
 - Overlay MMR and statistics are ranked values published by SC2 Pulse for that race. Unique name/region matches are marked as Suggested profile, without claiming client-confirmed identity. Ambiguous names and missing data remain without stats.
 - Live MMR changes are not estimated; published changes appear in history. Current MMR is not substituted for historical starting MMR.
-- Local detection still requires manual validation in a real match before publishing this version.
+- SC2 is in Early Access. Local replay outcomes have been validated; live overlay behavior and broader match coverage remain under observation.
 
 ## [0.5.2] - 2026-11-04
 
