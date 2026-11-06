@@ -109,6 +109,7 @@ impl RemoteGame {
             .map(|(team, player)| {
                 let stats = player.modes.get(queue);
                 Player {
+                    identity_hint: None,
                     id: player.profile_id.to_string(),
                     name: player.name.clone(),
                     civilization: player
@@ -126,12 +127,14 @@ impl RemoteGame {
                     rank: stats.and_then(|s| s.rank),
                     rank_level: stats.and_then(|s| s.rank_level.clone()),
                     wins: stats.and_then(|s| s.wins_count),
+                    draws: None,
                     losses: stats.and_then(|s| s.losses_count),
                     rating_change: if self.finished() {
                         player.rating_diff
                     } else {
                         None
                     },
+                    draw: None,
                     won: if self.finished() {
                         result(player.result.as_deref())
                     } else {
@@ -263,6 +266,11 @@ impl Aoe4Provider {
             .map_err(|_| "AoE4 World retornou dados incompatíveis".into())
     }
 
+    pub async fn local_profile(&self, roots: &[std::path::PathBuf]) -> Result<Profile, String> {
+        let steam_id = crate::games::local_profile::aoe4(roots)?;
+        self.resolve_profile(&steam_id).await
+    }
+
     pub async fn resolve_profile(&self, input: &str) -> Result<Profile, String> {
         let id = profile_id(input)?;
         let profile: RemoteProfile = self
@@ -290,6 +298,20 @@ impl Aoe4Provider {
             profile,
             games.ok_or("Histórico indisponível no AoE4 World")?,
         ))
+    }
+
+    pub async fn latest_result(&self, profile_id: u64) -> Result<Option<RemoteGame>, String> {
+        let feed: Option<super::profile::GameFeed> = self
+            .get(&format!(
+                "/players/{profile_id}/games?limit=20&include_alts=false&include_stats=true"
+            ))
+            .await?;
+        Ok(feed
+            .ok_or("Histórico indisponível no AoE4 World")?
+            .games
+            .into_iter()
+            .filter(|game| game.includes(profile_id) && game.supported() && game.finished())
+            .max_by_key(|game| game.started_at))
     }
 
     pub async fn last_game(
@@ -402,6 +424,11 @@ mod tests {
         assert!(profile.profile_id > 0);
         if input.len() < 17 {
             assert_eq!(profile.profile_id.to_string(), input);
+        }
+        if let Some(game) = provider.latest_result(profile.profile_id).await.unwrap() {
+            assert!(game.finished());
+            assert!(game.includes(profile.profile_id));
+            assert!(game.snapshot(profile.profile_id).finished_at.is_some());
         }
         for stats in [false, true] {
             if let Some(game) = provider.last_game(profile.profile_id, stats).await.unwrap() {

@@ -32,8 +32,8 @@ export interface OverlayRuntime {
   configure(settings: OverlaySettings, gameId?: string): Promise<void>;
   identifyLocalProfile(): Promise<PlayerProfile>;
   profileOverview(): Promise<ProfileOverview>;
-  configureDetection(enabled: boolean, profileInput: string): Promise<void>;
-  syncLatest(): Promise<void>;
+  configureDetection(enabled: boolean, profileInput: string, playerName?: string): Promise<void>;
+  syncLatest(completedOnly?: boolean): Promise<void>;
   listMonitors(): Promise<DisplayMonitor[]>;
   toggleVisibility(): Promise<void>;
   configureApp(preferences: AppPreferences): Promise<void>;

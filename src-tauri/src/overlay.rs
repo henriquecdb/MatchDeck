@@ -20,7 +20,7 @@ pub fn synchronize(
         .map_err(|error| error.to_string())?;
     app.emit("state-changed", state)
         .map_err(|error| error.to_string())?;
-    refresh_visibility(&window, state, reposition)
+    refresh_visibility(&window, state, reposition).map(|_| ())
 }
 
 fn refresh_geometry(window: &tauri::WebviewWindow, state: &AppState) -> Result<(), String> {
@@ -45,7 +45,7 @@ fn refresh_visibility(
     window: &tauri::WebviewWindow,
     state: &AppState,
     raise: bool,
-) -> Result<(), String> {
+) -> Result<Option<&'static str>, String> {
     let needs_focus = state
         .current_match
         .as_ref()
@@ -60,12 +60,34 @@ fn refresh_visibility(
                 &state.detection.config.game_id,
             ),
     );
-    if window.is_visible().map_err(|error| error.to_string())? == visible
-        && (!visible || (!raise && is_topmost(window)?))
+    let was_visible = window.is_visible().map_err(|error| error.to_string())?;
+    if was_visible == visible
+        && (!visible || (!raise && is_topmost(window)? && is_above_foreground(window)?))
     {
-        return Ok(());
+        return Ok(None);
     }
-    set_visibility(window, visible)
+    set_visibility(window, visible)?;
+    Ok((was_visible != visible).then_some(if visible {
+        "Overlay exibido."
+    } else if state.current_match.is_none() {
+        "Overlay ocultado: nenhuma partida ativa."
+    } else if state.hidden_match_id.as_ref() == state.current_match.as_ref().map(|game| &game.id) {
+        "Overlay ocultado pelo usuário."
+    } else {
+        "Overlay ocultado: jogo fora de foco ou foco indisponível."
+    }))
+}
+
+#[cfg(windows)]
+fn is_above_foreground(window: &tauri::WebviewWindow) -> Result<bool, String> {
+    Ok(crate::visibility::is_above_foreground(
+        window.hwnd().map_err(|error| error.to_string())?.0,
+    ))
+}
+
+#[cfg(not(windows))]
+fn is_above_foreground(_: &tauri::WebviewWindow) -> Result<bool, String> {
+    Ok(true)
 }
 
 #[cfg(windows)]
@@ -109,8 +131,14 @@ pub async fn watch_desktop(app: tauri::AppHandle) {
         let Some(window) = app.get_webview_window("overlay") else {
             return;
         };
-        if let Err(error) = refresh_visibility(&window, &snapshot, false) {
-            eprintln!("{error}");
+        match refresh_visibility(&window, &snapshot, false) {
+            Ok(Some(reason)) => {
+                if let Ok(mut state) = app.state::<SharedState>().lock() {
+                    crate::diagnostics::record(&mut state, "visibility", reason);
+                }
+            }
+            Err(error) => eprintln!("{error}"),
+            Ok(None) => {}
         }
         ticks = (ticks + 1) % 8;
         if ticks == 0 {

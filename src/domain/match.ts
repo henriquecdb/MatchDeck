@@ -1,6 +1,7 @@
-export type MatchMode = 'ranked' | 'quick' | 'skirmish' | 'custom';
+export type MatchMode = 'ranked' | 'quick' | 'skirmish' | 'custom' | 'unknown';
 
 export const modeLabels: Record<MatchMode, string> = {
+  unknown: 'Modalidade não informada',
   ranked: 'Ranqueada',
   quick: 'Multiplayer rápido',
   skirmish: 'Skirmish',
@@ -8,6 +9,7 @@ export const modeLabels: Record<MatchMode, string> = {
 };
 
 export interface Player {
+  identityHint?: string | null;
   rank?: number | null;
   rankLevel?: string | null;
   mmr?: number | null;
@@ -22,9 +24,11 @@ export interface Player {
   rating: number | null;
   wins: number | null;
   losses: number | null;
+  draws?: number | null;
   ratingChange?: number | null;
   teamId?: number | null;
   won?: boolean | null;
+  draw?: boolean | null;
 }
 
 export interface MatchSnapshot {
@@ -47,9 +51,9 @@ export function replayMatch(match: MatchSnapshot): MatchSnapshot {
   return { ...structuredClone(match), id: `demo-${match.id}`, source: 'demo', replayOf: match.id };
 }
 
-export function winRate(player: Pick<Player, 'wins' | 'losses'>): string {
+export function winRate(player: Pick<Player, 'wins' | 'losses' | 'draws'>): string {
   if (player.wins === null || player.losses === null) return '—';
-  const total = player.wins + player.losses;
+  const total = player.wins + player.losses + (player.draws ?? 0);
   return total > 0 ? `${((player.wins / total) * 100).toFixed(1)}%` : '—';
 }
 

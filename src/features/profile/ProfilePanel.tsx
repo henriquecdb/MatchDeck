@@ -62,23 +62,24 @@ export function ProfilePanel({ runtime, profile, visible, desktop, onLink, gameI
               <div><dt>{t(profileRatingLabel(selectedBoard.leaderboardId, gameId))}</dt><dd>{selectedBoard.rating ?? '—'}</dd></div>
               <div><dt>{t('Vitórias')}</dt><dd>{selectedBoard.wins ?? '—'}</dd></div>
               <div><dt>{t('Derrotas')}</dt><dd>{selectedBoard.losses ?? '—'}</dd></div>
+              {!!selectedBoard.draws && <div><dt>{t('Empates')}</dt><dd>{selectedBoard.draws}</dd></div>}
               <div><dt>{t('Aproveitamento')}</dt><dd>{winRate == null ? '—' : `${winRate.toLocaleString(language, { maximumFractionDigits: 1 })}%`}</dd></div>
             </dl></article> : <p>{t('Sem estatísticas publicadas para este perfil.')}</p>}
         </section>
-        {selectedBoard && supportsRatingHistory(gameId, selectedBoard.leaderboardId) && <RatingHistory key={selectedBoard.leaderboardId} board={selectedBoard} label={t(profileRatingLabel(selectedBoard.leaderboardId, gameId))} />}
+        {selectedBoard && supportsRatingHistory(gameId, selectedBoard.leaderboardId) && <RatingHistory windowDays={gameId === 'sc2' ? 90 : undefined} key={selectedBoard.leaderboardId} board={selectedBoard} label={t(profileRatingLabel(selectedBoard.leaderboardId, gameId))} />}
         <section aria-label={t('Últimas 5 partidas')}><h3>{t('Últimas 5 partidas')}</h3>
           {data.recentMatches.length ? <ol className="profile-history">{data.recentMatches.map(match => {
             const artwork = gameIntegration(gameId)?.artwork({ civilizationId: match.civilizationId ?? undefined, civilization: match.civilization ?? '', uniqueUnits: [] }, gameLanguage);
             const civilization = artwork?.name ?? match.civilization ?? t('Civilização indisponível');
-            return <li key={match.id} className={`history-match ${match.won === true ? 'is-win' : match.won === false ? 'is-loss' : 'is-unknown'}`}>
-              <span className="history-result">{t(match.won === true ? 'Vitória' : match.won === false ? 'Derrota' : 'Sem resultado')}</span>
+            return <li key={match.id} className={`history-match ${match.draw ? 'is-draw' : match.won === true ? 'is-win' : match.won === false ? 'is-loss' : 'is-unknown'}`}>
+              <span className="history-result">{t(match.draw ? 'Empate' : match.won === true ? 'Vitória' : match.won === false ? 'Derrota' : 'Sem resultado')}</span>
               <div className="history-details"><strong>{t(match.map)}</strong><small>{t(profileQueueLabel(match.queueId, gameId))}</small><time dateTime={match.startedAt}>{new Date(match.startedAt).toLocaleString(language, { dateStyle: 'short', timeStyle: 'short' })}</time></div>
               <div className="history-civilization"><CivilizationEmblem image={artwork?.emblem} civilization={civilization} /><span>{civilization}</span></div>
               <span className="history-rating" title={t('Variação de rating')} aria-label={t('Variação de rating: {0}', { 0: match.ratingChange == null ? '—' : `${match.ratingChange > 0 ? '+' : ''}${match.ratingChange}` })}>{match.ratingChange == null ? '—' : `${match.ratingChange > 0 ? '+' : ''}${match.ratingChange}`}</span>
             </li>;
           })}</ol> : <p>{t('Nenhuma partida encerrada publicada.')}</p>}
         </section>
-        <details className="help-details"><summary>{t('Sobre estes dados')}</summary><p>{t(gameId === 'aoe4' ? 'Fonte: AoE4 World. Até 5 partidas multiplayer encerradas entre as 10 mais recentes publicadas. Resultados podem atrasar ou estar privados.' : 'Fonte: AoE2 Companion. Até 5 partidas encerradas, da mais recente para a mais antiga. Resultados podem demorar a aparecer.')}</p><p>{t('Ratings e estatísticas são separados por modalidade. — indica dado indisponível; não significa zero.')}</p><p>{t('Cache de 1 minuto ao abrir esta aba. Use Atualizar perfil para consultar agora.')}</p><p>{t('Atualizado em {0}', { 0: new Date(data.fetchedAt).toLocaleString(language) })}</p></details>
+        <details className="help-details"><summary>{t('Sobre estes dados')}</summary><p>{t(gameId === 'sc2' ? 'SC2 Pulse: MMR e estatísticas. Histórico: até 5 replays locais 1v1; sem arquivos locais, usamos as partidas publicadas. Matchmaking inclui ranked e unranked.' : gameId === 'aoe4' ? 'Fonte: AoE4 World. Até 5 partidas multiplayer encerradas entre as 10 mais recentes publicadas. Resultados podem atrasar ou estar privados.' : 'Fonte: AoE2 Companion. Até 5 partidas encerradas, da mais recente para a mais antiga. Resultados podem demorar a aparecer.')}</p><p>{t('Ratings e estatísticas são separados por modalidade. — indica dado indisponível; não significa zero.')}</p><p>{t('Cache de 1 minuto ao abrir esta aba. Use Atualizar perfil para consultar agora.')}</p><p>{t('Atualizado em {0}', { 0: new Date(data.fetchedAt).toLocaleString(language) })}</p></details>
       </>}
     </>}
   </>;

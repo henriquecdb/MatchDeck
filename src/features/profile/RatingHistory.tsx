@@ -3,7 +3,7 @@ import { useState } from 'react';
 import type { ProfileLeaderboard } from '../../domain/profile';
 import { useI18n } from '../../i18n/LanguageProvider';
 
-export function RatingHistory({ board, label }: { board: ProfileLeaderboard; label: string }) {
+export function RatingHistory({ board, label, windowDays }: { board: ProfileLeaderboard; label: string; windowDays?: number }) {
   const { t, language } = useI18n();
   const points = availableRatingPoints(board.ratingHistory ?? []);
   const [active, setActive] = useState<number | null>(null);
@@ -17,7 +17,7 @@ export function RatingHistory({ board, label }: { board: ProfileLeaderboard; lab
     <div className="rating-history-heading"><div><h3>{t('Evolução de rating')}</h3><small>{label}{board.season != null ? ' · ' + t('Temporada {0}', { 0: board.season }) : ''}</small></div>
       {change != null && <span className={change >= 0 ? 'rating-trend is-positive' : 'rating-trend is-negative'} title={t('Variação entre o primeiro e o último registro')}>{change > 0 ? '+' : ''}{change}</span>}
     </div>
-    {!points.length ? <p>{t('Sem histórico de rating publicado para esta modalidade.')}</p> : <>
+    {!points.length ? <p>{windowDays ? t('Sem registros publicados nesta temporada nos últimos {0} dias.', { 0: windowDays }) : t('Sem histórico de rating publicado para esta modalidade.')}</p> : <>
       <div className="rating-history-value" aria-live="polite"><strong>{selected!.rating.toLocaleString(language)}</strong><small>{new Date(selected!.recordedAt).toLocaleString(language, { dateStyle: 'short', timeStyle: 'short' })}</small></div>
       <div className="rating-history-plot"><div className="rating-history-scale"><span>{max.toLocaleString(language)}</span><span>{min.toLocaleString(language)}</span></div>
       <div className="rating-bars" role="group" aria-label={t('Registros de rating')} onMouseLeave={() => setActive(null)}>

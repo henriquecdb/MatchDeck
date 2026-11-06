@@ -117,6 +117,7 @@ pub enum MatchMode {
     Quick,
     Skirmish,
     Custom,
+    Unknown,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -129,6 +130,8 @@ pub enum MatchSource {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Player {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub identity_hint: Option<String>,
     #[serde(default)]
     pub rank: Option<u32>,
     #[serde(default)]
@@ -149,12 +152,16 @@ pub struct Player {
     pub rating: Option<u32>,
     pub wins: Option<u32>,
     pub losses: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub draws: Option<u32>,
     #[serde(default)]
     pub rating_change: Option<i32>,
     #[serde(default)]
     pub team_id: Option<i32>,
     #[serde(default)]
     pub won: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub draw: Option<bool>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -183,6 +190,19 @@ pub struct MatchSnapshot {
 }
 
 impl MatchSnapshot {
+    pub fn belongs_to(&self, config: &crate::detection::model::DetectionConfig) -> bool {
+        let Some(profile) = &config.profile else {
+            return false;
+        };
+        let id = profile.profile_id.to_string();
+        self.game_id == config.game_id
+            && self
+                .self_player_id
+                .as_ref()
+                .is_none_or(|owner| owner == &id)
+            && self.players.iter().any(|player| player.id == id)
+    }
+
     pub fn as_demo(&self) -> Self {
         let mut replay = self.clone();
         replay.id = format!("demo-{}", self.id);
@@ -245,6 +265,27 @@ mod tests {
                 "rating": 1200, "wins": 30, "losses": 20}]
         });
         let original: MatchSnapshot = serde_json::from_value(value).unwrap();
+        for game_id in ["aoe2-de", "aoe4", "sc2"] {
+            let mut snapshot = original.clone();
+            snapshot.game_id = game_id.into();
+            let config = crate::detection::model::DetectionConfig {
+                game_id: game_id.into(),
+                enabled: false,
+                profile: Some(crate::detection::model::Profile {
+                    profile_id: 42,
+                    name: "Player".into(),
+                }),
+            };
+            assert!(snapshot.belongs_to(&config));
+            snapshot.self_player_id = Some("99".into());
+            assert!(!snapshot.belongs_to(&config));
+            snapshot.self_player_id = Some("42".into());
+            assert!(snapshot.belongs_to(&config));
+            snapshot.players[0].id = "99".into();
+            assert!(!snapshot.belongs_to(&config));
+            snapshot.game_id = "other".into();
+            assert!(!snapshot.belongs_to(&config));
+        }
         let restored: MatchSnapshot =
             serde_json::from_slice(&serde_json::to_vec(&original).unwrap()).unwrap();
         let mut replay = restored.as_demo();

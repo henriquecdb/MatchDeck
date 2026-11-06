@@ -100,6 +100,7 @@ pub async fn sync_latest_match(
     app: tauri::AppHandle,
     controller: State<'_, DetectionController>,
     state: State<'_, SharedState>,
+    completed_only: Option<bool>,
 ) -> Result<(), String> {
     let config = state
         .lock()
@@ -111,12 +112,24 @@ pub async fn sync_latest_match(
         .profile
         .as_ref()
         .ok_or("Configure um perfil na aba Partida")?;
-    let mut snapshot = if config.game_id == "aoe4" {
-        let remote = controller
-            .aoe4
-            .last_game(profile.profile_id, true)
-            .await?
-            .ok_or("Nenhuma partida disponível no AoE4 World")?;
+    let completed_only = completed_only.unwrap_or(false);
+    let mut snapshot = if config.game_id == "sc2" {
+        if let Some(local) =
+            crate::games::sc2::replay::latest(&app, &controller.sc2, profile.profile_id)
+                .await
+                .unwrap_or(None)
+        {
+            local
+        } else {
+            crate::games::sc2::service::latest_snapshot(&controller.sc2, profile.profile_id).await?
+        }
+    } else if config.game_id == "aoe4" {
+        let remote = if completed_only {
+            controller.aoe4.latest_result(profile.profile_id).await?
+        } else {
+            controller.aoe4.last_game(profile.profile_id, true).await?
+        }
+        .ok_or("Nenhuma partida compatível encontrada para este perfil")?;
         if !remote.supported() || !remote.includes(profile.profile_id) {
             return Err("A última partida não é um 1v1 compatível".into());
         }
@@ -126,12 +139,19 @@ pub async fn sync_latest_match(
         let latest = feed
             .matches
             .iter()
-            .filter(|candidate| candidate.includes(profile.profile_id) && candidate.supported())
+            .filter(|candidate| {
+                candidate.includes(profile.profile_id)
+                    && candidate.supported()
+                    && (!completed_only || candidate.is_finished())
+            })
             .max_by_key(|candidate| candidate.started)
             .ok_or("Nenhuma partida compatível encontrada para este perfil")?;
         controller.provider.snapshot(latest).await
     };
     snapshot.self_player_id = Some(profile.profile_id.to_string());
+    if completed_only && snapshot.finished_at.is_none() {
+        return Err("Nenhuma partida compatível encontrada para este perfil".into());
+    }
     let published = {
         let mut state = state.lock().map_err(|error| error.to_string())?;
         if state.detection.config.game_id != config.game_id
@@ -197,24 +217,36 @@ pub fn list_monitors(
 
 #[tauri::command]
 pub async fn identify_local_profile(
+    app: tauri::AppHandle,
     controller: State<'_, DetectionController>,
     state: State<'_, SharedState>,
 ) -> Result<Profile, String> {
-    if state
+    use tauri::Manager;
+    let game_id = state
         .lock()
         .map_err(|error| error.to_string())?
         .detection
         .config
         .game_id
-        == "aoe4"
-    {
-        return Err("Informe o ID ou link do perfil no AoE4 World".into());
+        .clone();
+    if game_id == "aoe2-de" {
+        return controller.provider.local_profile().await;
     }
-    controller.provider.local_profile().await
+    let documents = app
+        .path()
+        .document_dir()
+        .map_err(|_| "Pasta Documentos não encontrada. Informe o perfil manualmente.")?;
+    let roots = crate::games::local_profile::document_roots(documents);
+    match game_id.as_str() {
+        "aoe4" => controller.aoe4.local_profile(&roots).await,
+        "sc2" => controller.sc2.local_profile(&roots).await,
+        _ => Err("Integração de jogo indisponível".into()),
+    }
 }
 
 #[tauri::command]
 pub async fn profile_overview(
+    app: tauri::AppHandle,
     controller: State<'_, DetectionController>,
     state: State<'_, SharedState>,
 ) -> Result<crate::games::profile::ProfileOverview, String> {
@@ -230,6 +262,27 @@ pub async fn profile_overview(
         (state.detection.config.game_id.clone(), profile_id)
     };
     match game_id.as_str() {
+        "sc2" => {
+            let local = crate::games::sc2::replay::history(&app, &controller.sc2, profile_id)
+                .await
+                .unwrap_or_default();
+            match controller.sc2.profile_overview(profile_id).await {
+                Ok(mut overview) => {
+                    if !local.is_empty() {
+                        overview.recent_matches = local;
+                    }
+                    Ok(overview)
+                }
+                Err(error) if local.is_empty() => Err(error),
+                Err(_) => Ok(crate::games::profile::ProfileOverview {
+                    profile_id,
+                    name: format!("SC2 #{profile_id}"),
+                    leaderboards: vec![],
+                    recent_matches: local,
+                    fetched_at: chrono::Utc::now().to_rfc3339(),
+                }),
+            }
+        }
         "aoe4" => controller.aoe4.profile_overview(profile_id).await,
         "aoe2-de" => controller.provider.profile_overview(profile_id).await,
         _ => Err("Integração de jogo indisponível".into()),
@@ -243,6 +296,7 @@ pub async fn configure_detection(
     state: State<'_, SharedState>,
     enabled: bool,
     profile_input: String,
+    player_name: Option<String>,
 ) -> Result<(), String> {
     let game_id = state
         .lock()
@@ -252,7 +306,20 @@ pub async fn configure_detection(
         .game_id
         .clone();
     let profile = if enabled {
-        Some(if game_id == "aoe4" {
+        Some(if game_id == "sc2" {
+            let mut profile = controller.sc2.resolve_profile(&profile_input).await?;
+            if let Some(name) = player_name
+                .as_deref()
+                .map(str::trim)
+                .filter(|name| !name.is_empty())
+            {
+                if name.chars().count() > 64 || name.chars().any(char::is_control) {
+                    return Err("Nome do jogador inválido".into());
+                }
+                profile.name = name.into();
+            }
+            profile
+        } else if game_id == "aoe4" {
             controller.aoe4.resolve_profile(&profile_input).await?
         } else {
             controller.provider.resolve_profile(&profile_input).await?
@@ -277,6 +344,10 @@ pub async fn configure_detection(
             return Err("O jogo foi alterado; tente novamente".into());
         }
         storage::save_detection(&app, &config)?;
+        state.last_synced = state
+            .last_synced
+            .take()
+            .filter(|snapshot| snapshot.belongs_to(&config));
         state.detection.config = config.clone();
         state.detection.phase = if enabled { "waiting" } else { "disabled" }.into();
         state.detection.message = if enabled {

@@ -281,8 +281,8 @@ pub fn create_tray(app: &tauri::AppHandle) -> Result<(), String> {
                         if !config.enabled && config.profile.is_none() { crate::diagnostics::report_error(app, "Configure um perfil na aba Partida antes de ativar a detecção.".into()); open_main(app); return; }
                         let app = app.clone();
                         tauri::async_runtime::spawn(async move {
-                            let input = config.profile.map(|profile| profile.profile_id.to_string()).unwrap_or_default();
-                            if let Err(error) = crate::commands::configure_detection(app.clone(), app.state(), app.state(), !config.enabled, input).await { crate::diagnostics::report_error(&app, error); open_main(&app); }
+                            let input = config.profile.as_ref().map(|profile| profile.profile_id.to_string()).unwrap_or_default();
+                            if let Err(error) = crate::commands::configure_detection(app.clone(), app.state(), app.state(), !config.enabled, input, config.profile.as_ref().map(|profile| profile.name.clone())).await { crate::diagnostics::report_error(&app, error); open_main(&app); }
                         });
                     }
                 },

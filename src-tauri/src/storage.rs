@@ -116,7 +116,10 @@ pub fn save_preferences(
 
 pub fn load_last_match(app: &tauri::AppHandle, game_id: &str) -> Option<MatchSnapshot> {
     read_game::<MatchSnapshot>(app, "last-match.json", game_id).filter(|snapshot| {
-        snapshot.game_id == game_id && !snapshot.players.is_empty() && snapshot.players.len() <= 8
+        snapshot.game_id == game_id
+            && !snapshot.players.is_empty()
+            && snapshot.players.len() <= 8
+            && snapshot.belongs_to(&load_detection(app, game_id))
     })
 }
 

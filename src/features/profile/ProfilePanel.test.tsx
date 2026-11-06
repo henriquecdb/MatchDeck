@@ -140,3 +140,14 @@ it('shows separate Age 2 ranked and quick 1v1 histories without fetching on queu
   expect(screen.queryByText('1.500')).toBeNull();
   expect(load).toHaveBeenCalledTimes(1);
 });
+
+it('reuses the profile layout for SC2 with races, MMR, draws and a season-specific chart', async () => {
+ const runtime=new BrowserRuntime();const load=vi.spyOn(runtime,'profileOverview').mockResolvedValue({
+  ...overview,leaderboards:[{leaderboardId:'sc2_1v1_terran',rating:4200,wins:10,losses:9,draws:1,season:68,ratingHistory:[{recordedAt:'2026-11-03T10:00:00Z',rating:4100}]}],
+  recentMatches:[{...overview.recentMatches[0],queueId:'sc2_1v1_terran',civilizationId:'TERRAN',civilization:'TERRAN',won:null,draw:true}],
+ });
+ render(<ProfilePanel runtime={runtime} gameId="sc2" profile={{profileId:42,name:'Nova'}} desktop visible onLink={vi.fn()} />);
+ await screen.findByText('MMR');expect(screen.getByText('50%')).toBeTruthy();expect(screen.getByText('Empates')).toBeTruthy();
+ expect(screen.getByText('Empate')).toBeTruthy();expect(screen.getByRole('img',{name:'Emblema de Terran'}).getAttribute('src')).toBe('/sc2/races/terran.png');
+ expect(screen.getByRole('region',{name:'Evolução de rating'})).toBeTruthy();expect(load).toHaveBeenCalledTimes(1);
+});

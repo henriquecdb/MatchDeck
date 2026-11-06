@@ -183,6 +183,7 @@ impl Aoe2Provider {
                     let units = catalog::unique_units(player.civ.as_deref().unwrap_or(""));
                     (
                         Player {
+                            identity_hint: None,
                             rank: None,
                             rank_level: None,
                             mmr: None,
@@ -205,12 +206,14 @@ impl Aoe2Provider {
                                 .rating
                                 .or_else(|| stats.as_ref().and_then(|board| board.rating)),
                             wins: stats.as_ref().and_then(|board| board.wins),
+                            draws: None,
                             losses: stats.as_ref().and_then(|board| board.losses),
                             rating_change: if remote.is_finished() {
                                 player.rating_diff
                             } else {
                                 None
                             },
+                            draw: None,
                             won: if remote.is_finished() {
                                 player.won
                             } else {

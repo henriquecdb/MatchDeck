@@ -48,6 +48,7 @@ fn main() {
             }
             let provider = games::aoe2::provider::Aoe2Provider::new()?;
             let aoe4 = games::aoe4::provider::Aoe4Provider::new()?;
+            let sc2 = games::sc2::provider::Sc2Provider::new()?;
             let game_id = storage::selected_game(&handle);
             let preferences = storage::load_preferences(&handle);
             let mut config = storage::load_detection(&handle, &game_id);
@@ -59,6 +60,7 @@ fn main() {
             app.manage(detection::service::DetectionController {
                 provider: provider.clone(),
                 aoe4: aoe4.clone(),
+                sc2: sc2.clone(),
                 updates,
             });
             {
@@ -122,10 +124,15 @@ fn main() {
                     };
                 }
             });
+            tauri::async_runtime::spawn(games::sc2::replay::watch(
+                app.handle().clone(),
+                sc2.clone(),
+            ));
             tauri::async_runtime::spawn(detection::service::run(
                 app.handle().clone(),
                 provider,
                 aoe4,
+                sc2,
                 receiver,
             ));
             tauri::async_runtime::spawn(overlay::watch_desktop(app.handle().clone()));

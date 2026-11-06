@@ -21,8 +21,21 @@
       "customLobbies": "unverified"
     },
     "shortName": "Age of Empires IV",
-    "subtitle": "Integração em teste",
+    "subtitle": "Early Access",
     "icon": "/games/aoe4.ico",
+    "experimental": true
+  },
+  {
+    "id": "sc2",
+    "name": "StarCraft II",
+    "capabilities": {
+      "liveMultiplayer": true,
+      "offline": false,
+      "customLobbies": "unverified"
+    },
+    "shortName": "StarCraft II",
+    "subtitle": "Early Access",
+    "icon": "/games/sc2.png",
     "experimental": true
   }
 ]
