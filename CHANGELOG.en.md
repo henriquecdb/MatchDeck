@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.6.0] - 2026-11-06
+
+### Added
+
+- Automatic local SC2 replay reading to confirm maps and results and show up to five 1v1 matches, using file notifications, caching and processing limits.
+- Local Age 4 (Steam) and SC2 profile identification from the Windows Documents folder, including OneDrive, with remote identity checks and no guessing between multiple profiles.
+- Traditional SC2 icon extracted from the installed executable and bundled locally.
+- Early Access StarCraft II integration with game selection, demo and a compact two-row overlay.
+- SC2 profile linking by SC2 Pulse ID or SC2/Pulse profile URL, reusing statistics, last five matches and rating charts from the existing games.
+- MMR, wins, losses and draws separated by race and season. Up to 30 chart records from the last 90 days of the published season.
+- Match detection through the local SC2 client HTTP API, with stats captured at the start, end confirmation and consecutive-game handling.
+- Independent per-game settings and cached matches. No private Blizzard credentials required.
+
+### Improved
+
+- Latest results belong to the linked profile in each game, load automatically and highlight wins and losses with color and bold text.
+- Bundled SC2 race emblems and character-name identification when Pulse does not publish a valid name.
+- Draw results are preserved in match history and included in win-rate calculations.
+- Diagnostics, languages, hotkeys, game focus and demo support adapted to SC2.
+
+### Limitations
+
+- The first iteration targets two-human 1v1 games. Replays, AI and larger formats do not activate the overlay. The local API does not expose teams, map or queue; ranked, unranked and custom games are not claimed to be distinguishable.
+- Overlay MMR and statistics are ranked values published by SC2 Pulse for that race. Unique name/region matches are marked as Suggested profile, without claiming client-confirmed identity. Ambiguous names and missing data remain without stats.
+- Live MMR changes are not estimated; published changes appear in history. Current MMR is not substituted for historical starting MMR.
+- Local detection still requires manual validation in a real match before publishing this version.
+
 ## [0.5.2] - 2026-11-04
 
 ### Added
