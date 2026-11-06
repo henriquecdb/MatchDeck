@@ -50,3 +50,9 @@ O gráfico mostra até 30 registros recentes incluídos no perfil do AoE4 World.
 As últimas cinco partidas são selecionadas entre as dez mais recentes publicadas, sem contas alternativas. Entram partidas PC ranqueadas e rápidas, de 1v1 a 4v4, encerradas e que incluem o perfil vinculado. Partidas em andamento, descartadas, personalizadas e não publicadas não entram. Dados ausentes aparecem como —.
 
 A consulta ocorre ao abrir a aba, com cache de um minuto, ou ao clicar em Atualizar perfil. Navegar entre modalidades, inspecionar o gráfico ou jogar não gera consultas adicionais de perfil. Falhas de atualização preservam os dados anteriores e exibem um aviso.
+
+## Identificação local · 0.6.0
+
+Em Partida, use Identificar perfil local. O app procura um único Steam ID na pasta My Games/Age of Empires IV/Users dentro de Documentos do Windows e da pasta antiga, quando existe; Documentos redirecionados para OneDrive são respeitados. O Steam ID é confirmado no AoE4 World e convertido para o ID canônico antes de preencher o campo. Nenhum arquivo do jogo é alterado.
+
+Mais de um perfil exige seleção manual por ID ou link. Essa identificação automática cobre perfis locais Steam; instalações Xbox/Game Pass continuam podendo usar o link do AoE4 World. Confira o nome retornado, pois a pasta pode pertencer a um acesso antigo, e não necessariamente à sessão atual.

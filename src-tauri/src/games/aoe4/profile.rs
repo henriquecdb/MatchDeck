@@ -66,6 +66,7 @@ pub fn overview(mut profile: RemoteProfile, feed: GameFeed) -> ProfileOverview {
                 rating: mode.rating,
                 wins: mode.wins_count,
                 losses: mode.losses_count,
+                draws: None,
                 season: mode.season,
                 rating_history: history
                     .into_iter()
@@ -109,6 +110,7 @@ pub fn overview(mut profile: RemoteProfile, feed: GameFeed) -> ProfileOverview {
                 civilization_id: player.civilization.clone(),
                 civilization: player.civilization.clone(),
                 won: result(player.result.as_deref()),
+                draw: None,
                 rating_change: player.rating_diff,
             }
         })

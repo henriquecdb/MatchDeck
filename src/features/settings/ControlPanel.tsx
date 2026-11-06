@@ -17,7 +17,7 @@ import { GeneralSettings } from './GeneralSettings';
 import { CloseDialog } from './CloseDialog';
 import { DiagnosticsPanel } from '../diagnostics/DiagnosticsPanel';
 import { Onboarding } from '../onboarding/Onboarding';
-import { LastResult } from '../match/LastResult';
+import { LatestResult } from '../match/LatestResult';
 import { hotkeyLabel } from '../../domain/hotkeys';
 import { GameLibrary } from '../games/GameLibrary';
 import { AppHeader } from '../shell/AppHeader';
@@ -94,7 +94,7 @@ function ControlPanelContent({ runtime, desktop, runtimeState }: { runtime: Over
           <button onClick={() => void perform(() => runtime.toggleVisibility())}>{state.hiddenMatchId === match.id ? t('Mostrar nesta partida') : t('Ocultar nesta partida')}</button></div>}
         {match && <p>{state.preferences.hotkeys.toggleOverlay ? state.visibilityShortcutAvailable ? t('Mostrar/ocultar: {0}', { 0: hotkeyLabel(state.preferences.hotkeys.toggleOverlay) }) : t('Atalho indisponível. Use o botão da partida.') : t('Atalho desativado. Use o botão da partida.')}</p>}
         {match?.warnings?.map(warning => <p role="status" key={warning}>{t(warning)}</p>)}
-        <LastResult match={state.lastSynced} />
+        <LatestResult key={`${gameId}-${state.detection.config.profile?.profileId}`} runtime={runtime} state={state} active={desktop && ready && !!entered && activeTab === 'match'} />
       </>}
       {tab.id === 'profile' && <ProfilePanel key={gameId} gameId={gameId} runtime={runtime} profile={state.detection.config.profile} desktop={desktop} visible={!!entered && activeTab === 'profile'} onLink={() => setActiveTab('match')} />}
       {tab.id === 'overlay' && <>

@@ -19,7 +19,7 @@ export function GeneralSettings({ state, runtime, desktop, perform }: { state: A
       <label>{t('Idioma da interface')} <select value={preferences.language} onChange={event => configure({ language: event.target.value as typeof preferences.language })}>
         <option value="pt-BR">Português (Brasil)</option><option value="en">English</option>
       </select></label>
-      <label>{t('Civilizações e unidades')} <select value={preferences.gameLanguage} onChange={event => configure({ gameLanguage: event.target.value as typeof preferences.gameLanguage })}>
+      <label>{t(state.detection.config.gameId === 'sc2' ? 'Raças' : 'Civilizações e unidades')} <select value={preferences.gameLanguage} onChange={event => configure({ gameLanguage: event.target.value as typeof preferences.gameLanguage })}>
         <option value="en">English</option><option value="pt-BR">Português (Brasil)</option>
       </select></label>
       <p>{t('Padrão: inglês, independente do idioma da interface.')}</p>

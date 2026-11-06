@@ -1,3 +1,5 @@
+import { createSc2Demo } from './sc2/demo';
+import { raceArtwork } from './sc2/catalog';
 import { createAoe4Demo } from './aoe4/demo';
 import { civilizationArtwork } from './aoe4/catalog';
 import { createDemoMatch, type DemoTeamSize } from './aoe2/demo';
@@ -19,6 +21,6 @@ export interface GameIntegration {
   artwork(player: Pick<Player, 'civilizationId' | 'civilization' | 'uniqueUnits'>, language?: Language): FactionArtwork | undefined;
 }
 
-const integrations: GameIntegration[] = [{ ...games[0], capabilities: { ...games[0].capabilities, customLobbies: 'unverified' }, demo: createDemoMatch, artwork: unitArtwork }, { ...games[1], capabilities: { ...games[1].capabilities, customLobbies: 'unverified' }, demo: createAoe4Demo, artwork: civilizationArtwork }];
+const integrations: GameIntegration[] = [{ ...games[0], capabilities: { ...games[0].capabilities, customLobbies: 'unverified' }, demo: createDemoMatch, artwork: unitArtwork }, { ...games[1], capabilities: { ...games[1].capabilities, customLobbies: 'unverified' }, demo: createAoe4Demo, artwork: civilizationArtwork }, { ...games[2], capabilities: { ...games[2].capabilities, customLobbies: 'unverified' }, demo: createSc2Demo, artwork: raceArtwork }];
 export function gameIntegration(gameId: string): GameIntegration | undefined { return integrations.find(game => game.id === gameId); }
 export const installedGames = integrations.map(({ id, name, shortName, subtitle, icon, experimental, capabilities }) => ({ id, name, shortName, subtitle, icon, experimental, capabilities }));

@@ -2,6 +2,33 @@
 
 As mudanças relevantes são registradas por versão. O projeto usa Semantic Versioning e Conventional Commits.
 
+## [0.6.0] - 2026-11-06
+
+### Adicionado
+
+- Leitura automática de replays locais do SC2 para confirmar mapa e resultado e exibir até cinco partidas 1v1, com monitor de arquivos, cache e limites de processamento.
+- Identificação local do Age 4 (Steam) e do SC2 pela pasta Documentos do Windows, incluindo OneDrive, com validação na fonte e sem escolher entre múltiplos perfis.
+- Ícone tradicional do SC2, extraído do executável instalado e distribuído localmente.
+- Integração Early Access de StarCraft II com seleção de jogo, demonstração e overlay compacto de duas linhas.
+- Perfil SC2 via ID do SC2 Pulse ou link de perfil SC2/Pulse, usando a estrutura de estatísticas, últimas cinco partidas e gráfico dos outros jogos.
+- MMR, vitórias, derrotas e empates separados por raça e temporada. Até 30 registros de MMR por gráfico, consultando os últimos 90 dias da temporada publicada.
+- Detecção pela API HTTP local do cliente SC2, com capturas de estatísticas no início, confirmação do encerramento e reconhecimento de partidas consecutivas.
+- Dados, configurações e cache independentes por jogo. Não exige credenciais privadas da Blizzard.
+
+### Melhorado
+
+- Último resultado vinculado ao perfil configurado em cada jogo, com busca automática e vitória/derrota destacadas por cor e negrito.
+- Emblemas locais das raças SC2 e identificação pelo nome do personagem quando o Pulse não publica um nome válido.
+- Empates preservados no histórico e considerados no aproveitamento, sem classificá-los como derrotas.
+- Diagnóstico, idiomas, atalhos, foco do jogo e demonstração adaptados ao SC2.
+
+### Limitações
+
+- Primeira iteração destinada a 1v1 entre duas pessoas. Replays, IA e formatos com mais jogadores não ativam o overlay. A API local não informa equipe, mapa ou fila; o app não afirma se a partida é ranqueada, rápida ou personalizada.
+- MMR e estatísticas do overlay são os valores ranqueados publicados pelo SC2 Pulse para a raça. Correspondências únicas de nome/região aparecem como Perfil sugerido, sem afirmar uma identidade confirmada pelo cliente. Nomes ambíguos e dados ausentes ficam sem estatísticas.
+- A variação da partida ao vivo não é estimada; aparece no histórico quando publicada. MMR atual não substitui o MMR inicial de partidas históricas.
+- Integração SC2 em Early Access. Mapa e resultado podem ser confirmados por replay local; matchmaking não distingue ranqueadas de não ranqueadas.
+
 ## [0.5.2] - 2026-11-04
 
 ### Adicionado

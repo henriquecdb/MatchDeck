@@ -38,7 +38,7 @@ it('switches the demo to Age 4 and restricts this iteration to ranked and quick-
   render(<ControlPanel runtime={runtime} desktop={false} />);
   await screen.findByRole('button', { name: /Trocar jogo:/ });
   fireEvent.click(screen.getByRole('button', { name: /Trocar jogo:/ }));
-  fireEvent.click(screen.getByRole('button', { name: 'Age of Empires IV Integração em teste' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Age of Empires IV Early Access' }));
   await screen.findByRole('textbox', { name: 'ID ou link do perfil no AoE4 World' });
   fireEvent.click(screen.getByRole('tab', { name: 'Demonstração' }));
   expect(screen.queryByRole('combobox', { name: 'Formato da demonstração' })).toBeNull();

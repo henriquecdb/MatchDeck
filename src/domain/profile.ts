@@ -3,6 +3,7 @@ export interface ProfileLeaderboard {
   rating: number | null;
   wins: number | null;
   losses: number | null;
+  draws?: number | null;
   season?: number | null;
   ratingHistory?: RatingPoint[];
 }
@@ -20,6 +21,7 @@ export interface RecentMatch {
   civilizationId: string | null;
   civilization: string | null;
   won: boolean | null;
+  draw?: boolean | null;
   ratingChange: number | null;
 }
 
@@ -32,6 +34,6 @@ export interface ProfileOverview {
 }
 
 export function profileWinRate(board: ProfileLeaderboard): number | null {
-  if (board.wins == null || board.losses == null || board.wins + board.losses === 0) return null;
-  return board.wins / (board.wins + board.losses) * 100;
+  if (board.wins == null || board.losses == null || board.wins + board.losses + (board.draws ?? 0) === 0) return null;
+  return board.wins / (board.wins + board.losses + (board.draws ?? 0)) * 100;
 }

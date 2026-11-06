@@ -13,6 +13,7 @@ const queues: Record<string, string> = {
 };
 
 export function queueLabel(match: MatchSnapshot): string {
+  if (match.gameId === 'sc2') return match.queue ?? '1v1 · fila não informada';
   if (match.gameId === 'aoe4') return match.queue ?? (match.mode === 'ranked' ? 'RM 1v1' : 'QM 1v1');
   return (match.queueId && queues[match.queueId]) || match.queue || modeLabels[match.mode];
 }
@@ -26,10 +27,12 @@ const aoe4Queues: Record<string, string> = {
 };
 
 export function profileQueueLabel(queueId: string | null, gameId = 'aoe2-de'): string {
+  if (gameId === 'sc2') return ({ sc2_matchmade_1v1: '1v1 · matchmaking', sc2_custom_1v1: '1v1 · personalizada', sc2_replay_1v1: '1v1 · replay local', sc2_1v1_terran: 'Ranqueada · 1v1 · Terran', sc2_1v1_protoss: 'Ranqueada · 1v1 · Protoss', sc2_1v1_zerg: 'Ranqueada · 1v1 · Zerg', sc2_1v1_random: 'Ranqueada · 1v1 · Aleatório' } as Record<string, string>)[queueId ?? ''] ?? '1v1 · raça indisponível';
   return queueId ? (gameId === 'aoe4' ? aoe4Queues : queues)[queueId] ?? queueId : 'Modalidade indisponível';
 }
 
 export function profileRatingLabel(queueId: string, gameId: string): string {
+  if (gameId === 'sc2') return 'MMR';
   if (gameId !== 'aoe4') return 'Rating';
   if (queueId.endsWith('_elo')) return 'MMR';
   return queueId.startsWith('rm_') ? 'Pontos ranqueados' : 'Rating';

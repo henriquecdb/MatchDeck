@@ -15,6 +15,7 @@ use tokio::sync::watch;
 pub struct DetectionController {
     pub provider: Aoe2Provider,
     pub aoe4: crate::games::aoe4::provider::Aoe4Provider,
+    pub sc2: crate::games::sc2::provider::Sc2Provider,
     pub updates: watch::Sender<DetectionConfig>,
 }
 
@@ -50,7 +51,7 @@ pub fn decide<'a>(
     }
 }
 
-fn update(
+pub(crate) fn update(
     app: &tauri::AppHandle,
     config: &DetectionConfig,
     phase: &str,
@@ -224,9 +225,11 @@ pub async fn run(
     app: tauri::AppHandle,
     provider: Aoe2Provider,
     aoe4: crate::games::aoe4::provider::Aoe4Provider,
+    sc2: crate::games::sc2::provider::Sc2Provider,
     mut updates: watch::Receiver<DetectionConfig>,
 ) {
     let mut failures = 0;
+    let mut sc2_session = crate::games::sc2::client::Session::default();
     loop {
         let config = updates.borrow_and_update().clone();
         if !config.enabled {
@@ -243,7 +246,8 @@ pub async fn run(
                 continue;
             }
             result = async {
-                if config.game_id == "aoe4" { crate::games::aoe4::service::cycle(&app, &aoe4, &config).await }
+                if config.game_id == "sc2" { crate::games::sc2::service::cycle(&app, &sc2, &config, &mut sc2_session).await }
+                else if config.game_id == "aoe4" { crate::games::aoe4::service::cycle(&app, &aoe4, &config).await }
                 else { cycle(&app, &provider, &config).await }
             } => {
                 match result {
@@ -261,7 +265,7 @@ pub async fn run(
                 if changed.is_err() { break; }
                 failures = 0;
             }
-            _ = tokio::time::sleep(Duration::from_secs(retry_delay(failures))) => {}
+            _ = tokio::time::sleep(Duration::from_secs(if config.game_id == "sc2" && failures == 0 { 2 } else { retry_delay(failures) })) => {}
         }
     }
 }

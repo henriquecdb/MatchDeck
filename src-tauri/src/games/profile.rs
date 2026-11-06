@@ -17,6 +17,8 @@ pub struct ProfileLeaderboard {
     pub rating: Option<u32>,
     pub wins: Option<u32>,
     pub losses: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub draws: Option<u32>,
     pub season: Option<u32>,
     pub rating_history: Vec<RatingPoint>,
 }
@@ -38,5 +40,7 @@ pub struct RecentMatch {
     pub civilization_id: Option<String>,
     pub civilization: Option<String>,
     pub won: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub draw: Option<bool>,
     pub rating_change: Option<i32>,
 }

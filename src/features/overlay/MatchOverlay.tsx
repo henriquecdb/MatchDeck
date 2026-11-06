@@ -9,10 +9,12 @@ import { RatingImpact } from './RatingImpact';
 import { defaultSettings, type OverlaySettings } from '../../domain/settings';
 import { CompactOverlay } from './CompactOverlay';
 import { resolveOverlayLayout } from '../../domain/overlay-layout';
+import { Sc2Overlay } from '../../games/sc2/Sc2Overlay';
 import { Aoe4Overlay } from '../../games/aoe4/Aoe4Overlay';
 
 export function MatchOverlay({ match, layout = 'detailed', showProjection = true, display = defaultSettings }: { match: MatchSnapshot; layout?: OverlaySettings['layout']; showProjection?: boolean; display?: OverlaySettings }) {
   const { t, gameLanguage } = useI18n();
+  if (match.gameId === 'sc2') return <Sc2Overlay match={match} display={display} />;
   if (match.gameId === 'aoe4') return <Aoe4Overlay match={match} display={display} />;
   const activeLayout = resolveOverlayLayout(layout, match);
   if (activeLayout !== 'detailed') return <CompactOverlay match={match} stacked={activeLayout === 'stacked'} showProjection={showProjection} display={display} />;

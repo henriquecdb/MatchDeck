@@ -17,7 +17,7 @@ it('opens the library by default and remembers the startup preference and last s
   expect(screen.queryByRole('tab')).toBeNull();
   fireEvent.click(screen.getByRole('checkbox', { name: 'Abrir no último jogo usado' }));
   await waitFor(() => expect(screen.getByRole('checkbox')).toHaveProperty('disabled', false));
-  fireEvent.click(screen.getByRole('button', { name: 'Age of Empires IV Integração em teste' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Age of Empires IV Early Access' }));
   await screen.findByRole('tab', { name: 'Partida' });
   expect(select).toHaveBeenCalledWith('aoe4');
   expect((await runtime.read()).preferences.openLastGame).toBe(true);

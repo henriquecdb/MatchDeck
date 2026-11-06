@@ -69,6 +69,7 @@ pub fn overview(mut profile: RemoteProfile, feed: MatchFeed) -> ProfileOverview 
                 civilization_id: player.civ.clone(),
                 civilization: player.civ_name.clone(),
                 won: player.won,
+                draw: None,
                 rating_change: player.rating_diff,
             }
         })
@@ -85,6 +86,7 @@ pub fn overview(mut profile: RemoteProfile, feed: MatchFeed) -> ProfileOverview 
                 rating: board.rating,
                 wins: board.wins,
                 losses: board.losses,
+                draws: None,
                 season: None,
             })
             .collect(),

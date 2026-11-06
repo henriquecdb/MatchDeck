@@ -33,7 +33,9 @@ pub fn game_is_foreground(
             return false;
         }
         let path = String::from_utf16_lossy(&path[..length as usize]);
-        if game_id == "aoe4" {
+        if game_id == "sc2" {
+            is_sc2_executable(&path)
+        } else if game_id == "aoe4" {
             is_aoe4_executable(&path)
         } else {
             is_aoe2_executable(&path)
@@ -61,11 +63,22 @@ fn is_aoe4_executable(path: &str) -> bool {
     })
 }
 
+#[cfg(any(windows, test))]
+fn is_sc2_executable(path: &str) -> bool {
+    path.rsplit(['\\', '/']).next().is_some_and(|name| {
+        name.eq_ignore_ascii_case("SC2_x64.exe") || name.eq_ignore_ascii_case("SC2.exe")
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     #[test]
     fn matches_executable_name_instead_of_window_title() {
+        assert!(is_sc2_executable(r"C:\Games\SC2_x64.exe"));
+        assert!(is_sc2_executable(r"C:\Games\SC2.EXE"));
+        assert!(!is_sc2_executable(r"C:\Games\SC2_x64.exe.bak"));
+        assert!(!is_sc2_executable("MatchDeck.exe"));
         assert!(is_aoe2_executable(r"C:\Games\AOE2DE_S.EXE"));
         assert!(!is_aoe2_executable(r"C:\Games\AoE2DE_s.exe.backup"));
         assert!(!is_aoe2_executable("MatchDeck.exe"));

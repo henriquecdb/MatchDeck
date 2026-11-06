@@ -30,10 +30,13 @@ Quer experimentar antes? Na aba **Demonstração**, use jogadores fictícios ou 
 | --- | --- |
 | **Age of Empires II: DE** | Multiplayer ranqueado e rápido, rating por modalidade, vitórias, derrotas, civilizações e unidades únicas. A aba Perfil reúne estatísticas, últimas cinco partidas disponíveis e gráfico de rating para filas 1v1. |
 | **Age of Empires IV** · experimental | Multiplayer ranqueado e rápido de PC em 1v1. Faixa compacta com civilizações, liga, posição no ranking, rating/pontos e resultados. Perfil com estatísticas, últimas cinco partidas disponíveis e gráfico recente de rating/MMR. |
+| **StarCraft II** · experimental | Overlay compacto para duas pessoas, perfil com MMR por raça e temporada, últimas cinco partidas e gráfico. Estatísticas via SC2 Pulse. |
 
 Campanhas e skirmish offline não têm detecção. Lobbies personalizados do Age 2 dependem da cobertura da fonte e ainda precisam de validação; equipes e partidas personalizadas do Age 4 ainda não são suportadas.
 
 Os dados vêm do [AoE II Companion](https://www.aoe2companion.com/) e do [AoE4 World](https://aoe4world.com/). Valores indisponíveis aparecem como **—**. Pontos ranqueados e MMR são medidas diferentes; a projeção de ganho/perda do Age 2 é opcional e não oficial.
+
+No SC2, a detecção usa o cliente local; mapa e fila não são informados. Veja [como testar o SC2](docs/sc2-local.md).
 
 ## Do seu jeito
 
@@ -57,10 +60,10 @@ Para abrir somente a prévia no navegador, use `npm run dev`. A janela de overla
 
 Veja como [contribuir](CONTRIBUTING.md), [testar a detecção do Age 2](docs/real-detection.md) e [testar o Age 4](docs/aoe4-local.md). O histórico fica no [changelog](CHANGELOG.md); detalhes de [publicação](docs/releases.md) e [segurança](docs/security.md) ficam na documentação.
 
-A linha **0.5.x** está focada em consolidar o Age 4. A **0.6.0** será o início da integração com StarCraft II.
+A linha **0.6.x** inicia a integração experimental do StarCraft II, preservando as integrações de Age 2 e Age 4.
 
 ## Licença e créditos
 
 O código original do MatchDeck está sob a [licença MIT](LICENSE). Imagens, nomes, traduções e marcas dos jogos, assim como dependências de terceiros, mantêm seus próprios direitos e condições de uso.
 
-Consulte os créditos de [Age 2](public/units/NOTICE.md), [Age 4](public/aoe4/NOTICE.md) e [ícones dos jogos](public/games/NOTICE.md). MatchDeck é um projeto independente, sem vínculo ou endosso da Microsoft, Valve ou dos serviços de dados utilizados.
+Consulte os créditos de [Age 2](public/units/NOTICE.md), [Age 4](public/aoe4/NOTICE.md), [SC2](public/sc2/NOTICE.md) e [ícones dos jogos](public/games/NOTICE.md). MatchDeck é um projeto independente, sem vínculo ou endosso da Microsoft, Blizzard, Valve ou dos serviços de dados utilizados.

@@ -13,7 +13,7 @@ export class TauriRuntime implements OverlayRuntime {
   start(match: MatchSnapshot) { return invoke<void>('start_match', { incoming: match }); }
   finish() { return invoke<void>('finish_match'); }
   configure(settings: OverlaySettings, gameId?: string) { return invoke<void>('configure_overlay', { settings, gameId }); }
-  syncLatest() { return invoke<void>('sync_latest_match'); }
+  syncLatest(completedOnly = false) { return invoke<void>('sync_latest_match', { completedOnly }); }
   listMonitors() { return invoke<DisplayMonitor[]>('list_monitors'); }
   toggleVisibility() { return invoke<void>('toggle_overlay_visibility'); }
   configureApp(preferences: AppPreferences) { return invoke<void>('configure_app', { preferences }); }
@@ -25,8 +25,8 @@ export class TauriRuntime implements OverlayRuntime {
   dismissAppError() { return invoke<void>('dismiss_app_error'); }
   identifyLocalProfile() { return invoke<PlayerProfile>('identify_local_profile'); }
   profileOverview() { return invoke<ProfileOverview>('profile_overview'); }
-  configureDetection(enabled: boolean, profileInput: string) {
-    return invoke<void>('configure_detection', { enabled, profileInput });
+  configureDetection(enabled: boolean, profileInput: string, playerName?: string) {
+    return invoke<void>('configure_detection', { enabled, profileInput, playerName: playerName ?? null });
   }
   subscribe(listener: (state: AppState) => void) {
     return listen<AppState>('state-changed', event => listener(event.payload));

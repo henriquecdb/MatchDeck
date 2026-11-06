@@ -19,7 +19,7 @@ it('keeps update checking mounted on the game library and across game navigation
   await screen.findByRole('heading', { name: 'Escolha seu jogo' });
   await waitFor(() => expect(counts.mounted).toBe(1));
   expect(screen.getByTestId('update-visibility').textContent).toBe('false');
-  fireEvent.click(screen.getByRole('button', { name: 'Age of Empires IV Integração em teste' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Age of Empires IV Early Access' }));
   fireEvent.click(await screen.findByRole('tab', { name: 'Atualizações' }));
   await waitFor(() => expect(screen.getByTestId('update-visibility').textContent).toBe('true'));
   fireEvent.click(screen.getByRole('button', { name: 'Jogos' }));

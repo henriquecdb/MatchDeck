@@ -11,6 +11,7 @@ legend { padding: 0 8px; }
 label { display: block; margin: 10px 0; }
 input, select, button { font: inherit; }
 button, select, input[type=number], input[type=text] { padding: 7px 10px; border: 1px solid #768493; border-radius: 4px; background: #283544; color: #fff; }
+.player-name-input { margin-inline-start: 8px; }
 .profile-input { display: block; margin-top: 8px; width: 100%; }
 button { cursor: pointer; }
 button:disabled { opacity: .45; cursor: default; }
@@ -260,3 +261,34 @@ input[type=number] { width: 110px; }
 .rating-history-plot { position: relative; }
 .rating-history-scale { position: absolute; left: 0; top: 0; height: 100px; display: flex; flex-direction: column; justify-content: space-between; color: #879bb0; font-size: 10px; }
 .rating-bars, .rating-history-period { margin-left: 40px; }
+
+.sc2-overlay { width: 640px; min-width: 640px; height: 116px; padding: 8px 12px; background: #101820; border: 1px solid #345066; border-radius: 6px; color: #e8edf3; }
+.sc2-overlay header { display: flex; align-items: center; gap: 12px; height: 16px; font-size: 9px; color: #9ab5c9; }
+.sc2-overlay header strong { letter-spacing: 1px; color: #a8d5ef; }
+.sc2-overlay header span { flex: 1; }
+.sc2-overlay header small { font-size: 8px; color: #71ccdd; }
+.sc2-players { margin-top: 3px; }
+.sc2-players article { height: 32px; display: flex; align-items: center; gap: 12px; border-radius: 3px; padding: 2px 4px; }
+.sc2-players article.is-self { background: #1a3040; }
+.sc2-race { width: 28px; height: 28px; object-fit: contain; }
+.sc2-identity { flex: 1; min-width: 0; }
+.sc2-identity strong { display: block; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sc2-identity small { display: block; font-size: 9px; color: #9ab0c0; }
+.sc2-mmr { display: flex; gap: 6px; align-items: baseline; font-variant-numeric: tabular-nums; }
+.sc2-mmr small { font-size: 9px; color: #9ab0c0; }
+.sc2-mmr strong { font-size: 18px; }
+.sc2-mmr span { font-size: 10px; color: #9ab0c0; }
+.sc2-record { min-width: 68px; font-size: 11px; font-variant-numeric: tabular-nums; }
+.sc2-record b { font-weight: 500; }
+.sc2-record b:first-child { color: #68d9a4; }
+.sc2-record b:nth-child(2) { color: #ed9399; }
+.sc2-winrate { width: 42px; text-align: right; font-size: 11px; color: #b1c6d5; }
+.sc2-overlay footer { font-size: 8px; color: #88a2b4; padding-top: 4px; }
+.overlay-window .sc2-overlay { cursor: move; }
+.game-cards { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+
+.sc2-identity small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sc2-mmr strong > small { color: #e5c78c; margin-right: 3px; }
+
+.match-result-win { color: #64d4a0; font-weight: 700; }
+.match-result-loss { color: #f18489; font-weight: 700; }
