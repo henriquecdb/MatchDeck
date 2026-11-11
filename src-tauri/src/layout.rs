@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 
 pub fn overlay_size(snapshot: &MatchSnapshot, layout: &OverlayLayout) -> (f64, f64) {
     if snapshot.game_id == "sc2" {
-        return (640.0, 116.0);
+        return (400.0, 106.0);
     }
     if snapshot.game_id == "aoe4" {
         return (900.0, 64.0);
