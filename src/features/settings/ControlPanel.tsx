@@ -22,6 +22,7 @@ import { hotkeyLabel } from '../../domain/hotkeys';
 import { GameLibrary } from '../games/GameLibrary';
 import { AppHeader } from '../shell/AppHeader';
 import { ProfilePanel } from '../profile/ProfilePanel';
+import { Sc2SessionPanel } from '../../games/sc2/Sc2SessionPanel';
 
 export function ControlPanel({ runtime, desktop }: { runtime: OverlayRuntime; desktop: boolean }) {
   const runtimeState = useRuntime(runtime);
@@ -90,6 +91,13 @@ function ControlPanelContent({ runtime, desktop, runtimeState }: { runtime: Over
       {tab.id === 'match' && <>
         <div className="section-heading"><h2>{t('Partida')}</h2></div>
         <DetectionPanel key={gameId} runtime={runtime} status={state.detection} desktop={desktop} ready={ready} />
+        {gameId === 'sc2' && desktop && state.detection.config.profile && <Sc2SessionPanel
+          key={state.detection.config.profile.profileId}
+          runtime={runtime}
+          profileId={state.detection.config.profile.profileId}
+          active={!!entered && activeTab === 'match'}
+          matchActive={!!match}
+        />}
         {match && <div className="session-summary"><strong>{match.map}</strong><span>{match.players.map(player => player.name).join(' × ')}</span><p>{state.hiddenMatchId === match.id ? t('Overlay oculto; detecção ativa.') : settings.focusOnly && match.source === 'live' ? t('Visível com o jogo em foco.') : t('Visível ao trocar de janela.')}</p>
           <button onClick={() => void perform(() => runtime.toggleVisibility())}>{state.hiddenMatchId === match.id ? t('Mostrar nesta partida') : t('Ocultar nesta partida')}</button></div>}
         {match && <p>{state.preferences.hotkeys.toggleOverlay ? state.visibilityShortcutAvailable ? t('Mostrar/ocultar: {0}', { 0: hotkeyLabel(state.preferences.hotkeys.toggleOverlay) }) : t('Atalho indisponível. Use o botão da partida.') : t('Atalho desativado. Use o botão da partida.')}</p>}

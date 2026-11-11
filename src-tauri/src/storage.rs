@@ -49,7 +49,7 @@ fn read_game_at<T: serde::de::DeserializeOwned>(
     })
 }
 
-fn read_game<T: serde::de::DeserializeOwned>(
+pub(crate) fn read_game<T: serde::de::DeserializeOwned>(
     app: &tauri::AppHandle,
     name: &str,
     game_id: &str,
@@ -72,7 +72,7 @@ fn write_atomic<T: serde::Serialize>(
     fs::rename(&temporary, directory.join(name)).map_err(|error| error.to_string())
 }
 
-fn write_game<T: serde::Serialize>(
+pub(crate) fn write_game<T: serde::Serialize>(
     app: &tauri::AppHandle,
     name: &str,
     value: &T,

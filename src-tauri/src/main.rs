@@ -40,6 +40,7 @@ fn main() {
         .plugin(tauri_plugin_process::init())
         .manage(Mutex::new(model::AppState::default()))
         .manage(storage::PositionSaveRevision::default())
+        .manage(games::sc2::session::SessionLock::default())
         .manage(hotkeys::ConfigurationLock(Mutex::new(())))
         .setup(|app| {
             let handle = app.handle().clone();
@@ -154,6 +155,7 @@ fn main() {
             commands::configure_overlay,
             commands::identify_local_profile,
             commands::profile_overview,
+            games::sc2::session::sc2_session,
             commands::configure_detection,
             commands::sync_latest_match,
             commands::toggle_overlay_visibility,
