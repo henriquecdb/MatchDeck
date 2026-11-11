@@ -48,6 +48,24 @@ Fontes: [SC2 Pulse API](https://sc2pulse.nephest.com/sc2/v3/api-docs), [cliente 
 Se o SC2 Pulse retornar um marcador de nome indisponível, como f#1, o perfil continua disponível pelo ID e aparece como SC2 #ID. As estatísticas publicadas continuam acessíveis. Para reconhecer seu jogador na partida, preencha Nome no jogo com o nome exato do personagem. A BattleTag pode ser diferente. O nome informado não altera o ID consultado, não recupera dados ausentes e não confirma a identidade de adversários.
 
 
+## Sessão local
+
+Na aba Partida, com seu perfil SC2 vinculado, use **Iniciar sessão** antes de entrar na fila.
+Em Overlay, **Mostrar sessão no overlay** exibe uma faixa com placar, aproveitamento e
+os dez últimos resultados durante a partida. A faixa aparece enquanto a sessão estiver ativa.
+Na demonstração, o placar é fictício.
+O painel conta vitórias, derrotas, empates e aproveitamento e mostra os dez últimos resultados
+confirmados por replays locais, com adversário, raça adversária, mapa e horário.
+Inclui 1v1 entre pessoas de matchmaking e partidas personalizadas iniciadas após o começo da sessão.
+A API local e as demonstrações não alimentam esse placar.
+
+O início é explícito e a sessão continua após fechar o aplicativo ou passar da meia-noite.
+Use **Encerrar sessão** depois de terminar a partida. Replays gravados com atraso ainda podem
+completar o placar se a partida terminou antes do encerramento da sessão.
+**Nova sessão** substitui o placar anterior. Cada perfil tem seu próprio arquivo local.
+O monitor continua examinando até 32 replays recentes, portanto partidas jogadas com o app fechado
+dependem dessa janela de recuperação. O painel usa os eventos do monitor para atualizar os resultados.
+
 ## Replays automáticos
 
 Com o perfil SC2 vinculado e selecionado, o app acompanha Accounts/CONTA/REGIAO-S2-REINO-PERFIL/Replays/Multiplayer na pasta Documentos. Não é preciso ativar a detecção para consultar o histórico. Na primeira vinculação, o Pulse confirma o identificador Battle.net correspondente ao ID do perfil; arquivos de outros personagens são descartados.

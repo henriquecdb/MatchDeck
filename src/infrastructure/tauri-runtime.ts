@@ -6,6 +6,7 @@ import type { MatchSnapshot } from '../domain/match';
 import type { OverlaySettings } from '../domain/settings';
 import type { PlayerProfile } from '../domain/detection';
 import type { ProfileOverview } from '../domain/profile';
+import type { Sc2Session, Sc2SessionAction } from '../domain/sc2-session';
 
 export class TauriRuntime implements OverlayRuntime {
   read() { return invoke<AppState>('read_state'); }
@@ -25,6 +26,12 @@ export class TauriRuntime implements OverlayRuntime {
   dismissAppError() { return invoke<void>('dismiss_app_error'); }
   identifyLocalProfile() { return invoke<PlayerProfile>('identify_local_profile'); }
   profileOverview() { return invoke<ProfileOverview>('profile_overview'); }
+  sc2Session(profileId: number, action: Sc2SessionAction) {
+    return invoke<Sc2Session | null>('sc2_session', { profileId, action });
+  }
+  subscribeSc2Session(listener: (session: Sc2Session) => void) {
+    return listen<Sc2Session>('sc2-session-changed', event => listener(event.payload));
+  }
   configureDetection(enabled: boolean, profileInput: string, playerName?: string) {
     return invoke<void>('configure_detection', { enabled, profileInput, playerName: playerName ?? null });
   }

@@ -3,6 +3,7 @@ import { getCurrentWindow } from '@tauri-apps/api/window';
 import type { OverlayRuntime } from '../../application/runtime';
 import { useRuntime } from '../../application/use-runtime';
 import { MatchOverlay } from './MatchOverlay';
+import { useSc2Session } from '../../games/sc2/use-sc2-session';
 
 export function OverlayWindow({ runtime }: { runtime: OverlayRuntime }) {
   const { state, error } = useRuntime(runtime);
@@ -11,6 +12,8 @@ export function OverlayWindow({ runtime }: { runtime: OverlayRuntime }) {
 
 function OverlayContent({ runtime, state, error }: { runtime: OverlayRuntime; state: ReturnType<typeof useRuntime>['state']; error: string | null }) {
   const { t } = useI18n();
+  const profileId = state.detection.config.profile?.profileId ?? null;
+  const session = useSc2Session(runtime, profileId, state.detection.config.gameId === 'sc2' && state.settings.showSession);
   if (error) return <p role="alert">{t(error)}</p>;
   if (!state.match) return null;
   return <div style={{ opacity: state.settings.opacity, zoom: state.settings.scale }} onPointerDown={event => {
@@ -21,5 +24,5 @@ function OverlayContent({ runtime, state, error }: { runtime: OverlayRuntime; st
       }
       await getCurrentWindow().startDragging();
     })().catch(console.error);
-  }}><MatchOverlay match={state.match} layout={state.settings.layout} showProjection={state.settings.showProjection} display={state.settings} /></div>;
+  }}><MatchOverlay match={state.match} layout={state.settings.layout} showProjection={state.settings.showProjection} display={state.settings} session={session} /></div>;
 }

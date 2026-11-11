@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
-import { afterEach, expect, it } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, expect, it, vi } from 'vitest';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { existsSync } from 'node:fs';
 import { BrowserRuntime } from '../../infrastructure/browser-runtime';
 import { defaultSettings } from '../../domain/settings';
@@ -10,8 +10,11 @@ import { createSc2Demo } from './demo';
 import { raceArtwork } from './catalog';
 import { projectRating } from '../../domain/rating';
 import { winRate } from '../../domain/match';
+import { sc2DemoSession } from './demo';
+import type { Sc2Session } from '../../domain/sc2-session';
+import { useSc2Session } from './use-sc2-session';
 
-afterEach(() => { cleanup(); localStorage.clear(); });
+afterEach(() => { cleanup(); localStorage.clear(); vi.restoreAllMocks(); });
 
 it('keeps SC2 preferences separate and restores them after switching games', async () => {
  const runtime=new BrowserRuntime(); await runtime.selectGame('sc2');
@@ -49,6 +52,50 @@ it('selects SC2, offers a 1v1 demo and hides unsupported controls', async () => 
  fireEvent.click(screen.getByRole('tab',{name:'Overlay'}));
  expect(screen.queryByRole('checkbox',{name:'Exibir projeção não oficial de ganho/perda de rating'})).toBeNull();
  expect(screen.getByRole('checkbox',{name:'Mostrar partidas reais somente com o SC2 em primeiro plano'})).toBeTruthy();
+ const sessionToggle = screen.getByRole('checkbox', { name: 'Mostrar sessão no overlay' });
+ fireEvent.click(sessionToggle);
+ await waitFor(async () => expect((await runtime.read()).settings.showSession).toBe(false));
+});
+
+it('shows only the matching active session in live games and keeps the demo fictional', () => {
+ const match = { ...createSc2Demo('ranked'), source: 'live' as const, selfPlayerId: '42' };
+ const session = { ...sc2DemoSession, profileId: 42 };
+ const view = render(<MatchOverlay match={match} session={session} />);
+ const bar = screen.getByRole('region', { name: 'Sessão de StarCraft II' });
+ expect(within(bar).getByText('3V')).toBeTruthy();
+ expect(within(bar).getByText('2D')).toBeTruthy();
+ expect(within(bar).getByText('60%')).toBeTruthy();
+ expect(within(bar).getAllByRole('listitem')).toHaveLength(5);
+ view.rerender(<MatchOverlay match={match} session={{ ...session, profileId: 99 }} />);
+ expect(screen.queryByRole('region', { name: 'Sessão de StarCraft II' })).toBeNull();
+ view.rerender(<MatchOverlay match={match} session={{ ...session, endedAt: '2026-11-11T15:00:00Z' }} />);
+ expect(screen.queryByRole('region', { name: 'Sessão de StarCraft II' })).toBeNull();
+ view.rerender(<MatchOverlay match={match} session={session} display={{ ...defaultSettings, showSession: false }} />);
+ expect(screen.queryByRole('region', { name: 'Sessão de StarCraft II' })).toBeNull();
+ view.rerender(<MatchOverlay match={createSc2Demo('ranked')} session={{ ...session, matches: [] }} />);
+ expect(screen.getByText('3V')).toBeTruthy();
+});
+
+it('receives live session updates and drops a previous profile before the next read completes', async () => {
+ const runtime = new BrowserRuntime();
+ let update: (session: Sc2Session) => void = () => {};
+ const unsubscribe = vi.fn();
+ vi.spyOn(runtime, 'subscribeSc2Session').mockImplementation(async listener => { update = listener; return unsubscribe; });
+ const read = vi.spyOn(runtime, 'sc2Session').mockResolvedValue({ ...sc2DemoSession, profileId: 42, matches: [] });
+ function Preview({ profileId }: { profileId: number }) {
+   const session = useSc2Session(runtime, profileId, true);
+   return <MatchOverlay match={{ ...createSc2Demo('ranked'), source: 'live', selfPlayerId: String(profileId) }} session={session} />;
+ }
+ const view = render(<Preview profileId={42} />);
+ await screen.findByRole('region', { name: 'Sessão de StarCraft II' });
+ act(() => update({ ...sc2DemoSession, profileId: 99 }));
+ expect(screen.queryByText('3V')).toBeNull();
+ act(() => update({ ...sc2DemoSession, profileId: 42 }));
+ expect(screen.getByText('3V')).toBeTruthy();
+ read.mockImplementation(() => new Promise(() => {}));
+ view.rerender(<Preview profileId={99} />);
+ expect(screen.queryByRole('region', { name: 'Sessão de StarCraft II' })).toBeNull();
+ expect(unsubscribe).toHaveBeenCalled();
 });
 
 it('marks name-based opponent suggestions and honors hidden statistics', () => {

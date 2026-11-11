@@ -7,6 +7,7 @@ import { defaultPreferences, parsePreferences, type AppPreferences } from '../do
 import { gameIntegration } from '../games/registry';
 import metadata from '../../package.json';
 import type { ProfileOverview } from '../domain/profile';
+import type { Sc2Session, Sc2SessionAction } from '../domain/sc2-session';
 
 export class BrowserRuntime implements OverlayRuntime {
   private state: AppState = { match: null, settings: { ...defaultSettings }, detection: structuredClone(defaultDetection), shortcutAvailable: false, visibilityShortcutAvailable: false, hiddenMatchId: null, lastSynced: null, preferences: { ...defaultPreferences }, autostart: false, trayAvailable: false, closeRequested: false, startupMs: null, appError: null };
@@ -38,6 +39,14 @@ export class BrowserRuntime implements OverlayRuntime {
 
   async profileOverview(): Promise<ProfileOverview> {
     throw new Error('Estatísticas disponíveis no aplicativo Windows.');
+  }
+
+  async sc2Session(_profileId: number, _action: Sc2SessionAction): Promise<Sc2Session | null> {
+    throw new Error('Sessões disponíveis no aplicativo Windows.');
+  }
+
+  async subscribeSc2Session(_listener: (session: Sc2Session) => void) {
+    return () => {};
   }
 
   async identifyLocalProfile(): Promise<PlayerProfile> {

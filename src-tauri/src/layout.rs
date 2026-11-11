@@ -1,9 +1,21 @@
 use crate::model::{MatchSnapshot, OverlayLayout};
 use std::collections::BTreeMap;
 
+pub fn window_size(
+    snapshot: &MatchSnapshot,
+    settings: &crate::model::OverlaySettings,
+    has_session: bool,
+) -> (f64, f64) {
+    let (width, height) = overlay_size(snapshot, &settings.layout);
+    let show_session = snapshot.game_id == "sc2"
+        && settings.show_session
+        && (matches!(snapshot.source, crate::model::MatchSource::Demo) || has_session);
+    (width, height + if show_session { 32.0 } else { 0.0 })
+}
+
 pub fn overlay_size(snapshot: &MatchSnapshot, layout: &OverlayLayout) -> (f64, f64) {
     if snapshot.game_id == "sc2" {
-        return (640.0, 116.0);
+        return (400.0, 106.0);
     }
     if snapshot.game_id == "aoe4" {
         return (900.0, 64.0);
@@ -70,6 +82,21 @@ pub fn overlay_size(snapshot: &MatchSnapshot, layout: &OverlayLayout) -> (f64, f
 mod tests {
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn sc2_window_fits_the_session_bar_only_when_it_is_visible() {
+        let mut game = snapshot(&[None, None], "sc2_1v1");
+        game.game_id = "sc2".into();
+        let mut settings = crate::model::OverlaySettings::default();
+        assert_eq!(window_size(&game, &settings, false), (400.0, 138.0));
+        game.source = crate::model::MatchSource::Live;
+        assert_eq!(window_size(&game, &settings, false), (400.0, 106.0));
+        assert_eq!(window_size(&game, &settings, true), (400.0, 138.0));
+        settings.show_session = false;
+        assert_eq!(window_size(&game, &settings, true), (400.0, 106.0));
+        game.game_id = "aoe4".into();
+        assert_eq!(window_size(&game, &settings, true), (900.0, 64.0));
+    }
 
     fn snapshot(team_ids: &[Option<i32>], queue: &str) -> MatchSnapshot {
         serde_json::from_value(json!({

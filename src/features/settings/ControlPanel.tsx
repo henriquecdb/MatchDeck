@@ -22,6 +22,8 @@ import { hotkeyLabel } from '../../domain/hotkeys';
 import { GameLibrary } from '../games/GameLibrary';
 import { AppHeader } from '../shell/AppHeader';
 import { ProfilePanel } from '../profile/ProfilePanel';
+import { Sc2SessionPanel } from '../../games/sc2/Sc2SessionPanel';
+import { useSc2Session } from '../../games/sc2/use-sc2-session';
 
 export function ControlPanel({ runtime, desktop }: { runtime: OverlayRuntime; desktop: boolean }) {
   const runtimeState = useRuntime(runtime);
@@ -33,6 +35,7 @@ function ControlPanelContent({ runtime, desktop, runtimeState }: { runtime: Over
   const { t } = useI18n();
   const { state, ready, error, perform, retry } = runtimeState;
   const gameId = state.detection.config.gameId ?? 'aoe2-de';
+  const session = useSc2Session(runtime, state.detection.config.profile?.profileId ?? null, desktop && gameId === 'sc2');
   const [entered, setEntered] = useState<boolean | null>(null);
   const [switchingGame, setSwitchingGame] = useState(false);
   const changing = useRef(false);
@@ -90,6 +93,13 @@ function ControlPanelContent({ runtime, desktop, runtimeState }: { runtime: Over
       {tab.id === 'match' && <>
         <div className="section-heading"><h2>{t('Partida')}</h2></div>
         <DetectionPanel key={gameId} runtime={runtime} status={state.detection} desktop={desktop} ready={ready} />
+        {gameId === 'sc2' && desktop && state.detection.config.profile && <Sc2SessionPanel
+          key={state.detection.config.profile.profileId}
+          runtime={runtime}
+          profileId={state.detection.config.profile.profileId}
+          active={!!entered && activeTab === 'match'}
+          matchActive={!!match}
+        />}
         {match && <div className="session-summary"><strong>{match.map}</strong><span>{match.players.map(player => player.name).join(' × ')}</span><p>{state.hiddenMatchId === match.id ? t('Overlay oculto; detecção ativa.') : settings.focusOnly && match.source === 'live' ? t('Visível com o jogo em foco.') : t('Visível ao trocar de janela.')}</p>
           <button onClick={() => void perform(() => runtime.toggleVisibility())}>{state.hiddenMatchId === match.id ? t('Mostrar nesta partida') : t('Ocultar nesta partida')}</button></div>}
         {match && <p>{state.preferences.hotkeys.toggleOverlay ? state.visibilityShortcutAvailable ? t('Mostrar/ocultar: {0}', { 0: hotkeyLabel(state.preferences.hotkeys.toggleOverlay) }) : t('Atalho indisponível. Use o botão da partida.') : t('Atalho desativado. Use o botão da partida.')}</p>}
@@ -100,7 +110,7 @@ function ControlPanelContent({ runtime, desktop, runtimeState }: { runtime: Over
       {tab.id === 'overlay' && <>
         <div className="section-heading"><h2>{t('Overlay')}</h2><p>{t('Aparência e posição do overlay.')}</p></div>
         <OverlaySettingsPanel gameId={gameId} settings={settings} match={match} desktop={desktop} shortcutAvailable={state.shortcutAvailable} lockShortcut={state.preferences.hotkeys.lockOverlay} onChange={configure} monitors={monitors} onRefreshMonitors={refreshMonitors} monitorError={monitorError} />
-        <OverlayPreview match={preview} settings={settings} />
+        <OverlayPreview match={preview} settings={settings} session={session} />
       </>}
       {tab.id === 'demo' && <><div className="section-heading"><h2>{t('Demonstração')}</h2><p>{t('Teste sem entrar no jogo.')}</p></div><DemoPanel key={gameId} runtime={runtime} state={state} desktop={desktop} perform={perform} /></>}
       {tab.id === 'updates' && <UpdatePanel desktop={desktop} visible={!!entered && activeTab === 'updates'} busy={!!match || state.detection.config.enabled} autoUpdate={state.preferences.autoUpdate} onAutoUpdateChange={autoUpdate => void perform(() => runtime.configureApp({ ...state.preferences, autoUpdate }))} />}

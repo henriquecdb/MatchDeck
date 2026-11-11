@@ -2,6 +2,29 @@
 
 As mudanças relevantes são registradas por versão. O projeto usa Semantic Versioning e Conventional Commits.
 
+## [0.7.0] - 2026-11-11
+
+### Adicionado
+
+- Sessões locais do SC2 com início e encerramento manuais, placar e dez últimos resultados confirmados por replay.
+- Faixa de sessão no overlay com vitórias, derrotas, aproveitamento e sequência de resultados. Exibição opcional na aba Overlay.
+- Placar salvo por perfil, com recuperação após reabrir o aplicativo e proteção contra resultados duplicados.
+
+### Melhorado
+
+- Overlay de confronto do SC2 mais compacto, com raça, nome e MMR em duas linhas.
+- Textos mais objetivos no painel de sessão. Detalhes da contagem ficam em Sobre a sessão.
+- Demonstração da faixa com resultados fictícios e dimensionamento da janela conforme a exibição da sessão.
+
+### Corrigido
+
+- Cálculo do horário de início dos replays na velocidade Faster, evitando descartar partidas válidas da sessão.
+- Atualizações da sessão por eventos, preservando resultados recentes quando uma leitura anterior termina depois.
+
+### Validação
+
+- Overlay de confronto, faixa de sessão e contagem de resultados validados pelo usuário em partidas reais.
+
 ## [0.6.0] - 2026-11-06
 
 ### Adicionado

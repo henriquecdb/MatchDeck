@@ -31,6 +31,8 @@ pub struct OverlaySettings {
     pub show_win_rate: bool,
     #[serde(default = "enabled")]
     pub highlight_self: bool,
+    #[serde(default = "enabled")]
+    pub show_session: bool,
 }
 
 fn default_scale() -> f64 {
@@ -87,6 +89,7 @@ impl Default for OverlaySettings {
             show_record: true,
             show_win_rate: true,
             highlight_self: true,
+            show_session: true,
         }
     }
 }
@@ -243,6 +246,7 @@ mod tests {
             serde_json::from_value(json!({"opacity":0.8,"x":-500,"y":80,"locked":true})).unwrap();
         assert_eq!(settings.scale, 1.0);
         assert!(settings.focus_only && settings.show_projection);
+        assert!(settings.show_session);
         assert!(settings.monitor_id.is_none());
         assert!(settings.anchor == Anchor::Manual);
         let settings = OverlaySettings {

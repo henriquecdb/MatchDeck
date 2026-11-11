@@ -167,6 +167,9 @@ async fn records(
     })
     .await
     .map_err(|e| e.to_string())??;
+    if let Err(error) = super::super::session::record(app, id, &handle, &records) {
+        eprintln!("Não foi possível atualizar a sessão SC2: {error}");
+    }
     Ok((handle, records))
 }
 pub async fn latest(

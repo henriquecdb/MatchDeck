@@ -15,9 +15,10 @@ export interface OverlaySettings {
   showRecord: boolean;
   showWinRate: boolean;
   highlightSelf: boolean;
+  showSession: boolean;
 }
 
-export const defaultSettings: OverlaySettings = { opacity: 0.9, x: 40, y: 80, locked: false, layout: 'detailed', autoUpdate: false, scale: 1, focusOnly: true, showProjection: true, monitorId: null, anchor: 'manual', margin: 16, showRating: true, showRecord: true, showWinRate: true, highlightSelf: true };
+export const defaultSettings: OverlaySettings = { opacity: 0.9, x: 40, y: 80, locked: false, layout: 'detailed', autoUpdate: false, scale: 1, focusOnly: true, showProjection: true, monitorId: null, anchor: 'manual', margin: 16, showRating: true, showRecord: true, showWinRate: true, highlightSelf: true, showSession: true };
 
 export const anchorLabels: Record<OverlaySettings['anchor'], string> = {
   manual: 'Manual · arrastar ou informar X/Y', 'top-left': 'Superior esquerdo', 'top-center': 'Superior central', 'top-right': 'Superior direito',
@@ -49,5 +50,6 @@ export function parseSettings(value: unknown): OverlaySettings {
     showRecord: candidate.showRecord !== false,
     showWinRate: candidate.showWinRate !== false,
     highlightSelf: candidate.highlightSelf !== false,
+    showSession: candidate.showSession !== false,
   };
 }

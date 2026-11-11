@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.7.0] - 2026-11-11
+
+### Added
+
+- Local SC2 sessions with manual start and end controls, a record and the ten latest replay-confirmed results.
+- Optional in-game session bar with wins, losses, win rate and recent results, controlled from the Overlay tab.
+- Per-profile session storage, recovery after restarting the app and duplicate-result protection.
+
+### Improved
+
+- More compact SC2 matchup overlay with race, name and MMR in two rows.
+- Shorter session panel text, with counting details under About the session.
+- Session bar demo with fictional results and window sizing that follows session visibility.
+
+### Fixed
+
+- Replay start-time calculation at Faster speed, preventing valid games from being excluded from a session.
+- Event-driven session updates preserve newer results when an earlier read finishes later.
+
+### Validation
+
+- Matchup overlay, session bar and result tracking validated by the user in real games.
+
 ## [0.6.0] - 2026-11-06
 
 ### Added
