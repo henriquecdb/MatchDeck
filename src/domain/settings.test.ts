@@ -18,4 +18,6 @@ it('migrates old preferences and preserves compact mode', () => {
   expect(parseSettings({ opacity: 0.8 }).layout).toBe('detailed');
   expect(parseSettings({ layout: 'compact' }).layout).toBe('compact');
   expect(parseSettings({ layout: 'unknown' }).layout).toBe('detailed');
+  expect(parseSettings({}).showSession).toBe(true);
+  expect(parseSettings({ showSession: false }).showSession).toBe(false);
 });

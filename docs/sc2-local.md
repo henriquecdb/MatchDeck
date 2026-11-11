@@ -51,6 +51,9 @@ Se o SC2 Pulse retornar um marcador de nome indisponível, como f#1, o perfil co
 ## Sessão local
 
 Na aba Partida, com seu perfil SC2 vinculado, use **Iniciar sessão** antes de entrar na fila.
+Em Overlay, **Mostrar sessão no overlay** exibe uma faixa com placar, aproveitamento e
+os dez últimos resultados durante a partida. A faixa aparece enquanto a sessão estiver ativa.
+Na demonstração, o placar é fictício.
 O painel conta vitórias, derrotas, empates e aproveitamento e mostra os dez últimos resultados
 confirmados por replays locais, com adversário, raça adversária, mapa e horário.
 Inclui 1v1 entre pessoas de matchmaking e partidas personalizadas iniciadas após o começo da sessão.

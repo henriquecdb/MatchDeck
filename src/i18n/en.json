@@ -577,5 +577,14 @@
   "Conta partidas 1v1 entre pessoas iniciadas após o começo da sessão, incluindo matchmaking e personalizadas. Replays podem demorar alguns segundos. Nova sessão substitui o placar anterior.": "Counts human 1v1 games started after the session began, including matchmaking and custom games. Replays may take a few seconds. A new session replaces the previous record.",
   "Encerre a partida ou demonstração antes de alterar a sessão.": "End the game or demo before changing the session.",
   "O perfil foi alterado; tente novamente": "The profile changed; please try again",
-  "Sessões disponíveis no aplicativo Windows.": "Sessions are available in the Windows app."
+  "Sessões disponíveis no aplicativo Windows.": "Sessions are available in the Windows app.",
+  "Mostrar sessão no overlay": "Show session in overlay",
+  "Últimos resultados": "Latest results",
+  "Aguardando a primeira partida.": "Waiting for the first game.",
+  "Inicie a sessão antes de jogar.": "Start the session before playing.",
+  "Sobre a sessão": "About the session",
+  "1v1 de matchmaking e personalizadas. Resultados por replay local.": "Matchmaking and custom 1v1. Results from local replays.",
+  "Salva por perfil. Nova sessão substitui o placar anterior.": "Saved per profile. A new session replaces the previous record.",
+  "Disponível após a partida.": "Available after the game.",
+  "Por raça": "By race"
 }

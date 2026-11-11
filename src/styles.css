@@ -180,7 +180,7 @@ input[type=number] { width: 110px; }
 .sc2-session { margin: 16px 0; padding: 16px; border: 1px solid #304050; border-radius: 8px; background: #192430; }
 .sc2-session .profile-heading { margin: 0; }
 .sc2-session h3 { margin: 0; }
-.sc2-session-period, .sc2-session-help { color: #aebdce; font-size: 12px; line-height: 1.5; }
+.sc2-session-period { color: #aebdce; font-size: 12px; line-height: 1.5; }
 .sc2-session-score { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 12px; margin: 16px 0; }
 .sc2-session-score dt { color: #aebdce; font-size: 12px; }
 .sc2-session-score dd { margin: 4px 0 0; font-size: 24px; font-variant-numeric: tabular-nums; }
@@ -273,7 +273,18 @@ input[type=number] { width: 110px; }
 .rating-history-scale { position: absolute; left: 0; top: 0; height: 100px; display: flex; flex-direction: column; justify-content: space-between; color: #879bb0; font-size: 10px; }
 .rating-bars, .rating-history-period { margin-left: 40px; }
 
-.sc2-overlay { width: 400px; min-width: 400px; height: 106px; padding: 5px 7px; background: #101820; border: 1px solid #345066; border-radius: 6px; color: #e8edf3; }
+.sc2-overlay { display: flex; flex-direction: column; width: 400px; min-width: 400px; height: 106px; padding: 5px 7px; background: #101820; border: 1px solid #345066; border-radius: 6px; color: #e8edf3; }
+.sc2-overlay.has-session { height: 138px; }
+.sc2-session-bar { display: flex; flex: 0 0 32px; align-items: center; gap: 8px; margin-top: auto; padding-top: 4px; border-top: 1px solid #345066; font-size: 10px; font-variant-numeric: tabular-nums; }
+.sc2-session-bar > strong { font-size: 9px; color: #b1c6d5; }
+.sc2-session-record { display: flex; gap: 4px; white-space: nowrap; }
+.sc2-session-record b:first-child { color: #68d9a4; }
+.sc2-session-record b:nth-child(2) { color: #ed9399; }
+.sc2-session-record b:nth-child(3), .sc2-session-rate { color: #b1c6d5; }
+.sc2-session-bar ol { display: flex; gap: 2px; margin: 0 0 0 auto; padding: 0; list-style: none; }
+.sc2-session-bar li { display: grid; place-items: center; width: 13px; height: 16px; border-radius: 2px; background: #344454; color: #e8edf3; font-size: 8px; font-weight: 700; }
+.sc2-session-bar li.is-win { background: #285141; color: #8aefb9; }
+.sc2-session-bar li.is-loss { background: #542c36; color: #ffb3b8; }
 .sc2-overlay header { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 14px; font-size: 10px; color: #b1c6d5; }
 .sc2-overlay header small { font-size: 8px; color: #71ccdd; }
 .sc2-players { display: grid; gap: 2px; margin-top: 2px; }

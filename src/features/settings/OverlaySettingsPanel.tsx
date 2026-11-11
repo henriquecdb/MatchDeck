@@ -59,7 +59,8 @@ export function OverlaySettingsPanel({ gameId = 'aoe2-de', settings, match = nul
     <label><input type="checkbox" checked={settings.showRating} onChange={event => onChange({ showRating: event.target.checked })} />  {t('Exibir rating')}</label>
     <label><input type="checkbox" checked={settings.showRecord} onChange={event => onChange({ showRecord: event.target.checked })} />  {t('Exibir vitórias e derrotas')}</label>
     <label><input type="checkbox" checked={settings.showWinRate} onChange={event => onChange({ showWinRate: event.target.checked })} />  {t('Exibir porcentagem de vitórias')}</label>
-    <p>{t('No compacto, passe o mouse no jogador para ver vitórias, derrotas e aproveitamento.')}</p>
+    {gameId === 'sc2' && <label><input type="checkbox" checked={settings.showSession} onChange={event => onChange({ showSession: event.target.checked })} /> {t('Mostrar sessão no overlay')}</label>}
+    {gameId === 'aoe2-de' && <p>{t('No compacto, passe o mouse no jogador para ver vitórias, derrotas e aproveitamento.')}</p>}
     <label><input type="checkbox" checked={settings.highlightSelf} onChange={event => onChange({ highlightSelf: event.target.checked })} />  {t('Destacar meu jogador')}</label>
     <label><input type="checkbox" checked={settings.locked} onChange={event => onChange({ locked: event.target.checked })} />  {t('Travar overlay e passar cliques para o jogo')}</label>
     <p>{t('Destrave para arrastar.')} {desktop && (shortcutAvailable && lockShortcut ? t('{0} também alterna a trava.', { 0: hotkeyLabel(lockShortcut) }) : t('Atalho da trava indisponível ou desativado; use a opção acima.'))}</p>

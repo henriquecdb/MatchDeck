@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { OverlayRuntime } from '../../application/runtime';
-import type { Sc2Session, Sc2SessionAction } from '../../domain/sc2-session';
+import { sessionRecord, type Sc2Session, type Sc2SessionAction } from '../../domain/sc2-session';
 import { useI18n } from '../../i18n/LanguageProvider';
 import { raceArtwork } from './catalog';
 import { CivilizationEmblem } from '../../features/overlay/CivilizationEmblem';
@@ -62,9 +62,7 @@ export function Sc2SessionPanel({ runtime, profileId, active, matchActive }: {
   }
 
   const matches = session?.matches ?? [];
-  const wins = matches.filter(match => match.won === true && !match.draw).length;
-  const losses = matches.filter(match => match.won === false && !match.draw).length;
-  const draws = matches.filter(match => match.draw).length;
+  const { wins, losses, draws, winRate } = sessionRecord(session);
   const running = session != null && session.endedAt == null;
   return <section className="sc2-session" aria-label={t('Sessão de StarCraft II')}>
     <div className="profile-heading">
@@ -84,10 +82,10 @@ export function Sc2SessionPanel({ runtime, profileId, active, matchActive }: {
         <div><dt>{t('Vitórias')}</dt><dd>{wins}</dd></div>
         <div><dt>{t('Derrotas')}</dt><dd>{losses}</dd></div>
         <div><dt>{t('Empates')}</dt><dd>{draws}</dd></div>
-        <div><dt>{t('Aproveitamento')}</dt><dd>{matches.length ? (wins / matches.length * 100).toLocaleString(language, { maximumFractionDigits: 1 }) + '%' : '—'}</dd></div>
+        <div><dt>{t('Aproveitamento')}</dt><dd>{winRate == null ? '—' : winRate.toLocaleString(language, { maximumFractionDigits: 1 }) + '%'}</dd></div>
       </dl>
       {matches.length > 0 ? <>
-        <h4>{t('Últimos resultados da sessão')}</h4>
+        <h4>{t('Últimos resultados')}</h4>
         <ol className="profile-history">{matches.slice(0, 10).map(match => {
           const artwork = raceArtwork({ civilization: match.opponentRace }, gameLanguage);
           return <li key={match.id} className={`history-match ${match.draw ? 'is-draw' : match.won ? 'is-win' : 'is-loss'}`}>
@@ -100,9 +98,12 @@ export function Sc2SessionPanel({ runtime, profileId, active, matchActive }: {
             <div className="history-civilization"><CivilizationEmblem image={artwork.emblem} civilization={artwork.name} /><span>{artwork.name}</span></div>
           </li>;
         })}</ol>
-      </> : <p>{t('Aguardando resultados confirmados por replay local.')}</p>}
-    </> : <p>{t('Inicie a sessão antes de entrar na fila. O placar será salvo neste computador para este perfil.')}</p>}
-    <p className="sc2-session-help">{t('Conta partidas 1v1 entre pessoas iniciadas após o começo da sessão, incluindo matchmaking e personalizadas. Replays podem demorar alguns segundos. Nova sessão substitui o placar anterior.')}</p>
-    {matchActive && <p>{t('Encerre a partida ou demonstração antes de alterar a sessão.')}</p>}
+      </> : <p>{t('Aguardando a primeira partida.')}</p>}
+    </> : <p>{t('Inicie a sessão antes de jogar.')}</p>}
+    <details className="help-details"><summary>{t('Sobre a sessão')}</summary>
+      <p>{t('1v1 de matchmaking e personalizadas. Resultados por replay local.')}</p>
+      <p>{t('Salva por perfil. Nova sessão substitui o placar anterior.')}</p>
+    </details>
+    {matchActive && <p>{t('Disponível após a partida.')}</p>}
   </section>;
 }

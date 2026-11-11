@@ -76,6 +76,21 @@ fn filename(profile_id: u64) -> String {
     format!("session-{profile_id}.json")
 }
 
+pub fn active_for(app: &tauri::AppHandle, snapshot: &crate::model::MatchSnapshot) -> bool {
+    if snapshot.game_id != "sc2" {
+        return false;
+    }
+    let Some(profile_id) = snapshot
+        .self_player_id
+        .as_ref()
+        .and_then(|id| id.parse::<u64>().ok())
+    else {
+        return false;
+    };
+    storage::read_game::<Session>(app, &filename(profile_id), "sc2")
+        .is_some_and(|session| session.profile_id == profile_id && session.ended_at.is_none())
+}
+
 pub fn record(
     app: &tauri::AppHandle,
     profile_id: u64,

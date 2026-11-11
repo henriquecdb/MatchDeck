@@ -3,10 +3,16 @@ import { winRate } from '../../domain/match';
 import type { OverlaySettings } from '../../domain/settings';
 import { useI18n } from '../../i18n/LanguageProvider';
 import { raceArtwork } from './catalog';
+import type { Sc2Session } from '../../domain/sc2-session';
+import { sc2DemoSession } from './demo';
+import { Sc2SessionBar } from './Sc2SessionBar';
 
-export function Sc2Overlay({ match, display }: { match: MatchSnapshot; display: OverlaySettings }) {
+export function Sc2Overlay({ match, display, session = null }: { match: MatchSnapshot; display: OverlaySettings; session?: Sc2Session | null }) {
   const { t, gameLanguage } = useI18n();
-  return <section className="sc2-overlay" aria-label={t('Overlay StarCraft II')}>
+  const liveSession = session?.endedAt == null && String(session?.profileId) === match.selfPlayerId ? session : null;
+  const currentSession = match.source === 'demo' ? sc2DemoSession : liveSession;
+  const showSession = display.showSession && currentSession != null;
+  return <section className={`sc2-overlay${showSession ? ' has-session' : ''}`} aria-label={t('Overlay StarCraft II')}>
     <header>
       <span>{t(match.queue ?? '1v1 · fila não informada')}</span>
       {match.source === 'demo' && <small>{t('DEMONSTRAÇÃO')}</small>}
@@ -25,6 +31,7 @@ export function Sc2Overlay({ match, display }: { match: MatchSnapshot; display: 
       </article>;
     })}</div>
     {(display.showRating || display.showRecord || display.showWinRate) &&
-      <footer>{display.showRating && <strong>MMR · </strong>}{t('Estatísticas ranqueadas por raça · fonte SC2 Pulse')}</footer>}
+      <footer title={t('Estatísticas ranqueadas por raça · fonte SC2 Pulse')}>{display.showRating && <strong>MMR · </strong>}SC2 Pulse · {t('Por raça')}</footer>}
+    {showSession && <Sc2SessionBar session={currentSession} />}
   </section>;
 }

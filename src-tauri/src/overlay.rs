@@ -27,7 +27,14 @@ fn refresh_geometry(window: &tauri::WebviewWindow, state: &AppState) -> Result<(
     let size = state
         .current_match
         .as_ref()
-        .map(|current| crate::layout::overlay_size(current, &state.settings.layout))
+        .map(|current| {
+            crate::layout::window_size(
+                current,
+                &state.settings,
+                state.settings.show_session
+                    && crate::games::sc2::session::active_for(window.app_handle(), current),
+            )
+        })
         .unwrap_or((480.0, 436.0));
     crate::displays::apply(window, &state.settings, size)
 }
