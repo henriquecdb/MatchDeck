@@ -42,6 +42,19 @@ fn clean_name(value: &str) -> String {
         .trim()
         .to_string()
 }
+
+fn replay_duration(metadata: &Value, details: &Value) -> Result<chrono::Duration, String> {
+    let seconds = metadata["Duration"]
+        .as_i64()
+        .filter(|n| (0..=86400).contains(n))
+        .ok_or(INVALID)?;
+    // Replay metadata uses the 16-loop clock. Faster runs at 22.4 loops per real second.
+    Ok(if details["12"].as_i64() == Some(4) {
+        chrono::Duration::milliseconds(seconds * 5000 / 7)
+    } else {
+        chrono::Duration::seconds(seconds)
+    })
+}
 impl ReplayRecord {
     pub fn includes(&self, handle: &str) -> bool {
         self.players.iter().filter(|p| p.handle == handle).count() == 1
@@ -172,11 +185,7 @@ pub fn parse(path: &Path) -> Result<ReplayRecord, String> {
     if finished_at > Utc::now() + chrono::Duration::minutes(10) {
         return Err(INVALID.into());
     }
-    let duration = metadata["Duration"]
-        .as_i64()
-        .filter(|n| (0..=86400).contains(n))
-        .ok_or(INVALID)?;
-    let started_at = finished_at - chrono::Duration::seconds(duration);
+    let started_at = finished_at - replay_duration(&metadata, &details)?;
     let map = metadata["Title"]
         .as_str()
         .filter(|s| !s.is_empty() && s.len() <= 256)
@@ -243,6 +252,23 @@ mod tests {
     fn strips_clan_markup_without_treating_it_as_identity() {
         assert_eq!(clean_name("&lt;Clan&gt;<sp/>Nova"), "Nova");
     }
+    #[test]
+    fn faster_replay_duration_uses_wall_clock_time_for_session_boundaries() {
+        let metadata = serde_json::json!({"Duration": 997});
+        let duration = replay_duration(&metadata, &serde_json::json!({"12": 4})).unwrap();
+        assert_eq!(duration.num_milliseconds(), 712142);
+        let end = DateTime::parse_from_rfc3339("2026-11-11T02:18:12Z").unwrap();
+        let session_start = DateTime::parse_from_rfc3339("2026-11-11T02:04:47Z").unwrap();
+        assert!(end - duration > session_start);
+        assert_eq!(
+            replay_duration(&metadata, &serde_json::json!({"12": 2}))
+                .unwrap()
+                .num_seconds(),
+            997
+        );
+        assert!(replay_duration(&serde_json::json!({"Duration": -1}), &Value::Null).is_err());
+    }
+
     #[test]
     #[ignore = "requires local SC2 replay"]
     fn local_replays_smoke_test() {

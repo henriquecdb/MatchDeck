@@ -167,6 +167,36 @@ mod tests {
     use crate::games::sc2::replay::ReplayPlayer;
     use chrono::Duration;
 
+    #[test]
+    #[ignore = "requires a local replay and saved session"]
+    fn local_replay_is_recovered_into_its_saved_session() {
+        let replay = std::env::var("MATCHDECK_TEST_REPLAY").unwrap();
+        let saved = std::env::var("MATCHDECK_TEST_SESSION").unwrap();
+        let handle = std::env::var("MATCHDECK_TEST_HANDLE").unwrap();
+        let mut session: Session = serde_json::from_slice(&std::fs::read(saved).unwrap()).unwrap();
+        let record = crate::games::sc2::replay::parse(std::path::Path::new(&replay)).unwrap();
+        let expected = record
+            .players
+            .iter()
+            .find(|p| p.handle == handle)
+            .unwrap()
+            .won;
+        session.ingest(&handle, std::slice::from_ref(&record));
+        assert_eq!(
+            session.matches.iter().filter(|m| m.id == record.id).count(),
+            1
+        );
+        assert!(session
+            .matches
+            .iter()
+            .any(|m| m.id == record.id && m.won == expected));
+        assert!(!session.ingest(&handle, &[record]));
+        println!(
+            "Recovered {} confirmed session matches",
+            session.matches.len()
+        );
+    }
+
     fn replay(id: &str, start: DateTime<Utc>, won: Option<bool>) -> ReplayRecord {
         ReplayRecord {
             id: id.into(),
