@@ -93,8 +93,28 @@ pub fn start_match(
     if incoming.players.is_empty() || incoming.players.len() > 8 {
         return Err("A partida deve ter entre 1 e 8 jogadores".into());
     }
-    state.post_game = None;
-    state.current_match = Some(incoming);
+    if incoming.id.starts_with("demo-sc2-result-")
+        && incoming.game_id == "sc2"
+        && matches!(incoming.source, crate::model::MatchSource::Demo)
+        && incoming.finished_at.is_some()
+    {
+        if state.current_match.is_some() {
+            return Err("Encerre a demonstração antes de testar o pós-partida.".into());
+        }
+        if state.settings.post_game_seconds == 0 {
+            return Err("Ative o resumo na aba Overlay.".into());
+        }
+        state.hidden_match_id = None;
+        state.post_game = Some(crate::model::PostGame {
+            game: incoming,
+            opponent_id: None,
+            expires_at: chrono::Utc::now()
+                + chrono::Duration::seconds(state.settings.post_game_seconds as i64),
+        });
+    } else {
+        state.post_game = None;
+        state.current_match = Some(incoming);
+    }
     overlay::synchronize(&app, &state, true)
 }
 
@@ -184,6 +204,7 @@ pub fn finish_match(app: tauri::AppHandle, state: State<'_, SharedState>) -> Res
         return Err("Desative a detecção para esconder a partida real".into());
     }
     state.current_match = None;
+    state.post_game = None;
     state.hidden_match_id = None;
     overlay::synchronize(&app, &state, false)
 }

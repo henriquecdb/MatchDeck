@@ -7,7 +7,7 @@ import type { Sc2History, Sc2Session, Sc2SessionAction } from '../domain/sc2-ses
 
 export interface AppState {
   match: MatchSnapshot | null;
-  postGame?: { game: MatchSnapshot; expiresAt: string; opponentId?: string };
+  postGame?: { game: MatchSnapshot; expiresAt: string; opponentId?: string } | null;
   settings: OverlaySettings;
   detection: DetectionStatus;
   shortcutAvailable: boolean;

@@ -50,10 +50,14 @@ pub fn displayed_match(state: &AppState) -> Option<&crate::model::MatchSnapshot>
             .post_game
             .as_ref()
             .filter(|card| {
-                state.detection.config.enabled
+                ((matches!(card.game.source, MatchSource::Demo)
+                    && !state.detection.config.enabled
+                    && card.game.game_id == state.detection.config.game_id)
+                    || (!matches!(card.game.source, MatchSource::Demo)
+                        && state.detection.config.enabled
+                        && card.game.belongs_to(&state.detection.config)))
                     && state.settings.post_game_seconds > 0
                     && card.expires_at > chrono::Utc::now()
-                    && card.game.belongs_to(&state.detection.config)
             })
             .map(|card| &card.game)
     })
@@ -232,5 +236,23 @@ mod tests {
         next.id = "next".into();
         state.current_match = Some(next);
         assert_eq!(displayed_match(&state).unwrap().id, "next");
+    }
+
+    #[test]
+    fn post_game_demo_needs_no_profile_or_focus_but_cannot_cross_game_or_detection_scope() {
+        let mut state = AppState::default();
+        state.detection.config.game_id = "sc2".into();
+        let game = serde_json::from_value(serde_json::json!({"id":"demo-sc2-result-one","gameId":"sc2","mode":"ranked","map":"Arena","source":"demo","players":[]})).unwrap();
+        state.post_game = Some(crate::model::PostGame {
+            game,
+            opponent_id: None,
+            expires_at: chrono::Utc::now() + chrono::Duration::seconds(8),
+        });
+        assert!(should_show(&state, false));
+        state.detection.config.enabled = true;
+        assert!(!should_show(&state, true));
+        state.detection.config.enabled = false;
+        state.detection.config.game_id = "aoe4".into();
+        assert!(!should_show(&state, true));
     }
 }

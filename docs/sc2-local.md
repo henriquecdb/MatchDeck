@@ -121,3 +121,7 @@ confirmação de atualização do MMR no servidor. A fonte pode atrasar. Cache d
 não conta como nova amostra. Se não houver consulta inicial válida antes de jogar, a base e
 a variação ficam com —; o app não estima ganhos por partida. Sessões encerradas não recebem
 novas consultas de MMR. Sessões antigas continuam legíveis, sem uma base retroativa.
+
+Na aba **Demonstração**, selecione um **Resultado de teste** e clique em **Testar pós-partida**.
+A prévia e o overlay usam dados fictícios e o tempo configurado, sem alterar sessão ou histórico.
+Desative a detecção e encerre a demonstração em andamento antes do teste.

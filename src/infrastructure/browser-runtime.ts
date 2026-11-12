@@ -68,18 +68,28 @@ export class BrowserRuntime implements OverlayRuntime {
     catch { this.state.settings = { ...defaultSettings }; }
     this.state.detection = structuredClone(defaultDetection);
     this.state.detection.config.gameId = gameId;
-    this.state.lastSynced = null; this.state.hiddenMatchId = null;
+    this.state.lastSynced = null; this.state.hiddenMatchId = null; this.state.postGame = null;
     this.publish();
   }
 
   async start(match: MatchSnapshot) {
     if (match.gameId !== this.state.detection.config.gameId) throw new Error('A demonstração deve corresponder ao jogo selecionado');
-    this.state.match = captureMatch(this.state.match, match);
+    if (this.state.detection.config.enabled) throw new Error('Desative a detecção real antes de iniciar uma demonstração');
+    if (match.id.startsWith('demo-sc2-result-') && match.gameId === 'sc2' && match.source === 'demo' && match.finishedAt) {
+      if (this.state.match) throw new Error('Encerre a demonstração antes de testar o pós-partida.');
+      if (this.state.settings.postGameSeconds === 0) throw new Error('Ative o resumo na aba Overlay.');
+      this.state.postGame = { game: match, expiresAt: new Date(Date.now() + this.state.settings.postGameSeconds * 1000).toISOString() };
+    } else {
+      this.state.match = captureMatch(this.state.match, match);
+      this.state.postGame = null;
+    }
+    this.state.hiddenMatchId = null;
     this.publish();
   }
 
   async finish() {
     this.state.match = null;
+    this.state.postGame = null;
     this.state.hiddenMatchId = null;
     this.publish();
   }
@@ -87,7 +97,7 @@ export class BrowserRuntime implements OverlayRuntime {
   async listMonitors() { return []; }
 
   async toggleVisibility() {
-    const id = this.state.match?.id ?? null;
+    const id = this.state.match?.id ?? this.state.postGame?.game.id ?? null;
     this.state.hiddenMatchId = this.state.hiddenMatchId === id ? null : id;
     this.publish();
   }
