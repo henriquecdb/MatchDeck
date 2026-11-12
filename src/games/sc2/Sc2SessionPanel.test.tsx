@@ -17,6 +17,24 @@ const session: Sc2Session = {
   ],
 };
 
+it('distinguishes a missing baseline, a loading query and a retryable failure without resetting the session', async () => {
+  const runtime = new BrowserRuntime();
+  const query = vi.spyOn(runtime, 'sc2Session').mockResolvedValue(session);
+  let update: (next: Sc2Session) => void = () => {};
+  vi.spyOn(runtime, 'subscribeSc2Session').mockImplementation(async listener => { update = listener; return () => {}; });
+  render(<Sc2SessionPanel runtime={runtime} profileId={42} active matchActive={false} />);
+  await screen.findByText('Sem registro inicial de MMR.');
+  act(() => update({ ...session, mmrStatus: 'loading' }));
+  expect(screen.getByText('Consultando MMR…')).toBeTruthy();
+  act(() => update({ ...session, mmrStatus: 'error' }));
+  expect(screen.getByText('Falha na consulta do MMR.')).toBeTruthy();
+  query.mockResolvedValue({ ...session, mmrStatus: 'ready', mmr: [{ race: 'TERRAN', season: 68, initial: null, latest: 4200, queriedAt: '2026-11-11T01:00:00Z' }] });
+  fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }));
+  await screen.findByText('Sem registro inicial de MMR.');
+  expect(query).toHaveBeenLastCalledWith(42, 'refresh');
+  expect(screen.getByText('50%', { selector: 'dd' })).toBeTruthy();
+});
+
 it('starts explicitly, receives only the linked profile results and ends without losing the record', async () => {
   const runtime = new BrowserRuntime();
   const command = vi.spyOn(runtime, 'sc2Session').mockResolvedValue(null);

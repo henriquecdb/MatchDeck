@@ -608,5 +608,14 @@
   "Ative o resumo na aba Overlay.": "Enable the summary in the Overlay tab.",
   "Encerre a demonstração antes de testar o pós-partida.": "End the demo before testing the post-game summary.",
   "Consultar mapa": "Look up a map",
-  "Selecionar mapa": "Select a map"
+  "Selecionar mapa": "Select a map",
+  "Consultando MMR…": "Querying MMR…",
+  "Falha na consulta do MMR.": "MMR query failed.",
+  "Fonte indisponível. Última consulta preservada.": "Source unavailable. Last query preserved.",
+  "Sem MMR ranqueado disponível.": "No ranked MMR available.",
+  "Sem registro inicial de MMR.": "No initial MMR recorded.",
+  "MMR atualizado.": "MMR updated.",
+  "Atualizar MMR": "Refresh MMR",
+  "Inicie uma sessão antes de consultar o MMR.": "Start a session before querying MMR.",
+  "A sessão já foi encerrada.": "The session has already ended."
 }

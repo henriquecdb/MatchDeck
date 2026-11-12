@@ -34,6 +34,8 @@ pub struct Session {
     matches: Vec<SessionMatch>,
     #[serde(default)]
     mmr: Vec<SessionMmr>,
+    #[serde(default)]
+    mmr_status: Option<String>,
 }
 
 impl Session {
@@ -140,6 +142,7 @@ pub enum SessionAction {
     Read,
     Start,
     Finish,
+    Refresh,
 }
 
 #[tauri::command]
@@ -171,6 +174,16 @@ pub fn sc2_session(
         .filter(|session| session.profile_id == profile_id);
     let next = match action {
         SessionAction::Read => return Ok(current),
+        SessionAction::Refresh => {
+            let Some(mut session) = current else {
+                return Err("Inicie uma sessão antes de consultar o MMR.".into());
+            };
+            if session.ended_at.is_some() {
+                return Err("A sessão já foi encerrada.".into());
+            }
+            session.mmr_status = Some("loading".into());
+            session
+        }
         SessionAction::Start => {
             if current.as_ref().is_some_and(|s| s.ended_at.is_none()) {
                 return Ok(current);
@@ -181,6 +194,7 @@ pub fn sc2_session(
                 ended_at: None,
                 matches: vec![],
                 mmr: vec![],
+                mmr_status: Some("loading".into()),
             }
         }
         SessionAction::Finish => {
@@ -195,8 +209,13 @@ pub fn sc2_session(
         }
     };
     storage::write_game(&app, &name, &next, "sc2")?;
-    if matches!(action, SessionAction::Start) {
-        sample_mmr(app.clone(), profile_id, next.started_at, true);
+    if matches!(action, SessionAction::Start | SessionAction::Refresh) {
+        sample_mmr(
+            app.clone(),
+            profile_id,
+            next.started_at,
+            matches!(action, SessionAction::Start),
+        );
     }
     app.emit("sc2-session-changed", &next)
         .map_err(|e| e.to_string())?;
@@ -227,6 +246,7 @@ pub fn record_history(
         ended_at: None,
         matches: saved.map(|h| h.matches).unwrap_or_default(),
         mmr: vec![],
+        mmr_status: None,
     };
     if accumulator.ingest(handle, records) {
         let history = LocalHistory {
@@ -322,16 +342,27 @@ pub fn sample_mmr(
     baseline: bool,
 ) {
     tauri::async_runtime::spawn(async move {
-        if !baseline {
-            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+        {
+            let lock = app.state::<SessionLock>();
+            if let Ok(_guard) = lock.0.lock() {
+                if let Some(mut session) =
+                    storage::read_game::<Session>(&app, &filename(profile_id), "sc2")
+                        .filter(|s| s.started_at == started_at && s.ended_at.is_none())
+                {
+                    session.mmr_status = Some("loading".into());
+                    if storage::write_game(&app, &filename(profile_id), &session, "sc2").is_ok() {
+                        let _ = app.emit("sc2-session-changed", session);
+                    }
+                } else {
+                    return;
+                }
+            };
         }
         let provider = app
             .state::<crate::detection::service::DetectionController>()
             .sc2
             .clone();
-        let Ok(data) = provider.player_data(profile_id, true).await else {
-            return;
-        };
+        let result = provider.player_data(profile_id, true).await;
         let can_baseline = app.state::<SharedState>().lock().is_ok_and(|state| {
             state.current_match.is_none()
                 && state.detection.config.game_id == "sc2"
@@ -349,11 +380,28 @@ pub fn sample_mmr(
         let Some(mut session) = storage::read_game::<Session>(&app, &name, "sc2") else {
             return;
         };
-        if session.profile_id == profile_id
-            && session.started_at == started_at
-            && session.observe_mmr(&data, baseline && can_baseline)
-            && storage::write_game(&app, &name, &session, "sc2").is_ok()
+        if session.profile_id != profile_id
+            || session.started_at != started_at
+            || session.ended_at.is_some()
         {
+            return;
+        }
+        session.mmr_status = Some(
+            match result {
+                Err(_) => "error",
+                Ok(data) if data.stale => "stale",
+                Ok(data) => {
+                    session.observe_mmr(&data, baseline && can_baseline);
+                    if session.mmr.is_empty() {
+                        "unavailable"
+                    } else {
+                        "ready"
+                    }
+                }
+            }
+            .into(),
+        );
+        if storage::write_game(&app, &name, &session, "sc2").is_ok() {
             let _ = app.emit("sc2-session-changed", session);
         }
     });
@@ -363,7 +411,11 @@ pub fn sample_after_game(app: &tauri::AppHandle, profile_id: u64) {
     if let Some(session) = storage::read_game::<Session>(app, &filename(profile_id), "sc2")
         .filter(|s| s.ended_at.is_none())
     {
-        sample_mmr(app.clone(), profile_id, session.started_at, false);
+        let app = app.clone();
+        tauri::async_runtime::spawn(async move {
+            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+            sample_mmr(app, profile_id, session.started_at, false);
+        });
     }
 }
 
@@ -440,6 +492,7 @@ mod tests {
             ended_at: None,
             matches: vec![],
             mmr: vec![],
+            mmr_status: None,
         };
         let win = replay("win", start + Duration::minutes(1), Some(true));
         let loss = replay("loss", start + Duration::minutes(15), Some(false));
@@ -501,6 +554,7 @@ mod tests {
             ended_at: None,
             matches: vec![],
             mmr: vec![],
+            mmr_status: None,
         };
         let mut data = mmr_data(start + Duration::seconds(1), 68, 4200);
         assert!(session.observe_mmr(&data, true));
@@ -532,6 +586,7 @@ mod tests {
             ended_at: None,
             matches: vec![],
             mmr: vec![],
+            mmr_status: None,
         };
         let data = mmr_data(start + Duration::minutes(10), 68, 4200);
         assert!(session.observe_mmr(&data, false));

@@ -16,10 +16,11 @@ export interface Sc2Session {
   startedAt: string;
   endedAt: string | null;
   matches: Sc2SessionMatch[];
+  mmrStatus?: 'loading' | 'error' | 'stale' | 'unavailable' | 'ready' | null;
   mmr?: Array<{ race: string; season: number; initial: number | null; latest: number; queriedAt: string }>;
 }
 
-export type Sc2SessionAction = 'read' | 'start' | 'finish';
+export type Sc2SessionAction = 'read' | 'start' | 'finish' | 'refresh';
 
 export function sessionRecord(session: Pick<Sc2Session, 'matches'> | null) {
   const matches = session?.matches ?? [];
