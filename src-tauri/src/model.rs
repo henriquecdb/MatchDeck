@@ -132,7 +132,16 @@ pub enum MatchSource {
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct StatsCache {
+    pub fetched_at: String,
+    pub stale: bool,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Player {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stats_cache: Option<StatsCache>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub identity_hint: Option<String>,
     #[serde(default)]

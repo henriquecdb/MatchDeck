@@ -3,6 +3,10 @@ use serde::Serialize;
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileOverview {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stats_cache: Option<crate::model::StatsCache>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub warnings: Vec<String>,
     pub profile_id: u64,
     pub name: String,
     pub leaderboards: Vec<ProfileLeaderboard>,

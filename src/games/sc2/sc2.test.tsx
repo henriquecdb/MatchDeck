@@ -106,3 +106,14 @@ it('marks name-based opponent suggestions and honors hidden statistics', () => {
  view.rerender(<MatchOverlay match={match} display={{...defaultSettings,showRating:false,showRecord:false,showWinRate:false}} />);
  expect(screen.queryByText('4417')).toBeNull();expect(screen.queryByText('4470')).toBeNull();expect(screen.getByText('Nova')).toBeTruthy();
 });
+
+it('marks cached SC2 ratings while keeping their original values visible', () => {
+ const match = createSc2Demo('ranked');
+ match.players[0].statsCache = { fetchedAt: '2026-11-11T14:00:00Z', stale: true };
+ const view = render(<MatchOverlay match={match} />);
+ expect(screen.getByText('4417')).toBeTruthy();
+ expect(screen.getByText(/^Cache /)).toBeTruthy();
+ expect(screen.getByTitle(/^Cache de /)).toBeTruthy();
+ view.rerender(<MatchOverlay match={match} display={{ ...defaultSettings, showRating: false, showRecord: false, showWinRate: false }} />);
+ expect(screen.queryByTitle(/^Cache de /)).toBeNull();
+});

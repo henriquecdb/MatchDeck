@@ -270,11 +270,16 @@ pub async fn profile_overview(
                 Ok(mut overview) => {
                     if !local.is_empty() {
                         overview.recent_matches = local;
+                        overview
+                            .warnings
+                            .retain(|warning| warning != "Histórico indisponível.");
                     }
                     Ok(overview)
                 }
                 Err(error) if local.is_empty() => Err(error),
                 Err(_) => Ok(crate::games::profile::ProfileOverview {
+                    stats_cache: None,
+                    warnings: vec!["SC2 Pulse indisponível.".into()],
                     profile_id,
                     name: format!("SC2 #{profile_id}"),
                     leaderboards: vec![],

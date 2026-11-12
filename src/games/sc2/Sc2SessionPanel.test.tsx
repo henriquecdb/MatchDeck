@@ -38,9 +38,13 @@ it('starts explicitly, receives only the linked profile results and ends without
   expect(screen.queryByText('Orion')).toBeNull();
   act(() => update(session));
   const panel = screen.getByRole('region', { name: 'Sessão de StarCraft II' });
-  expect(within(panel).getByText('50%')).toBeTruthy();
+  expect(within(panel).getByText('50%', { selector: 'dd' })).toBeTruthy();
   expect(within(panel).getByText('Empate')).toBeTruthy();
   expect(within(panel).getByText('Vitória')).toBeTruthy();
+  const matchups = screen.getByRole('region', { name: 'Por raça adversária' });
+  expect(within(matchups).getAllByRole('listitem')).toHaveLength(3);
+  expect(within(matchups).getByText('1V · 0D · 1E')).toBeTruthy();
+  expect(within(matchups).getByText('50%')).toBeTruthy();
   view.rerender(<Sc2SessionPanel runtime={runtime} profileId={42} active matchActive />);
   expect(screen.getByRole('button', { name: 'Encerrar sessão' })).toHaveProperty('disabled', true);
   view.rerender(<Sc2SessionPanel runtime={runtime} profileId={42} active matchActive={false} />);
@@ -48,7 +52,7 @@ it('starts explicitly, receives only the linked profile results and ends without
   fireEvent.click(screen.getByRole('button', { name: 'Encerrar sessão' }));
   await screen.findByRole('button', { name: 'Nova sessão' });
   expect(command).toHaveBeenLastCalledWith(42, 'finish');
-  expect(within(panel).getAllByRole('listitem')).toHaveLength(2);
+  expect(within(screen.getByRole('list', { name: 'Últimos resultados' })).getAllByRole('listitem')).toHaveLength(2);
   view.unmount();
   expect(unsubscribe).toHaveBeenCalledOnce();
 });
@@ -65,6 +69,6 @@ it('keeps a live replay update when the initial read finishes with an older reco
     update(session);
     resolveRead(null);
   });
-  expect(screen.getByText('50%')).toBeTruthy();
+  expect(screen.getByText('50%', { selector: 'dd' })).toBeTruthy();
   expect(screen.getByRole('button', { name: 'Encerrar sessão' })).toBeTruthy();
 });

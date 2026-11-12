@@ -130,18 +130,7 @@ async fn records(
     let handle = if let Some((_, handle)) = identity {
         handle
     } else {
-        let data = provider.player_data(id, false).await?;
-        let region = match data.character.region.as_str() {
-            "US" => 1,
-            "EU" => 2,
-            "KR" => 3,
-            "CN" => 5,
-            _ => return Err("Região SC2 indisponível".into()),
-        };
-        let handle = format!(
-            "{region}-S2-{}-{}",
-            data.character.realm, data.character.battlenet_id
-        );
+        let handle = provider.identity(id).await?.handle();
         let mut index = provider.replays.lock().map_err(|e| e.to_string())?;
         *index = Index {
             identity: Some((id, handle.clone())),

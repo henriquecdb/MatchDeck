@@ -151,3 +151,18 @@ it('reuses the profile layout for SC2 with races, MMR, draws and a season-specif
  expect(screen.getByText('Empate')).toBeTruthy();expect(screen.getByRole('img',{name:'Emblema de Terran'}).getAttribute('src')).toBe('/sc2/races/terran.png');
  expect(screen.getByRole('region',{name:'Evolução de rating'})).toBeTruthy();expect(load).toHaveBeenCalledTimes(1);
 });
+
+it('keeps cached SC2 statistics visible and labels the fetch time and missing history', async () => {
+  const runtime = new BrowserRuntime();
+  vi.spyOn(runtime, 'profileOverview').mockResolvedValue({
+    ...overview,
+    statsCache: { fetchedAt: '2026-11-11T14:00:00Z', stale: true },
+    warnings: ['Histórico indisponível.'],
+    leaderboards: [{ leaderboardId: 'sc2_1v1_terran', rating: 4250, wins: 10, losses: 5 }],
+    recentMatches: [],
+  });
+  render(<ProfilePanel runtime={runtime} gameId="sc2" profile={{ profileId: 42, name: 'Nova' }} desktop visible onLink={vi.fn()} />);
+  await screen.findByText('4250');
+  expect(screen.getByText(/^Cache de /, { selector: '.profile-cache' })).toBeTruthy();
+  expect(screen.getByText('Histórico indisponível.')).toBeTruthy();
+});

@@ -586,5 +586,13 @@
   "1v1 de matchmaking e personalizadas. Resultados por replay local.": "Matchmaking and custom 1v1. Results from local replays.",
   "Salva por perfil. Nova sessão substitui o placar anterior.": "Saved per profile. A new session replaces the previous record.",
   "Disponível após a partida.": "Available after the game.",
-  "Por raça": "By race"
+  "Por raça": "By race",
+  "Por raça adversária": "By opponent race",
+  "Consultado em {0}": "Fetched at {0}",
+  "Cache de {0}": "Cached at {0}",
+  "SC2 Pulse indisponível.": "SC2 Pulse unavailable.",
+  "Histórico indisponível.": "Match history unavailable.",
+  "Gráfico indisponível.": "Rating chart unavailable.",
+  "Partida em andamento · dados locais": "Game in progress · local data",
+  "SC2 Pulse ocupado; tente novamente em instantes.": "SC2 Pulse busy; please try again shortly."
 }
