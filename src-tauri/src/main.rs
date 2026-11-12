@@ -49,7 +49,8 @@ fn main() {
             }
             let provider = games::aoe2::provider::Aoe2Provider::new()?;
             let aoe4 = games::aoe4::provider::Aoe4Provider::new()?;
-            let sc2 = games::sc2::provider::Sc2Provider::new()?;
+            let sc2 = games::sc2::provider::Sc2Provider::new()?
+                .with_cache_directory(handle.path().app_config_dir()?.join("games/sc2"));
             let game_id = storage::selected_game(&handle);
             let preferences = storage::load_preferences(&handle);
             let mut config = storage::load_detection(&handle, &game_id);

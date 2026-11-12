@@ -16,16 +16,14 @@ use tokio::sync::Mutex;
 const API: &str = "https://sc2pulse.nephest.com/sc2/api";
 const MAX_RESPONSE: usize = 2 * 1024 * 1024;
 
-#[derive(Clone)]
-pub struct PlayerData {
-    pub character: Character,
-    pub teams: Vec<Team>,
-}
+pub use super::cache::PlayerData;
+use super::cache::{CharacterIdentity, PlayerCache};
 #[derive(Clone)]
 pub struct Sc2Provider {
     remote: Client,
     local: Client,
-    cache: Arc<Mutex<HashMap<u64, (Instant, PlayerData)>>>,
+    cache: Arc<PlayerCache>,
+    cooldown: Arc<Mutex<Option<Instant>>>,
     pub(super) replays: Arc<std::sync::Mutex<super::replay::monitor::Index>>,
 }
 
@@ -37,7 +35,7 @@ impl Sc2Provider {
             " (https://github.com/henriquecdb/MatchDeck)"
         );
         let remote = Client::builder()
-            .timeout(Duration::from_secs(12))
+            .timeout(Duration::from_secs(5))
             .redirect(reqwest::redirect::Policy::none())
             .user_agent(user_agent)
             .build()
@@ -52,9 +50,26 @@ impl Sc2Provider {
         Ok(Self {
             remote,
             local,
-            cache: Arc::new(Mutex::new(HashMap::new())),
+            cache: Arc::new(PlayerCache::default()),
+            cooldown: Arc::new(Mutex::new(None)),
             replays: Arc::new(std::sync::Mutex::new(Default::default())),
         })
+    }
+
+    pub fn with_cache_directory(mut self, directory: std::path::PathBuf) -> Self {
+        self.cache = Arc::new(PlayerCache::open(directory));
+        self
+    }
+
+    pub async fn identity(&self, id: u64) -> Result<CharacterIdentity, String> {
+        if let Some(identity) = self.cache.identity(id) {
+            return Ok(identity);
+        }
+        let data = self.player_data(id, false).await?;
+        let identity = CharacterIdentity::from_character(&data.character)
+            .ok_or("Identificador local SC2 inválido")?;
+        self.cache.remember_character(&data.character);
+        Ok(identity)
     }
 
     async fn get<T: DeserializeOwned>(
@@ -62,6 +77,14 @@ impl Sc2Provider {
         path: &str,
         params: &[(&str, String)],
     ) -> Result<T, String> {
+        if self
+            .cooldown
+            .lock()
+            .await
+            .is_some_and(|until| until > Instant::now())
+        {
+            return Err("SC2 Pulse ocupado; tente novamente em instantes.".into());
+        }
         let response = self
             .remote
             .get(format!("{API}{path}"))
@@ -69,6 +92,20 @@ impl Sc2Provider {
             .send()
             .await
             .map_err(|_| "Não foi possível conectar ao SC2 Pulse")?;
+        if response.status() == StatusCode::TOO_MANY_REQUESTS {
+            let delay = retry_delay(
+                response
+                    .headers()
+                    .get(reqwest::header::RETRY_AFTER)
+                    .and_then(|value| value.to_str().ok()),
+            );
+            let now = Instant::now();
+            let until = now
+                .checked_add(delay)
+                .unwrap_or(now + Duration::from_secs(24 * 60 * 60));
+            let mut cooldown = self.cooldown.lock().await;
+            *cooldown = Some(cooldown.map_or(until, |current| current.max(until)));
+        }
         let response = response.error_for_status().map_err(|error| {
             format!(
                 "SC2 Pulse: erro HTTP {}",
@@ -103,7 +140,15 @@ impl Sc2Provider {
             ProfileInput::Pulse(id) => vec![("characterId", id.to_string())],
             ProfileInput::BattleNet(handle) => vec![("toonHandle", handle.clone())],
         };
-        let mut result: Vec<CharacterResult> = self.get("/characters", &params).await?;
+        let mut result: Vec<CharacterResult> = match self.get("/characters", &params).await {
+            Ok(result) => result,
+            Err(error) => {
+                return match target {
+                    ProfileInput::Pulse(id) => self.cache.profile(id).ok_or(error),
+                    ProfileInput::BattleNet(_) => Err(error),
+                }
+            }
+        };
         if result.len() != 1 {
             return Err("Perfil SC2 não encontrado ou ambíguo".into());
         }
@@ -123,6 +168,10 @@ impl Sc2Provider {
         if !valid || character.id == 0 {
             return Err("A fonte retornou um perfil diferente do solicitado".into());
         }
+        if CharacterIdentity::from_character(&character).is_none() {
+            return Err("Identificador local SC2 inválido".into());
+        }
+        self.cache.remember_character(&character);
         Ok(Profile {
             profile_id: character.id,
             name: character.profile_name(),
@@ -130,13 +179,12 @@ impl Sc2Provider {
     }
 
     pub async fn player_data(&self, id: u64, refresh: bool) -> Result<PlayerData, String> {
-        if !refresh {
-            if let Some((time, value)) = self.cache.lock().await.get(&id) {
-                if time.elapsed() < Duration::from_secs(60) {
-                    return Ok(value.clone());
-                }
-            }
-        }
+        self.cache
+            .load(id, refresh, self.fetch_player_data(id))
+            .await
+    }
+
+    async fn fetch_player_data(&self, id: u64) -> Result<PlayerData, String> {
         let params = [("characterId", id.to_string())];
         let team_params = [
             ("characterId", id.to_string()),
@@ -151,16 +199,15 @@ impl Sc2Provider {
             return Err("A fonte retornou um perfil diferente do solicitado".into());
         }
         let character = characters.remove(0).members.character;
-        let data = PlayerData {
+        if CharacterIdentity::from_character(&character).is_none() {
+            return Err("Identificador local SC2 inválido".into());
+        }
+        Ok(PlayerData {
             teams: latest_teams(teams, &character),
             character,
-        };
-        let mut cache = self.cache.lock().await;
-        if cache.len() >= 32 {
-            cache.clear();
-        }
-        cache.insert(id, (Instant::now(), data.clone()));
-        Ok(data)
+            fetched_at: Utc::now(),
+            stale: false,
+        })
     }
 
     pub async fn opponent(&self, name: &str, region: &str) -> Option<PlayerData> {
@@ -242,11 +289,27 @@ impl Sc2Provider {
     }
 
     pub async fn profile_overview(&self, id: u64) -> Result<ProfileOverview, String> {
-        let (data, matches) = tokio::try_join!(self.player_data(id, true), self.matches(id))?;
+        let (data, matches) = tokio::join!(self.player_data(id, true), self.matches(id));
+        let data = data?;
+        let mut warnings = Vec::new();
+        let matches = matches.unwrap_or_else(|_| {
+            warnings.push("Histórico indisponível.".into());
+            vec![]
+        });
         let mut boards = Vec::new();
-        for team in &data.teams {
+        let histories =
+            futures_util::future::join_all(data.teams.iter().map(|team| self.history(team))).await;
+        for (team, history) in data.teams.iter().zip(histories) {
             let Some(race) = team.race(id) else { continue };
-            let history = self.history(team).await?;
+            let history = history.unwrap_or_else(|_| {
+                if !warnings
+                    .iter()
+                    .any(|warning| warning == "Gráfico indisponível.")
+                {
+                    warnings.push("Gráfico indisponível.".into());
+                }
+                vec![]
+            });
             boards.push(ProfileLeaderboard {
                 leaderboard_id: queue(race),
                 rating: team.rating,
@@ -280,6 +343,11 @@ impl Sc2Provider {
             })
             .collect();
         Ok(ProfileOverview {
+            stats_cache: Some(crate::model::StatsCache {
+                fetched_at: data.fetched_at.to_rfc3339(),
+                stale: data.stale,
+            }),
+            warnings,
             profile_id: id,
             name: data.character.profile_name(),
             leaderboards: boards,
@@ -287,6 +355,19 @@ impl Sc2Provider {
             fetched_at: Utc::now().to_rfc3339(),
         })
     }
+}
+
+fn retry_delay(value: Option<&str>) -> Duration {
+    let seconds = value
+        .and_then(|value| {
+            value.parse::<u64>().ok().or_else(|| {
+                DateTime::parse_from_rfc2822(value)
+                    .ok()
+                    .map(|date| date.signed_duration_since(Utc::now()).num_seconds().max(1) as u64)
+            })
+        })
+        .unwrap_or(30);
+    Duration::from_secs(seconds.max(1))
 }
 
 async fn bounded_json<T: DeserializeOwned>(
@@ -426,7 +507,7 @@ pub fn parse_profile(input: &str) -> Result<ProfileInput, String> {
         _ => Err(invalid()),
     }
 }
-fn region_id(region: &str) -> Option<u32> {
+pub(super) fn region_id(region: &str) -> Option<u32> {
     match region {
         "US" => Some(1),
         "EU" => Some(2),
@@ -440,6 +521,85 @@ fn region_id(region: &str) -> Option<u32> {
 mod tests {
     use super::*;
     use serde_json::json;
+    fn cached_player() -> PlayerData {
+        let character =
+            json!({"id":42,"name":"Nova#123","region":"US","realm":1,"battlenetId":900});
+        PlayerData {
+            character: serde_json::from_value(character.clone()).unwrap(),
+            teams: serde_json::from_value(json!([{
+                "rating":4200,"wins":10,"losses":5,"ties":1,"season":68,
+                "region":"US","queueType":201,"legacyUid":"test",
+                "members":[{"character":character,"raceGames":{"TERRAN":16}}]
+            }]))
+            .unwrap(),
+            fetched_at: Utc::now() - chrono::Duration::minutes(2),
+            stale: false,
+        }
+    }
+
+    #[tokio::test]
+    async fn a_rate_limited_provider_reuses_valid_statistics_without_retrying_the_network() {
+        let provider = Sc2Provider::new().unwrap();
+        provider.cache.save(&cached_player());
+        *provider.cooldown.lock().await = Some(Instant::now() + Duration::from_secs(120));
+        let cached = provider.player_data(42, false).await.unwrap();
+        assert!(cached.stale);
+        assert_eq!(cached.teams[0].rating, Some(4200));
+        assert!(provider.matches(42).await.is_err());
+        assert!(provider.player_data(42, true).await.unwrap().stale);
+        assert!(provider.player_data(99, false).await.is_err());
+    }
+
+    #[tokio::test]
+    async fn persisted_identity_survives_expired_statistics_and_offline_restart() {
+        let directory = std::env::temp_dir().join(format!(
+            "matchdeck-pulse-{}-{}",
+            std::process::id(),
+            Utc::now().timestamp_nanos_opt().unwrap()
+        ));
+        let provider = Sc2Provider::new()
+            .unwrap()
+            .with_cache_directory(directory.clone());
+        let mut data = cached_player();
+        provider.cache.remember_character(&data.character);
+        provider.cache.save(&data);
+        let reopened = Sc2Provider::new()
+            .unwrap()
+            .with_cache_directory(directory.clone());
+        *reopened.cooldown.lock().await = Some(Instant::now() + Duration::from_secs(120));
+        assert_eq!(reopened.identity(42).await.unwrap().handle(), "1-S2-1-900");
+        assert_eq!(reopened.resolve_profile("42").await.unwrap().name, "Nova");
+        assert!(reopened.resolve_profile("99").await.is_err());
+        let fallback = reopened.player_data(42, false).await.unwrap();
+        assert!(fallback.stale);
+        assert_eq!(fallback.fetched_at, data.fetched_at);
+        let overview = reopened.profile_overview(42).await.unwrap();
+        assert_eq!(overview.leaderboards[0].rating, Some(4200));
+        assert!(overview.stats_cache.unwrap().stale);
+        assert!(overview
+            .warnings
+            .iter()
+            .any(|warning| warning == "Histórico indisponível."));
+        data.fetched_at -= chrono::Duration::days(2);
+        provider.cache.save(&data);
+        let expired = Sc2Provider::new()
+            .unwrap()
+            .with_cache_directory(directory.clone());
+        *expired.cooldown.lock().await = Some(Instant::now() + Duration::from_secs(120));
+        assert_eq!(expired.identity(42).await.unwrap().handle(), "1-S2-1-900");
+        assert!(expired.player_data(42, false).await.is_err());
+        std::fs::remove_file(directory.join("pulse-cache.json")).unwrap();
+        std::fs::remove_dir(directory).unwrap();
+    }
+
+    #[test]
+    fn retry_after_accepts_numeric_and_date_formats_without_shortening_the_server_delay() {
+        assert_eq!(retry_delay(Some("600")), Duration::from_secs(600));
+        assert_eq!(retry_delay(Some("invalid")), Duration::from_secs(30));
+        let date = (Utc::now() + chrono::Duration::minutes(10)).to_rfc2822();
+        assert!(retry_delay(Some(&date)) > Duration::from_secs(590));
+    }
+
     #[test]
     fn parses_pulse_and_official_profile_links_without_fetching_user_urls() {
         assert_eq!(parse_profile("42").unwrap(), ProfileInput::Pulse(42));

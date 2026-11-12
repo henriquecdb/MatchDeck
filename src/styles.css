@@ -186,6 +186,14 @@ input[type=number] { width: 110px; }
 .sc2-session-score dd { margin: 4px 0 0; font-size: 24px; font-variant-numeric: tabular-nums; }
 .sc2-session-score > div:first-child dd { color: #68d9a4; }
 .sc2-session-score > div:nth-child(2) dd { color: #ed9399; }
+.sc2-matchups { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; list-style: none; padding: 0; margin: 0 0 16px; }
+.sc2-matchups li { display: flex; align-items: center; gap: 8px; padding: 10px; border: 1px solid #304050; border-radius: 6px; }
+.sc2-matchups strong, .sc2-matchups span { display: block; font-size: 12px; }
+.sc2-matchups span { color: #b1c6d5; margin-top: 3px; font-variant-numeric: tabular-nums; }
+.sc2-matchups small { margin-left: auto; color: #b1c6d5; font-variant-numeric: tabular-nums; }
+.profile-cache { color: #b1c6d5; font-size: 12px; }
+.sc2-cache { white-space: nowrap; font-size: 9px; color: #dfc783; }
+.sc2-mmr .sc2-cache { color: #dfc783; font-size: 9px; }
 .profile-history { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .history-match { display: grid; grid-template-columns: 82px minmax(0, 1fr) minmax(80px, 120px) 40px; align-items: center; gap: 12px; padding: 14px; border: 1px solid #304050; border-left: 3px solid #8191a4; border-radius: 7px; background: #192430; }
 .history-match.is-win { border-left-color: #64d4a0; }

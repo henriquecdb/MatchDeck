@@ -57,7 +57,7 @@ pub(crate) fn read_game<T: serde::de::DeserializeOwned>(
     read_game_at(&app.path().app_config_dir().ok()?, name, game_id)
 }
 
-fn write_atomic<T: serde::Serialize>(
+pub(crate) fn write_atomic<T: serde::Serialize>(
     directory: &std::path::Path,
     name: &str,
     value: &T,

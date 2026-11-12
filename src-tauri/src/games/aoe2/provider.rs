@@ -183,6 +183,7 @@ impl Aoe2Provider {
                     let units = catalog::unique_units(player.civ.as_deref().unwrap_or(""));
                     (
                         Player {
+                            stats_cache: None,
                             identity_hint: None,
                             rank: None,
                             rank_level: None,

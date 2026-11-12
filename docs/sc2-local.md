@@ -24,11 +24,32 @@ Um perfil de outra pessoa pode ser usado para conferir estatísticas e demonstra
 
 Abra o StarCraft II, ative a detecção e inicie um 1v1 entre duas pessoas. Use janela sem bordas. O aplicativo consulta somente http://127.0.0.1:6119/game, sem proxy ou redirecionamentos, a cada dois segundos.
 
-O cliente fornece nomes, raças, tempo de jogo e resultados. O app captura as estatísticas externas no início e mantém esses dados durante a partida. O fim é confirmado pelo resultado local ou pelo retorno ao menu em duas consultas consecutivas. Falhas de conexão preservam a captura atual; uma falha não vira resultado de derrota.
+O cliente fornece nomes, raças, tempo de jogo e resultados. O overlay aparece com os dados locais e completa as estatísticas externas em segundo plano uma única vez. O fim é confirmado pelo resultado local ou pelo retorno ao menu em duas consultas consecutivas. Falhas de conexão preservam a captura atual; uma falha não vira resultado de derrota.
 
 Partidas consecutivas são reconhecidas pela mudança de participantes ou pelo reinício do relógio. Alterações de raça revelada não criam uma nova captura. Trocar de jogo e encerrar a detecção usam os mesmos controles dos demais jogos.
 
 ## Dados e limites
+
+### Dados locais e cache
+
+O overlay exibe nomes e raças assim que identifica a partida. O MMR é preenchido em segundo plano,
+com uma única busca por partida. Uma resposta atrasada não altera uma partida já encerrada.
+
+O vínculo validado entre o ID do Pulse e o personagem Battle.net fica salvo localmente.
+Após a primeira consulta bem-sucedida, reabrir o app permite ler os replays desse perfil sem
+consultar o Pulse novamente.
+Um ID já validado também pode ser reativado durante uma falha do Pulse; o nome configurado
+no jogo continua sendo usado para reconhecer seu jogador.
+
+Estatísticas são reutilizadas por um minuto. Se o Pulse falhar, a última consulta válida pode
+ser usada por até 24 horas, marcada como **Cache** com o horário da consulta. O cache guarda até
+32 perfis. Consultas simultâneas ao mesmo perfil compartilham a busca. Respostas HTTP 429
+respeitam Retry-After; falhas de perfil aguardam 15 segundos antes de outra tentativa.
+
+O painel da sessão mostra o retrospecto por raça adversária, incluindo empates e raças
+sem partidas. A contagem usa os replays locais.
+
+### Cobertura e histórico
 
 - A API local não expõe o mapa, a equipe, a fila ou os IDs globais dos participantes. Portanto, não distingue com segurança ranqueadas, rápidas e personalizadas. Esta iteração se destina a 1v1 padrão; outros modos com apenas duas pessoas precisam de validação.
 - Assistir a um replay não inicia um overlay ao vivo. Para o histórico local, são aceitos replays encerrados 1v1 entre humanos; IA, observadores e equipes ficam fora desta iteração.

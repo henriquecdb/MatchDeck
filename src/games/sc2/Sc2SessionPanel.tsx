@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { OverlayRuntime } from '../../application/runtime';
-import { sessionRecord, type Sc2Session, type Sc2SessionAction } from '../../domain/sc2-session';
+import { sessionRaceRecords, sessionRecord, type Sc2Session, type Sc2SessionAction } from '../../domain/sc2-session';
 import { useI18n } from '../../i18n/LanguageProvider';
 import { raceArtwork } from './catalog';
 import { CivilizationEmblem } from '../../features/overlay/CivilizationEmblem';
@@ -84,9 +84,22 @@ export function Sc2SessionPanel({ runtime, profileId, active, matchActive }: {
         <div><dt>{t('Empates')}</dt><dd>{draws}</dd></div>
         <div><dt>{t('Aproveitamento')}</dt><dd>{winRate == null ? '—' : winRate.toLocaleString(language, { maximumFractionDigits: 1 }) + '%'}</dd></div>
       </dl>
+      <section aria-label={t('Por raça adversária')}>
+        <h4>{t('Por raça adversária')}</h4>
+        <ul className="sc2-matchups">{sessionRaceRecords(session).map(record => {
+          const artwork = raceArtwork({ civilization: record.race }, gameLanguage);
+          return <li key={record.race}>
+            <CivilizationEmblem image={artwork.emblem} civilization={artwork.name} />
+            <div><strong>{artwork.name}</strong>
+              <span>{record.wins}{t('V')} · {record.losses}{t('D')}{record.draws > 0 && <> · {record.draws}{t('E')}</>}</span>
+            </div>
+            <small title={t('Aproveitamento')}>{record.winRate == null ? '—' : record.winRate.toLocaleString(language, { maximumFractionDigits: 0 }) + '%'}</small>
+          </li>;
+        })}</ul>
+      </section>
       {matches.length > 0 ? <>
         <h4>{t('Últimos resultados')}</h4>
-        <ol className="profile-history">{matches.slice(0, 10).map(match => {
+        <ol className="profile-history" aria-label={t('Últimos resultados')}>{matches.slice(0, 10).map(match => {
           const artwork = raceArtwork({ civilization: match.opponentRace }, gameLanguage);
           return <li key={match.id} className={`history-match ${match.draw ? 'is-draw' : match.won ? 'is-win' : 'is-loss'}`}>
             <span className="history-result">{t(match.draw ? 'Empate' : match.won ? 'Vitória' : 'Derrota')}</span>

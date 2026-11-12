@@ -1,3 +1,4 @@
+mod cache;
 pub mod client;
 pub mod provider;
 pub mod replay;

@@ -109,6 +109,7 @@ impl RemoteGame {
             .map(|(team, player)| {
                 let stats = player.modes.get(queue);
                 Player {
+                    stats_cache: None,
                     identity_hint: None,
                     id: player.profile_id.to_string(),
                     name: player.name.clone(),

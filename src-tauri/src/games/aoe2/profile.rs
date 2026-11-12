@@ -75,6 +75,8 @@ pub fn overview(mut profile: RemoteProfile, feed: MatchFeed) -> ProfileOverview 
         })
         .collect();
     ProfileOverview {
+        stats_cache: None,
+        warnings: vec![],
         profile_id: profile.profile_id,
         name: profile.name,
         leaderboards: profile

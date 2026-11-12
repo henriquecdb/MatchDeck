@@ -1,5 +1,5 @@
 use super::{
-    client::{ClientPlayer, Session},
+    client::{ClientGame, ClientPlayer, Session},
     provider::{participant_race, PlayerData, Sc2Provider},
     response::{outcome, race, RemoteMatch},
 };
@@ -13,6 +13,7 @@ use tauri::{Emitter, Manager};
 
 pub(super) fn base_player(id: String, name: String, race: &str, team: usize) -> Player {
     Player {
+        stats_cache: None,
         identity_hint: None,
         id,
         name,
@@ -52,6 +53,10 @@ fn local_player(player: &ClientPlayer, data: Option<&PlayerData>, team: usize) -
             .iter()
             .find(|stats| stats.race(data.character.id) == Some(race))
         {
+            mapped.stats_cache = Some(crate::model::StatsCache {
+                fetched_at: data.fetched_at.to_rfc3339(),
+                stale: data.stale,
+            });
             mapped.rating = stats.rating;
             mapped.mmr = stats.rating;
             mapped.wins = stats.wins;
@@ -259,12 +264,39 @@ pub async fn cycle(
     if current.is_some() {
         publish(app, config, None, true, "Nova partida SC2 encontrada.")?;
     }
-    crate::detection::service::update(
+    let id = format!("sc2-local-{}", chrono::Utc::now().timestamp_millis());
+    let mut incoming = live_snapshot(&game, own_index, profile.profile_id, id.clone(), None, None);
+    incoming.warnings.truncate(1);
+    publish(
         app,
         config,
-        "loading",
-        "Carregando estatísticas do SC2 Pulse…".into(),
+        Some(incoming),
+        false,
+        "Partida em andamento · dados locais",
     )?;
+    let app = app.clone();
+    let provider = provider.clone();
+    let config = config.clone();
+    tauri::async_runtime::spawn(async move {
+        if let Err(error) = enrich(&app, &provider, &config, game, own_index, id).await {
+            eprintln!("Não foi possível completar as estatísticas SC2: {error}");
+        }
+    });
+    Ok(())
+}
+
+async fn enrich(
+    app: &tauri::AppHandle,
+    provider: &Sc2Provider,
+    config: &DetectionConfig,
+    game: ClientGame,
+    own_index: usize,
+    id: String,
+) -> Result<(), String> {
+    let profile = config
+        .profile
+        .as_ref()
+        .ok_or("Vincule um perfil SC2 Pulse")?;
     let data = provider
         .player_data(profile.profile_id, false)
         .await
@@ -273,9 +305,18 @@ pub async fn cycle(
             !data.character.has_public_name() || data.character.display_name() == profile.name
         });
     let opponent_index = 1 - own_index;
-    let opponent = if let Some(data) = &data {
+    let region = if let Some(data) = &data {
+        Some(data.character.region.clone())
+    } else {
         provider
-            .opponent(&game.players[opponent_index].name, &data.character.region)
+            .identity(profile.profile_id)
+            .await
+            .ok()
+            .map(|identity| identity.region)
+    };
+    let opponent = if let Some(region) = region {
+        provider
+            .opponent(&game.players[opponent_index].name, &region)
             .await
     } else {
         None
@@ -289,7 +330,59 @@ pub async fn cycle(
     {
         return Ok(());
     }
-    session.observe(&confirmed, profile.profile_id);
+    let incoming = live_snapshot(
+        &game,
+        own_index,
+        profile.profile_id,
+        id,
+        data.as_ref(),
+        opponent.as_ref(),
+    );
+    let snapshot = {
+        let shared = app.state::<SharedState>();
+        let mut state = shared.lock().map_err(|error| error.to_string())?;
+        if !apply_enrichment(&mut state, config, incoming) {
+            return Ok(());
+        }
+        if let Some(current) = &state.current_match {
+            if let Err(error) = storage::save_last_match(app, current) {
+                eprintln!("{error}");
+            }
+        }
+        state.clone()
+    };
+    overlay::synchronize(app, &snapshot, false)
+}
+
+fn apply_enrichment(
+    state: &mut crate::model::AppState,
+    config: &DetectionConfig,
+    incoming: MatchSnapshot,
+) -> bool {
+    if state.detection.config != *config {
+        return false;
+    }
+    let Some(current) = state.current_match.as_mut().filter(|current| {
+        current.id == incoming.id
+            && current.finished_at.is_none()
+            && matches!(current.source, MatchSource::Live)
+    }) else {
+        return false;
+    };
+    current.players = incoming.players;
+    current.warnings = incoming.warnings;
+    state.last_synced = Some(current.clone());
+    true
+}
+
+fn live_snapshot(
+    game: &ClientGame,
+    own_index: usize,
+    profile_id: u64,
+    id: String,
+    data: Option<&PlayerData>,
+    opponent: Option<&PlayerData>,
+) -> MatchSnapshot {
     let players = game
         .players
         .iter()
@@ -297,27 +390,18 @@ pub async fn cycle(
         .map(|(index, player)| {
             let mut mapped = local_player(
                 player,
-                if index == own_index {
-                    data.as_ref()
-                } else {
-                    opponent.as_ref()
-                },
+                if index == own_index { data } else { opponent },
                 index,
             );
             if index == own_index {
-                mapped.id = profile.profile_id.to_string();
+                mapped.id = profile_id.to_string();
             } else if opponent.is_some() {
                 mapped.identity_hint = Some("name-region".into());
             }
             mapped
         })
         .collect();
-    let mut incoming = snapshot(
-        players,
-        profile.profile_id,
-        format!("sc2-local-{}", chrono::Utc::now().timestamp_millis()),
-        "Mapa indisponível".into(),
-    );
+    let mut incoming = snapshot(players, profile_id, id, "Mapa indisponível".into());
     if opponent.is_none() {
         incoming.warnings.push(
             "Adversário sem identificação única no SC2 Pulse; estatísticas indisponíveis.".into(),
@@ -328,13 +412,7 @@ pub async fn cycle(
             .warnings
             .push("Estatísticas do SC2 Pulse indisponíveis; exibindo os dados locais.".into());
     }
-    publish(
-        app,
-        config,
-        Some(incoming),
-        false,
-        "Partida em andamento · dados do início",
-    )
+    incoming
 }
 
 fn publish(
@@ -397,6 +475,42 @@ fn publish(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn late_statistics_never_revive_a_game_or_change_its_visibility() {
+        let game: ClientGame = serde_json::from_value(serde_json::json!({
+            "isReplay": false, "displayTime": 12,
+            "players": [
+                {"id":1,"name":"Nova","race":"Terran","type":"user","result":"Undecided"},
+                {"id":2,"name":"Orion","race":"Zerg","type":"user","result":"Undecided"}
+            ]
+        }))
+        .unwrap();
+        let initial = live_snapshot(&game, 0, 42, "first".into(), None, None);
+        assert_eq!(initial.players[0].id, "42");
+        assert!(initial.players.iter().all(|player| player.mmr.is_none()));
+        let mut state = crate::model::AppState::default();
+        state.detection.config.game_id = "sc2".into();
+        let config = state.detection.config.clone();
+        state.current_match = Some(initial.clone());
+        state.hidden_match_id = Some(initial.id.clone());
+        let start = initial.synced_at.clone();
+        let mut enriched = initial.clone();
+        enriched.players[0].mmr = Some(4200);
+        assert!(apply_enrichment(&mut state, &config, enriched));
+        assert_eq!(
+            state.current_match.as_ref().unwrap().players[0].mmr,
+            Some(4200)
+        );
+        assert_eq!(state.hidden_match_id.as_deref(), Some("first"));
+        assert_eq!(state.current_match.as_ref().unwrap().synced_at, start);
+        state.current_match.as_mut().unwrap().id = "next".into();
+        assert!(!apply_enrichment(&mut state, &config, initial.clone()));
+        state.current_match = None;
+        assert!(!apply_enrichment(&mut state, &config, initial.clone()));
+        state.current_match = Some(initial.clone());
+        state.detection.config.game_id = "aoe4".into();
+        assert!(!apply_enrichment(&mut state, &config, initial));
+    }
     #[test]
     fn unknown_players_have_no_invented_identity_stats_or_rating_projection() {
         let local = ClientPlayer {

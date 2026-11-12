@@ -1,3 +1,5 @@
+import type { StatsCache } from './match';
+
 export interface ProfileLeaderboard {
   leaderboardId: string;
   rating: number | null;
@@ -26,6 +28,8 @@ export interface RecentMatch {
 }
 
 export interface ProfileOverview {
+  statsCache?: StatsCache | null;
+  warnings?: string[];
   profileId: number;
   name: string;
   leaderboards: ProfileLeaderboard[];
