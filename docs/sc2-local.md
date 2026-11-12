@@ -111,7 +111,7 @@ O histórico de confrontos é armazenado por perfil, independentemente da sessã
 no app ou no resumo pós-partida. Sua apresentação em overlay fica para uma etapa futura.
 A identidade vem do personagem no replay (região, reino e ID), sem juntar homônimos.
 A primeira leitura considera os 32 arquivos mais recentes; novos resultados são acumulados.
-Isso não representa todo o histórico da conta. **Por mapa** mostra apenas a sessão selecionada,
+Isso não representa todo o histórico da conta. **Consultar mapa** permite selecionar um mapa da sessão e ver seus resultados sob demanda,
 com tamanho da amostra, vitórias, derrotas, empates e aproveitamento.
 
 **MMR da sessão** consulta o SC2 Pulse ao iniciar a sessão e, após um resultado recente,

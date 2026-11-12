@@ -1,6 +1,7 @@
+import { Sc2MapStats } from './Sc2MapStats';
 import { useEffect, useRef, useState } from 'react';
 import type { OverlayRuntime } from '../../application/runtime';
-import { sessionMapRecords, sessionRaceRecords, sessionRecord, type Sc2Session, type Sc2SessionAction } from '../../domain/sc2-session';
+import { sessionRaceRecords, sessionRecord, type Sc2Session, type Sc2SessionAction } from '../../domain/sc2-session';
 import { useI18n } from '../../i18n/LanguageProvider';
 import { raceArtwork } from './catalog';
 import { CivilizationEmblem } from '../../features/overlay/CivilizationEmblem';
@@ -105,9 +106,7 @@ export function Sc2SessionPanel({ runtime, profileId, active, matchActive }: {
           <small>SC2 Pulse · {t('Consulta')} {new Date(row.queriedAt).toLocaleString(language, { dateStyle: 'short', timeStyle: 'short' })}</small>
         </li>)}</ul>
       </section>}
-      {matches.length > 0 && <section aria-label={t('Por mapa')}><h4>{t('Por mapa')}</h4><ul className="sc2-opponents">
-        {sessionMapRecords(session).map(row => <li key={row.map}><strong>{row.map}</strong><span>{row.wins}{t('V')} · {row.losses}{t('D')}{row.draws > 0 && <> · {row.draws}{t('E')}</>} · {row.winRate == null ? '—' : row.winRate.toLocaleString(language, { maximumFractionDigits: 0 }) + '%'}</span><small>{row.total} {t('partidas')}</small></li>)}
-      </ul></section>}
+      {matches.length > 0 && <Sc2MapStats key={session.profileId + ':' + session.startedAt} session={session} />}
       {matches.length > 0 ? <>
         <h4>{t('Últimos resultados')}</h4>
         <ol className="profile-history" aria-label={t('Últimos resultados')}>{matches.slice(0, 10).map(match => {
