@@ -6,7 +6,22 @@ use std::sync::Mutex;
 use tauri::{Emitter, Manager, State};
 
 #[derive(Default)]
-pub struct SessionLock(pub Mutex<()>);
+pub struct SessionLock(
+    pub Mutex<()>,
+    Mutex<std::collections::HashSet<(u64, DateTime<Utc>)>>,
+);
+
+struct ActiveQuery {
+    app: tauri::AppHandle,
+    key: (u64, DateTime<Utc>),
+}
+impl Drop for ActiveQuery {
+    fn drop(&mut self) {
+        if let Ok(mut queries) = self.app.state::<SessionLock>().1.lock() {
+            queries.remove(&self.key);
+        }
+    }
+}
 
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -170,8 +185,19 @@ pub fn sc2_session(
     let lock = app.state::<SessionLock>();
     let _guard = lock.0.lock().map_err(|e| e.to_string())?;
     let name = filename(profile_id);
-    let current = storage::read_game::<Session>(&app, &name, "sc2")
+    let mut current = storage::read_game::<Session>(&app, &name, "sc2")
         .filter(|session| session.profile_id == profile_id);
+    if let Some(session) = &mut current {
+        if session.mmr_status.as_deref() == Some("loading")
+            && !lock
+                .1
+                .lock()
+                .map_err(|e| e.to_string())?
+                .contains(&(profile_id, session.started_at))
+        {
+            session.mmr_status = Some("interrupted".into());
+        }
+    }
     let next = match action {
         SessionAction::Read => return Ok(current),
         SessionAction::Refresh => {
@@ -205,6 +231,9 @@ pub fn sc2_session(
                 return Ok(Some(session));
             }
             session.ended_at = Some(Utc::now());
+            if session.mmr_status.as_deref() == Some("loading") {
+                session.mmr_status = Some("interrupted".into());
+            }
             session
         }
     };
@@ -341,7 +370,20 @@ pub fn sample_mmr(
     started_at: DateTime<Utc>,
     baseline: bool,
 ) {
+    {
+        let lock = app.state::<SessionLock>();
+        let Ok(mut queries) = lock.1.lock() else {
+            return;
+        };
+        if !queries.insert((profile_id, started_at)) {
+            return;
+        }
+    }
     tauri::async_runtime::spawn(async move {
+        let _query = ActiveQuery {
+            app: app.clone(),
+            key: (profile_id, started_at),
+        };
         {
             let lock = app.state::<SessionLock>();
             if let Ok(_guard) = lock.0.lock() {

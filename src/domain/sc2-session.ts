@@ -16,7 +16,7 @@ export interface Sc2Session {
   startedAt: string;
   endedAt: string | null;
   matches: Sc2SessionMatch[];
-  mmrStatus?: 'loading' | 'error' | 'stale' | 'unavailable' | 'ready' | null;
+  mmrStatus?: 'loading' | 'error' | 'stale' | 'interrupted' | 'unavailable' | 'ready' | null;
   mmr?: Array<{ race: string; season: number; initial: number | null; latest: number; queriedAt: string }>;
 }
 

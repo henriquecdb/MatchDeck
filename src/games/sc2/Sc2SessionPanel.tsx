@@ -99,7 +99,7 @@ export function Sc2SessionPanel({ runtime, profileId, active, matchActive }: {
         })}</ul>
       </section>
       <div className="profile-heading">
-        <p role="status">{t(session.mmrStatus === 'loading' ? 'Consultando MMR…' : session.mmrStatus === 'error' ? 'Falha na consulta do MMR.' : session.mmrStatus === 'stale' ? 'Fonte indisponível. Última consulta preservada.' : session.mmrStatus === 'unavailable' ? 'Sem MMR ranqueado disponível.' : (!session.mmr?.length || session.mmr.some(row => row.initial == null)) ? 'Sem registro inicial de MMR.' : 'MMR atualizado.')}</p>
+        <p role="status">{t(session.mmrStatus === 'loading' ? 'Consultando MMR…' : session.mmrStatus === 'interrupted' ? 'Consulta de MMR interrompida.' : session.mmrStatus === 'error' ? 'Falha na consulta do MMR.' : session.mmrStatus === 'stale' ? 'Fonte indisponível. Tente novamente.' : session.mmrStatus === 'unavailable' ? 'Sem MMR ranqueado disponível.' : (!session.mmr?.length || session.mmr.some(row => row.initial == null)) ? 'Sem registro inicial de MMR.' : 'MMR atualizado.')}</p>
         {running && <button disabled={busy || matchActive} onClick={() => void changeSession('refresh')}>{t(session.mmrStatus === 'error' || session.mmrStatus === 'stale' ? 'Tentar novamente' : 'Atualizar MMR')}</button>}
       </div>
       {session.mmr && session.mmr.length > 0 && <section aria-label={t('MMR da sessão')}><h4>{t('MMR da sessão')}</h4>
