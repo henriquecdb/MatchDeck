@@ -28,7 +28,7 @@ export function OverlaySettingsPanel({ runtime, gameId = 'aoe2-de', settings, ma
   return <fieldset>
     <legend>{t('Aparência e posição')}</legend>
     <OverlayLayoutProfiles key={gameId} runtime={runtime} gameId={gameId} settings={settings} />
-    {gameId === 'sc2' ? <p>{t('SC2 · compacto 1v1')}</p> : gameId === 'aoe4' ? <p>{t('Age 4 · faixa horizontal 1v1')}</p> : <><label>{t('Modo de exibição')} <select value={activeLayout} onChange={event => onChange({ layout: event.target.value as OverlaySettings['layout'] })}>
+    {gameId === 'sc2' ? <p>{t('SC2 · compacto 1v1')}</p> : gameId === 'aoe4' ? <label>{t('Modo de exibição')} <select value={settings.layout === 'stacked' ? 'stacked' : 'compact'} onChange={event => onChange({ layout: event.target.value as OverlaySettings['layout'] })}><option value="compact">{t('Compacto horizontal')}</option><option value="stacked">{t('Compacto vertical')}</option></select></label> : <><label>{t('Modo de exibição')} <select value={activeLayout} onChange={event => onChange({ layout: event.target.value as OverlaySettings['layout'] })}>
       <option value="detailed" disabled={!!match && !isDuel(match)}>{t('Completo · apenas 1v1')}</option><option value="compact">{t('Compacto horizontal')}</option><option value="stacked">{t('Compacto vertical')}</option>
     </select></label>
     <details className="help-details"><summary>{t('Sobre os layouts')}</summary><p>{t('Completo só em 1v1. Nos demais formatos, usa o vertical e retorna no próximo duelo.')}</p>

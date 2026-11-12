@@ -18,7 +18,7 @@ pub fn overlay_size(snapshot: &MatchSnapshot, layout: &OverlayLayout) -> (f64, f
         return (400.0, 106.0);
     }
     if snapshot.game_id == "aoe4" {
-        return (900.0, 64.0);
+        return if matches!(layout, OverlayLayout::Stacked) { (360.0, 156.0) } else { (900.0, 64.0) };
     }
     let duel = snapshot.players.len() == 2
         && !snapshot
