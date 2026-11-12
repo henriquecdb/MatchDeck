@@ -3,12 +3,13 @@ import { listen } from '@tauri-apps/api/event';
 import type { AppState, DiagnosticReport, DisplayMonitor, OverlayRuntime } from '../application/runtime';
 import type { AppPreferences } from '../domain/preferences';
 import type { MatchSnapshot } from '../domain/match';
-import type { OverlaySettings } from '../domain/settings';
+import type { LayoutProfile, LayoutProfileAction, LayoutProfileInput, OverlaySettings } from '../domain/settings';
 import type { PlayerProfile } from '../domain/detection';
 import type { ProfileOverview } from '../domain/profile';
 import type { Sc2History, Sc2Session, Sc2SessionAction } from '../domain/sc2-session';
 
 export class TauriRuntime implements OverlayRuntime {
+  layoutProfiles(gameId: string, action: LayoutProfileAction, input: LayoutProfileInput = {}) { return invoke<LayoutProfile[]>('layout_profiles', { gameId, action, id: input.id ?? null, name: input.name ?? null, settings: input.settings ?? null }); }
   read() { return invoke<AppState>('read_state'); }
   selectGame(gameId: string) { return invoke<void>('select_game', { gameId }); }
   start(match: MatchSnapshot) { return invoke<void>('start_match', { incoming: match }); }

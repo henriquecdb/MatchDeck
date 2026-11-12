@@ -1,7 +1,7 @@
 import { hotkeyError } from '../domain/hotkeys';
 import type { AppState, OverlayRuntime } from '../application/runtime';
 import { captureMatch, type MatchSnapshot } from '../domain/match';
-import { defaultSettings, parseSettings, type OverlaySettings } from '../domain/settings';
+import { defaultSettings, parseSettings, type LayoutProfile, type LayoutProfileAction, type LayoutProfileInput, type OverlaySettings } from '../domain/settings';
 import { defaultDetection, type PlayerProfile } from '../domain/detection';
 import { defaultPreferences, parsePreferences, type AppPreferences } from '../domain/preferences';
 import { gameIntegration } from '../games/registry';
@@ -22,6 +22,28 @@ export class BrowserRuntime implements OverlayRuntime {
       this.state.settings = { ...defaultSettings };
     }
     try { const saved = localStorage.getItem('matchdeck.preferences'); this.state.preferences = saved ? parsePreferences(JSON.parse(saved)) : { ...defaultPreferences, autoUpdate: this.state.settings.autoUpdate }; } catch { this.state.preferences = { ...defaultPreferences }; }
+  }
+
+  async layoutProfiles(gameId: string, action: LayoutProfileAction, input: LayoutProfileInput = {}): Promise<LayoutProfile[]> {
+    if (gameId !== this.state.detection.config.gameId) throw new Error('O jogo foi alterado; tente novamente');
+    const key = 'matchdeck.games.' + gameId + '.layoutProfiles';
+    let profiles: LayoutProfile[] = JSON.parse(localStorage.getItem(key) ?? '[]');
+    if (action === 'save') {
+      const name = input.name?.trim() ?? '';
+      if (!name || [...name].length > 32) throw new Error('Use um nome de 1 a 32 caracteres.');
+      if (profiles.some(p => p.name.toLowerCase() === name.toLowerCase() && p.id !== input.id)) throw new Error('Já existe um perfil com esse nome.');
+      if (!input.settings) throw new Error('Configuração de layout ausente.');
+      const saved = profiles.find(p => p.id === input.id);
+      if (input.id && !saved) throw new Error('Perfil de layout não encontrado.');
+      if (!saved && profiles.length >= 12) throw new Error('Limite de 12 perfis por jogo.');
+      const profile = { id: saved?.id ?? crypto.randomUUID(), name, settings: parseSettings(input.settings) };
+      profiles = saved ? profiles.map(p => p.id === saved.id ? profile : p) : [...profiles, profile];
+    } else if (action === 'delete') {
+      if (!profiles.some(p => p.id === input.id)) throw new Error('Perfil de layout não encontrado.');
+      profiles = profiles.filter(p => p.id !== input.id);
+    }
+    if (action !== 'read') localStorage.setItem(key, JSON.stringify(profiles));
+    return structuredClone(profiles);
   }
 
   async read() { return structuredClone(this.state); }

@@ -109,7 +109,7 @@ function ControlPanelContent({ runtime, desktop, runtimeState }: { runtime: Over
       {tab.id === 'profile' && <ProfilePanel key={gameId} gameId={gameId} runtime={runtime} profile={state.detection.config.profile} desktop={desktop} visible={!!entered && activeTab === 'profile'} onLink={() => setActiveTab('match')} />}
       {tab.id === 'overlay' && <>
         <div className="section-heading"><h2>{t('Overlay')}</h2><p>{t('Aparência e posição do overlay.')}</p></div>
-        <OverlaySettingsPanel gameId={gameId} settings={settings} match={match} desktop={desktop} shortcutAvailable={state.shortcutAvailable} lockShortcut={state.preferences.hotkeys.lockOverlay} onChange={configure} monitors={monitors} onRefreshMonitors={refreshMonitors} monitorError={monitorError} />
+        <OverlaySettingsPanel runtime={runtime} gameId={gameId} settings={settings} match={match} desktop={desktop} shortcutAvailable={state.shortcutAvailable} lockShortcut={state.preferences.hotkeys.lockOverlay} onChange={configure} monitors={monitors} onRefreshMonitors={refreshMonitors} monitorError={monitorError} />
         <OverlayPreview match={preview} settings={settings} session={session} />
       </>}
       {tab.id === 'demo' && <><div className="section-heading"><h2>{t('Demonstração')}</h2><p>{t('Teste sem entrar no jogo.')}</p></div><DemoPanel key={gameId} runtime={runtime} state={state} desktop={desktop} perform={perform} /></>}

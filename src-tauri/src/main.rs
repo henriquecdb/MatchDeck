@@ -9,6 +9,7 @@ mod games;
 mod hotkeys;
 mod language;
 mod layout;
+mod layout_profiles;
 mod lifecycle;
 mod model;
 mod overlay;
@@ -150,6 +151,7 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::read_state,
+            layout_profiles::layout_profiles,
             commands::select_game,
             commands::start_match,
             commands::finish_match,

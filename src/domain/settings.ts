@@ -55,3 +55,7 @@ export function parseSettings(value: unknown): OverlaySettings {
     postGameSeconds: typeof candidate.postGameSeconds === 'number' && Number.isFinite(candidate.postGameSeconds) ? Math.round(Math.max(0, Math.min(30, candidate.postGameSeconds))) : 8,
   };
 }
+
+export interface LayoutProfile { id: string; name: string; settings: OverlaySettings; }
+export type LayoutProfileAction = 'read' | 'save' | 'delete';
+export interface LayoutProfileInput { id?: string; name?: string; settings?: OverlaySettings; }
