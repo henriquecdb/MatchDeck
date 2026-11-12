@@ -105,12 +105,13 @@ pub struct PlayerCache {
 impl PlayerCache {
     pub fn open(directory: PathBuf) -> Self {
         let path = directory.join("pulse-cache.json");
-        let mut disk: DiskCache = std::fs::metadata(&path)
+        let loaded: Option<DiskCache> = std::fs::metadata(&path)
             .ok()
             .filter(|metadata| metadata.len() <= 8 * 1024 * 1024)
             .and_then(|_| std::fs::read(path).ok())
-            .and_then(|bytes| serde_json::from_slice(&bytes).ok())
-            .unwrap_or_default();
+            .and_then(|bytes| serde_json::from_slice(&bytes).ok());
+        let was_loaded = loaded.is_some();
+        let mut disk = loaded.unwrap_or_default();
         disk.players.retain(|id, data| data.usable(*id));
         disk.identities
             .retain(|id, identity| *id > 0 && identity.valid());
@@ -140,8 +141,10 @@ impl PlayerCache {
             disk: Mutex::new(disk),
             directory: Some(directory),
         };
-        if let Ok(disk) = cache.disk.lock() {
-            cache.persist(&disk);
+        if was_loaded {
+            if let Ok(disk) = cache.disk.lock() {
+                cache.persist(&disk);
+            }
         }
         cache
     }
@@ -290,6 +293,23 @@ fn trim_players(players: &mut HashMap<u64, PlayerData>) {
 mod tests {
     use super::*;
     use std::sync::atomic::{AtomicUsize, Ordering};
+
+    #[test]
+    fn opening_an_invalid_cache_preserves_the_original_file_for_recovery() {
+        let directory = std::env::temp_dir().join(format!(
+            "matchdeck-cache-invalid-{}-{}",
+            std::process::id(),
+            Utc::now().timestamp_nanos_opt().unwrap()
+        ));
+        std::fs::create_dir_all(&directory).unwrap();
+        let path = directory.join("pulse-cache.json");
+        std::fs::write(&path, b"{incomplete").unwrap();
+        let cache = PlayerCache::open(directory.clone());
+        assert!(cache.identity(42).is_none());
+        assert_eq!(std::fs::read(&path).unwrap(), b"{incomplete");
+        std::fs::remove_file(path).unwrap();
+        std::fs::remove_dir(directory).unwrap();
+    }
 
     #[tokio::test]
     async fn concurrent_refreshes_share_one_fetch_and_errors_back_off_with_the_last_valid_data() {
