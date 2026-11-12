@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useSc2History } from '../../games/sc2/use-sc2-history';
 import { Sc2PostGameCard } from '../../games/sc2/Sc2PostGameCard';
 import { LanguageProvider, useI18n } from '../../i18n/LanguageProvider';
 import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -17,7 +16,6 @@ function OverlayContent({ runtime, state, error }: { runtime: OverlayRuntime; st
   const { t } = useI18n();
   const profileId = state.detection.config.profile?.profileId ?? null;
   const session = useSc2Session(runtime, profileId, state.detection.config.gameId === 'sc2' && state.settings.showSession);
-  const history = useSc2History(runtime, profileId, state.detection.config.gameId === 'sc2');
   const [now, setNow] = useState(Date.now());
   const expiresAt = state.postGame?.expiresAt;
   useEffect(() => {
@@ -38,5 +36,5 @@ function OverlayContent({ runtime, state, error }: { runtime: OverlayRuntime; st
       }
       await getCurrentWindow().startDragging();
     })().catch(console.error);
-  }}>{showCard ? <Sc2PostGameCard game={card.game} opponentId={card.opponentId} session={state.settings.showSession ? session : null} history={history} /> : state.match && <MatchOverlay match={state.match} layout={state.settings.layout} showProjection={state.settings.showProjection} display={state.settings} session={session} />}</div>;
+  }}>{showCard ? <Sc2PostGameCard game={card.game} session={state.settings.showSession ? session : null} /> : state.match && <MatchOverlay match={state.match} layout={state.settings.layout} showProjection={state.settings.showProjection} display={state.settings} session={session} />}</div>;
 }

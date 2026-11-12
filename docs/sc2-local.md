@@ -102,12 +102,13 @@ Teste local: abrir o SC2 no MatchDeck, conferir as partidas na aba Perfil, jogar
 ## Resumo e retrospecto
 
 Ao terminar um 1v1 acompanhado pelo MatchDeck, o replay confirma o resultado e pode exibir
-um resumo com adversário, mapa, duração real, confrontos e placar da sessão. Em Overlay,
+um resumo com adversário, mapa, duração real e placar da sessão. Em Overlay,
 **Pós-partida (s)** controla a duração (padrão: 8; 0 desativa; máximo: 30).
 O resumo respeita foco, posição, escala e ocultação manual. Replays antigos lidos ao abrir
 o aplicativo não acionam esse resumo. Uma nova partida substitui o cartão.
 
-**Confrontos** conserva os replays indexados por perfil, independentemente da sessão.
+O histórico de confrontos é armazenado por perfil, independentemente da sessão, sem exibição
+no app ou no resumo pós-partida. Sua apresentação em overlay fica para uma etapa futura.
 A identidade vem do personagem no replay (região, reino e ID), sem juntar homônimos.
 A primeira leitura considera os 32 arquivos mais recentes; novos resultados são acumulados.
 Isso não representa todo o histórico da conta. **Por mapa** mostra apenas a sessão selecionada,
