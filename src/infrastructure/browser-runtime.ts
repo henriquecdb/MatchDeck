@@ -1,3 +1,4 @@
+import type { GameSession, GameSessionAction } from '../domain/game-session';
 import { hotkeyError } from '../domain/hotkeys';
 import type { AppState, OverlayRuntime } from '../application/runtime';
 import { captureMatch, type MatchSnapshot } from '../domain/match';
@@ -65,6 +66,8 @@ export class BrowserRuntime implements OverlayRuntime {
 
   async sc2History(_profileId: number): Promise<Sc2History> { throw new Error('Histórico disponível no aplicativo Windows.'); }
   async subscribeSc2History(_listener: (history: Sc2History) => void) { return () => {}; }
+  async gameSession(_gameId: string, _profileId: number, _action: GameSessionAction): Promise<GameSession | null> { throw new Error('Sessões disponíveis no aplicativo Windows.'); }
+  async subscribeGameSession(_listener: (session: GameSession) => void) { return () => {}; }
   async sc2Session(_profileId: number, _action: Sc2SessionAction): Promise<Sc2Session | null> {
     throw new Error('Sessões disponíveis no aplicativo Windows.');
   }
@@ -97,7 +100,7 @@ export class BrowserRuntime implements OverlayRuntime {
   async start(match: MatchSnapshot) {
     if (match.gameId !== this.state.detection.config.gameId) throw new Error('A demonstração deve corresponder ao jogo selecionado');
     if (this.state.detection.config.enabled) throw new Error('Desative a detecção real antes de iniciar uma demonstração');
-    if (match.id.startsWith('demo-sc2-result-') && match.gameId === 'sc2' && match.source === 'demo' && match.finishedAt) {
+    if (match.id.startsWith('demo-' + match.gameId + '-result-') && match.source === 'demo' && match.finishedAt) {
       if (this.state.match) throw new Error('Encerre a demonstração antes de testar o pós-partida.');
       if (this.state.settings.postGameSeconds === 0) throw new Error('Ative o resumo na aba Overlay.');
       this.state.postGame = { game: match, expiresAt: new Date(Date.now() + this.state.settings.postGameSeconds * 1000).toISOString() };

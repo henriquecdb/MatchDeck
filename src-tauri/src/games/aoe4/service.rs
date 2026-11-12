@@ -76,29 +76,55 @@ pub async fn cycle(
             Some(stats.snapshot(profile_id))
         };
     }
-    let finished = if incoming.is_none() {
-        if let Some(current) = current.as_ref() {
-            let remote = if last.as_ref().is_some_and(|game| game.id() == current.id) {
-                last.clone()
-            } else {
-                let id = current
-                    .id
-                    .strip_prefix("aoe4-")
-                    .and_then(|id| id.parse().ok())
-                    .ok_or("ID de partida inválido")?;
-                provider.game(profile_id, id).await?
-            };
-            remote
-                .filter(|game| {
-                    game.id() == current.id && game.includes(profile_id) && game.finished()
-                })
-                .map(|game| game.record_outcome(current))
+    let cached = app
+        .state::<SharedState>()
+        .lock()
+        .map_err(|e| e.to_string())?
+        .last_synced
+        .clone();
+    let previous = current.as_ref().or_else(|| {
+        cached.as_ref().filter(|saved| {
+            saved.belongs_to(config)
+                && last.as_ref().is_some_and(|game| game.id() == saved.id)
+                && saved
+                    .players
+                    .iter()
+                    .find(|p| Some(&p.id) == saved.self_player_id.as_ref())
+                    .is_some_and(|p| p.won.is_none() && p.draw != Some(true))
+        })
+    });
+    let confirmed_remote = if let Some(previous) = previous {
+        let remote = if last.as_ref().is_some_and(|game| game.id() == previous.id) {
+            last.clone()
         } else {
-            None
-        }
+            let id = previous
+                .id
+                .strip_prefix("aoe4-")
+                .and_then(|id| id.parse().ok())
+                .ok_or("ID de partida inválido")?;
+            provider.game(profile_id, id).await?
+        };
+        remote.filter(|game| {
+            game.id() == previous.id
+                && game.includes(profile_id)
+                && game.supported()
+                && game.finished()
+        })
     } else {
         None
     };
+    let finished = confirmed_remote
+        .as_ref()
+        .zip(previous)
+        .map(|(game, previous)| game.record_outcome(previous));
+    let records: Vec<_> = last
+        .iter()
+        .chain(confirmed_remote.iter())
+        .filter_map(|game| crate::games::session::aoe4(game, profile_id))
+        .collect();
+    if let Err(error) = crate::games::session::record(app, config, &records) {
+        eprintln!("Sessão Age 4: {error}");
+    }
     let changed = incoming.is_some() || finished.is_some();
     let published = {
         let shared = app.state::<SharedState>();
@@ -106,16 +132,23 @@ pub async fn cycle(
         if state.detection.config != *config {
             return Ok(());
         }
-        if let Some(mut game) = incoming {
-            save_snapshot(app, &mut game);
-            state.last_synced = Some(game.clone());
-            state.current_match = Some(game);
-            state.hidden_match_id = None;
-        }
         if let Some(mut game) = finished {
             save_snapshot(app, &mut game);
+            if confirmed_remote
+                .as_ref()
+                .is_some_and(|remote| crate::games::session::aoe4(remote, profile_id).is_some())
+            {
+                crate::games::session::post_game(&mut state, &game);
+            }
             state.last_synced = Some(game);
             state.current_match = None;
+        }
+        if let Some(mut game) = incoming {
+            save_snapshot(app, &mut game);
+            state.observed_age_match_id = Some(game.id.clone());
+            state.last_synced = Some(game.clone());
+            state.current_match = Some(game);
+            state.post_game = None;
             state.hidden_match_id = None;
         }
         state.detection.failures = 0;

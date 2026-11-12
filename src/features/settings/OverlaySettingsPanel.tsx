@@ -62,8 +62,8 @@ export function OverlaySettingsPanel({ runtime, gameId = 'aoe2-de', settings, ma
     <label><input type="checkbox" checked={settings.showRating} onChange={event => onChange({ showRating: event.target.checked })} />  {t('Exibir rating')}</label>
     <label><input type="checkbox" checked={settings.showRecord} onChange={event => onChange({ showRecord: event.target.checked })} />  {t('Exibir vitórias e derrotas')}</label>
     <label><input type="checkbox" checked={settings.showWinRate} onChange={event => onChange({ showWinRate: event.target.checked })} />  {t('Exibir porcentagem de vitórias')}</label>
-    {gameId === 'sc2' && <label>{t('Pós-partida (s) · 0 desativa')} <input type="number" min={0} max={30} value={settings.postGameSeconds} onChange={event => onChange({ postGameSeconds: Math.max(0, Math.min(30, Number(event.target.value))) })} /></label>}
-    {gameId === 'sc2' && <label><input type="checkbox" checked={settings.showSession} onChange={event => onChange({ showSession: event.target.checked })} /> {t('Mostrar sessão no overlay')}</label>}
+    {<label>{t('Pós-partida (s) · 0 desativa')} <input type="number" min={0} max={30} value={settings.postGameSeconds} onChange={event => onChange({ postGameSeconds: Math.max(0, Math.min(30, Number(event.target.value))) })} /></label>}
+    {<label><input type="checkbox" checked={settings.showSession} onChange={event => onChange({ showSession: event.target.checked })} /> {t('Mostrar sessão no overlay')}</label>}
     {gameId === 'aoe2-de' && <p>{t('No compacto, passe o mouse no jogador para ver vitórias, derrotas e aproveitamento.')}</p>}
     <label><input type="checkbox" checked={settings.highlightSelf} onChange={event => onChange({ highlightSelf: event.target.checked })} />  {t('Destacar meu jogador')}</label>
     <label><input type="checkbox" checked={settings.locked} onChange={event => onChange({ locked: event.target.checked })} />  {t('Travar overlay e passar cliques para o jogo')}</label>

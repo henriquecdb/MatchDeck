@@ -22,7 +22,7 @@ export interface Sc2Session {
 
 export type Sc2SessionAction = 'read' | 'start' | 'finish' | 'refresh';
 
-export function sessionRecord(session: Pick<Sc2Session, 'matches'> | null) {
+export function sessionRecord(session: { matches: ReadonlyArray<{ won: boolean | null; draw: boolean }> } | null) {
   const matches = session?.matches ?? [];
   const wins = matches.filter(match => match.won === true && !match.draw).length;
   const losses = matches.filter(match => match.won === false && !match.draw).length;

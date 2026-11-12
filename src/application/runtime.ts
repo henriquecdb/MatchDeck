@@ -1,3 +1,4 @@
+import type { GameSession, GameSessionAction } from '../domain/game-session';
 import type { MatchSnapshot } from '../domain/match';
 import type { LayoutProfile, LayoutProfileAction, LayoutProfileInput, OverlaySettings } from '../domain/settings';
 import type { DetectionStatus, PlayerProfile } from '../domain/detection';
@@ -37,6 +38,8 @@ export interface OverlayRuntime {
   profileOverview(): Promise<ProfileOverview>;
   sc2History(profileId: number): Promise<Sc2History>;
   subscribeSc2History(listener: (history: Sc2History) => void): Promise<() => void>;
+  gameSession(gameId: string, profileId: number, action: GameSessionAction): Promise<GameSession | null>;
+  subscribeGameSession(listener: (session: GameSession) => void): Promise<() => void>;
   sc2Session(profileId: number, action: Sc2SessionAction): Promise<Sc2Session | null>;
   subscribeSc2Session(listener: (session: Sc2Session) => void): Promise<() => void>;
   configureDetection(enabled: boolean, profileInput: string, playerName?: string): Promise<void>;

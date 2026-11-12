@@ -1,3 +1,6 @@
+import type { GameSession } from '../../domain/game-session';
+import { sessionForMatch, sessionBarData } from '../../domain/game-session';
+import { SessionBar } from '../session/SessionBar';
 import { useI18n } from '../../i18n/LanguageProvider';
 import { winRate, type MatchSnapshot } from '../../domain/match';
 import { missingStats, queueLabel, ratingLabel } from '../../domain/match-labels';
@@ -13,7 +16,7 @@ import { Sc2Overlay } from '../../games/sc2/Sc2Overlay';
 import { Aoe4Overlay } from '../../games/aoe4/Aoe4Overlay';
 import type { Sc2Session } from '../../domain/sc2-session';
 
-export function MatchOverlay({ match, display = defaultSettings, layout = display.layout, showProjection = true, session = null }: { match: MatchSnapshot; layout?: OverlaySettings['layout']; showProjection?: boolean; display?: OverlaySettings; session?: Sc2Session | null }) {
+function MatchContent({ match, display = defaultSettings, layout = display.layout, showProjection = true, session = null }: { match: MatchSnapshot; layout?: OverlaySettings['layout']; showProjection?: boolean; display?: OverlaySettings; session?: Sc2Session | null }) {
   const { t, gameLanguage } = useI18n();
   if (match.gameId === 'sc2') return <Sc2Overlay match={match} display={display} session={session} />;
   if (match.gameId === 'aoe4') return <Aoe4Overlay match={match} display={{ ...display, layout }} />;
@@ -43,4 +46,10 @@ export function MatchOverlay({ match, display = defaultSettings, layout = displa
     })}</div>
     {!match.finishedAt && showProjection && <div className="rating-disclaimer">{t('~ Projeção Elo orientativa · não oficial')}</div>}
   </section>;
+}
+
+export function MatchOverlay(props: Parameters<typeof MatchContent>[0] & { gameSession?: GameSession | null }) {
+  if (props.match.gameId === 'sc2') return <MatchContent {...props} />;
+  const active = sessionForMatch(props.gameSession ?? null, props.match);
+  return <div className="age-session-overlay"><MatchContent {...props} />{(props.display ?? defaultSettings).showSession && active && <SessionBar session={sessionBarData(active)} />}</div>;
 }

@@ -1,3 +1,4 @@
+import type { GameSession, GameSessionAction } from '../domain/game-session';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import type { AppState, DiagnosticReport, DisplayMonitor, OverlayRuntime } from '../application/runtime';
@@ -29,6 +30,8 @@ export class TauriRuntime implements OverlayRuntime {
   profileOverview() { return invoke<ProfileOverview>('profile_overview'); }
   sc2History(profileId: number) { return invoke<Sc2History>('sc2_history', { profileId }); }
   subscribeSc2History(listener: (history: Sc2History) => void) { return listen<Sc2History>('sc2-history-changed', event => listener(event.payload)); }
+  gameSession(gameId: string, profileId: number, action: GameSessionAction) { return invoke<GameSession | null>('game_session', { gameId, profileId, action }); }
+  subscribeGameSession(listener: (session: GameSession) => void) { return listen<GameSession>('game-session-changed', event => listener(event.payload)); }
   sc2Session(profileId: number, action: Sc2SessionAction) {
     return invoke<Sc2Session | null>('sc2_session', { profileId, action });
   }

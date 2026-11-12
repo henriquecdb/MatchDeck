@@ -7,8 +7,7 @@ pub fn window_size(
     has_session: bool,
 ) -> (f64, f64) {
     let (width, height) = overlay_size(snapshot, &settings.layout);
-    let show_session = snapshot.game_id == "sc2"
-        && settings.show_session
+    let show_session = settings.show_session
         && (matches!(snapshot.source, crate::model::MatchSource::Demo) || has_session);
     (width, height + if show_session { 32.0 } else { 0.0 })
 }
@@ -18,7 +17,11 @@ pub fn overlay_size(snapshot: &MatchSnapshot, layout: &OverlayLayout) -> (f64, f
         return (400.0, 106.0);
     }
     if snapshot.game_id == "aoe4" {
-        return if matches!(layout, OverlayLayout::Stacked) { (360.0, 156.0) } else { (900.0, 64.0) };
+        return if matches!(layout, OverlayLayout::Stacked) {
+            (360.0, 156.0)
+        } else {
+            (900.0, 64.0)
+        };
     }
     let duel = snapshot.players.len() == 2
         && !snapshot
@@ -173,5 +176,26 @@ mod tests {
             overlay_size(&duel, &OverlayLayout::Detailed),
             (480.0, 436.0)
         );
+    }
+
+    #[test]
+    fn age_windows_follow_vertical_layout_and_optional_session_height() {
+        let mut game = snapshot(&[Some(1), Some(2)], "rm_1v1");
+        game.game_id = "aoe4".into();
+        let mut settings = crate::model::OverlaySettings {
+            layout: OverlayLayout::Stacked,
+            ..Default::default()
+        };
+        assert_eq!(window_size(&game, &settings, false), (360.0, 188.0));
+        game.source = crate::model::MatchSource::Live;
+        assert_eq!(window_size(&game, &settings, false), (360.0, 156.0));
+        assert_eq!(window_size(&game, &settings, true), (360.0, 188.0));
+        settings.layout = OverlayLayout::Compact;
+        assert_eq!(window_size(&game, &settings, true), (900.0, 96.0));
+        game.game_id = "aoe2-de".into();
+        settings.layout = OverlayLayout::Detailed;
+        assert_eq!(window_size(&game, &settings, true), (480.0, 468.0));
+        settings.show_session = false;
+        assert_eq!(window_size(&game, &settings, true), (480.0, 436.0));
     }
 }

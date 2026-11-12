@@ -340,3 +340,5 @@ input[type=number] { width: 110px; }
 .aoe4-overlay.is-stacked .aoe4-player.player-0 { grid-column: 1; grid-row: 2; }
 .aoe4-overlay.is-stacked .aoe4-player.player-1 { grid-column: 1; grid-row: 3; flex-direction: row; text-align: left; }
 
+.age-session-overlay { display: flex; flex-direction: column; width: max-content; }
+.age-session-overlay > .sc2-session-bar { box-sizing: border-box; height: 32px; flex-basis: 32px; margin: 0; padding: 4px 8px 0; border: 1px solid #345066; border-top: 0; border-radius: 0 0 6px 6px; background: #101820; color: #e8edf3; }

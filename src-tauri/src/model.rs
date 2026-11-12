@@ -250,6 +250,8 @@ pub struct AppState {
     pub post_game: Option<PostGame>,
     #[serde(skip)]
     pub observed_sc2_match_id: Option<String>,
+    #[serde(skip)]
+    pub observed_age_match_id: Option<String>,
     pub settings: OverlaySettings,
     pub detection: crate::detection::model::DetectionStatus,
     pub shortcut_available: bool,
