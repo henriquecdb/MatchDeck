@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { OverlayRuntime } from '../../application/runtime';
-import { sessionRaceRecords, sessionRecord, type Sc2Session, type Sc2SessionAction } from '../../domain/sc2-session';
+import { sessionMapRecords, sessionRaceRecords, sessionRecord, type Sc2Session, type Sc2SessionAction } from '../../domain/sc2-session';
 import { useI18n } from '../../i18n/LanguageProvider';
 import { raceArtwork } from './catalog';
 import { CivilizationEmblem } from '../../features/overlay/CivilizationEmblem';
@@ -97,6 +97,17 @@ export function Sc2SessionPanel({ runtime, profileId, active, matchActive }: {
           </li>;
         })}</ul>
       </section>
+      {(!session.mmr || session.mmr.length === 0) && <p>{t('MMR indisponível.')}</p>}
+      {session.mmr && session.mmr.length > 0 && <section aria-label={t('MMR da sessão')}><h4>{t('MMR da sessão')}</h4>
+        <ul className="sc2-opponents">{session.mmr.map(row => <li key={row.race + row.season}>
+          <strong>{raceArtwork({ civilization: row.race }, gameLanguage).name} · {t('Temporada')} {row.season}</strong>
+          <span>{row.initial ?? '—'} → {row.latest} · {row.initial == null ? '—' : (row.latest - row.initial >= 0 ? '+' : '') + (row.latest - row.initial)}</span>
+          <small>SC2 Pulse · {t('Consulta')} {new Date(row.queriedAt).toLocaleString(language, { dateStyle: 'short', timeStyle: 'short' })}</small>
+        </li>)}</ul>
+      </section>}
+      {matches.length > 0 && <section aria-label={t('Por mapa')}><h4>{t('Por mapa')}</h4><ul className="sc2-opponents">
+        {sessionMapRecords(session).map(row => <li key={row.map}><strong>{row.map}</strong><span>{row.wins}{t('V')} · {row.losses}{t('D')}{row.draws > 0 && <> · {row.draws}{t('E')}</>} · {row.winRate == null ? '—' : row.winRate.toLocaleString(language, { maximumFractionDigits: 0 }) + '%'}</span><small>{row.total} {t('partidas')}</small></li>)}
+      </ul></section>}
       {matches.length > 0 ? <>
         <h4>{t('Últimos resultados')}</h4>
         <ol className="profile-history" aria-label={t('Últimos resultados')}>{matches.slice(0, 10).map(match => {

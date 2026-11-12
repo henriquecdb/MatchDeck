@@ -21,3 +21,11 @@ it('migrates old preferences and preserves compact mode', () => {
   expect(parseSettings({}).showSession).toBe(true);
   expect(parseSettings({ showSession: false }).showSession).toBe(false);
 });
+
+it('migrates and clamps post-game duration including explicit disable', () => {
+  expect(parseSettings({}).postGameSeconds).toBe(8);
+  expect(parseSettings({ postGameSeconds: 0 }).postGameSeconds).toBe(0);
+  expect(parseSettings({ postGameSeconds: 99 }).postGameSeconds).toBe(30);
+  expect(parseSettings({ postGameSeconds: -5 }).postGameSeconds).toBe(0);
+  expect(parseSettings({ postGameSeconds: NaN }).postGameSeconds).toBe(8);
+});

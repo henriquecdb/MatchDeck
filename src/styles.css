@@ -321,3 +321,15 @@ input[type=number] { width: 110px; }
 
 .match-result-win { color: #64d4a0; font-weight: 700; }
 .match-result-loss { color: #f18489; font-weight: 700; }
+
+.sc2-post-game { box-sizing: border-box; display: flex; flex-direction: column; gap: 7px; width: 400px; height: 164px; padding: 12px; background: #101820; border: 1px solid #345066; border-radius: 6px; color: #e8edf3; font-size: 12px; }
+.sc2-post-game header, .sc2-post-game p { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0; }
+.sc2-post-game header { font-size: 16px; }
+.sc2-post-game header span, .sc2-post-game p > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sc2-post-game.is-win header > strong { color: #68d9a4; }
+.sc2-post-game.is-loss header > strong { color: #ed9399; }
+.sc2-post-game p { color: #b1c6d5; }
+.sc2-opponents { list-style: none; margin: 8px 0; padding: 0; display: grid; gap: 6px; }
+.sc2-opponents li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 12px; padding: 8px; border-radius: 4px; background: #17232d; font-variant-numeric: tabular-nums; }
+.sc2-opponents strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sc2-opponents small { grid-column: 1 / -1; color: #9ab0c0; }

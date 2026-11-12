@@ -157,6 +157,7 @@ fn main() {
             commands::identify_local_profile,
             commands::profile_overview,
             games::sc2::session::sc2_session,
+            games::sc2::session::sc2_history,
             commands::configure_detection,
             commands::sync_latest_match,
             commands::toggle_overlay_visibility,

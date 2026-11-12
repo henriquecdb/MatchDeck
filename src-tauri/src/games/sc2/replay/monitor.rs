@@ -159,6 +159,9 @@ async fn records(
     if let Err(error) = super::super::session::record(app, id, &handle, &records) {
         eprintln!("Não foi possível atualizar a sessão SC2: {error}");
     }
+    if let Err(error) = super::super::session::record_history(app, id, &handle, &records) {
+        eprintln!("Não foi possível atualizar o histórico SC2: {error}");
+    }
     Ok((handle, records))
 }
 pub async fn latest(
@@ -188,8 +191,27 @@ fn same_players(a: &MatchSnapshot, b: &MatchSnapshot) -> bool {
             .iter()
             .all(|p| b.players.iter().any(|other| other.name == p.name))
 }
+fn observed_fresh_result(
+    state: &crate::model::AppState,
+    incoming: &MatchSnapshot,
+    matching_current: bool,
+) -> bool {
+    let observed = matching_current
+        || state.last_synced.as_ref().is_some_and(|old| {
+            state.observed_sc2_match_id.as_ref() == Some(&old.id) && same_players(old, incoming)
+        });
+    observed
+        && incoming
+            .finished_at
+            .as_ref()
+            .and_then(|end| chrono::DateTime::parse_from_rfc3339(end).ok())
+            .is_some_and(|end| {
+                let age = chrono::Utc::now().signed_duration_since(end);
+                age >= chrono::Duration::zero() && age <= chrono::Duration::seconds(30)
+            })
+}
 fn apply(app: &tauri::AppHandle, incoming: MatchSnapshot) -> Result<(), String> {
-    let snapshot = {
+    let (snapshot, refresh_mmr) = {
         let shared = app.state::<SharedState>();
         let mut state = shared.lock().map_err(|e| e.to_string())?;
         if !incoming.belongs_to(&state.detection.config) {
@@ -223,6 +245,17 @@ fn apply(app: &tauri::AppHandle, incoming: MatchSnapshot) -> Result<(), String> 
         }) {
             return Ok(());
         }
+        let observed_fresh = observed_fresh_result(&state, &incoming, matching_current);
+        let opponent_id = incoming
+            .players
+            .iter()
+            .find(|p| Some(&p.id) != incoming.self_player_id.as_ref())
+            .map(|p| p.id.trim_start_matches("sc2-toon-").to_owned());
+        let hidden = state
+            .current_match
+            .as_ref()
+            .or(state.last_synced.as_ref())
+            .is_some_and(|old| state.hidden_match_id.as_ref() == Some(&old.id));
         let mut result = incoming;
         if matching_current {
             if let Some(mut captured) = state.current_match.take() {
@@ -239,11 +272,24 @@ fn apply(app: &tauri::AppHandle, incoming: MatchSnapshot) -> Result<(), String> 
                 captured.queue = result.queue;
                 captured.queue_id = result.queue_id;
                 captured.finished_at = result.finished_at;
+                captured.duration_seconds = result.duration_seconds;
                 captured.warnings = vec![CONFIRMED.into()];
                 result = captured;
             }
         }
         crate::storage::save_last_match(app, &result)?;
+        if observed_fresh
+            && !hidden
+            && state.detection.config.enabled
+            && state.settings.post_game_seconds > 0
+        {
+            state.post_game = Some(crate::model::PostGame {
+                game: result.clone(),
+                opponent_id,
+                expires_at: chrono::Utc::now()
+                    + chrono::Duration::seconds(state.settings.post_game_seconds as i64),
+            });
+        }
         state.last_synced = Some(result);
         if matching_current {
             state.detection.phase = "waiting".into();
@@ -254,9 +300,18 @@ fn apply(app: &tauri::AppHandle, incoming: MatchSnapshot) -> Result<(), String> 
             "sc2-replay",
             "Resultado atualizado por replay local.",
         );
-        state.clone()
+        (state.clone(), observed_fresh)
     };
-    crate::overlay::synchronize(app, &snapshot, false)?;
+    if let Some(id) = snapshot
+        .last_synced
+        .as_ref()
+        .filter(|_| refresh_mmr)
+        .and_then(|m| m.self_player_id.as_ref())
+        .and_then(|id| id.parse().ok())
+    {
+        super::super::session::sample_after_game(app, id);
+    }
+    crate::overlay::synchronize(app, &snapshot, true)?;
     Ok(())
 }
 pub async fn watch(app: tauri::AppHandle, provider: Sc2Provider) {
@@ -385,5 +440,23 @@ mod tests {
             parsed,
             index.last_ms
         );
+    }
+
+    #[test]
+    fn only_a_recent_result_observed_in_this_run_can_trigger_post_game() {
+        let mut state = crate::model::AppState::default();
+        let incoming: MatchSnapshot = serde_json::from_value(serde_json::json!({"id":"replay","gameId":"sc2","mode":"unknown","map":"Arena","source":"live","players":[],"selfPlayerId":"42","finishedAt":chrono::Utc::now().to_rfc3339()})).unwrap();
+        let mut local = incoming.clone();
+        local.id = "sc2-local-one".into();
+        state.last_synced = Some(local);
+        assert!(!observed_fresh_result(&state, &incoming, false));
+        state.observed_sc2_match_id = Some("sc2-local-one".into());
+        assert!(observed_fresh_result(&state, &incoming, false));
+        let mut old = incoming.clone();
+        old.finished_at = Some((chrono::Utc::now() - chrono::Duration::minutes(1)).to_rfc3339());
+        assert!(!observed_fresh_result(&state, &old, true));
+        let mut other_profile = incoming;
+        other_profile.self_player_id = Some("99".into());
+        assert!(!observed_fresh_result(&state, &other_profile, false));
     }
 }

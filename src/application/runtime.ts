@@ -3,10 +3,11 @@ import type { OverlaySettings } from '../domain/settings';
 import type { DetectionStatus, PlayerProfile } from '../domain/detection';
 import type { AppPreferences } from '../domain/preferences';
 import type { ProfileOverview } from '../domain/profile';
-import type { Sc2Session, Sc2SessionAction } from '../domain/sc2-session';
+import type { Sc2History, Sc2Session, Sc2SessionAction } from '../domain/sc2-session';
 
 export interface AppState {
   match: MatchSnapshot | null;
+  postGame?: { game: MatchSnapshot; expiresAt: string; opponentId?: string };
   settings: OverlaySettings;
   detection: DetectionStatus;
   shortcutAvailable: boolean;
@@ -33,6 +34,8 @@ export interface OverlayRuntime {
   configure(settings: OverlaySettings, gameId?: string): Promise<void>;
   identifyLocalProfile(): Promise<PlayerProfile>;
   profileOverview(): Promise<ProfileOverview>;
+  sc2History(profileId: number): Promise<Sc2History>;
+  subscribeSc2History(listener: (history: Sc2History) => void): Promise<() => void>;
   sc2Session(profileId: number, action: Sc2SessionAction): Promise<Sc2Session | null>;
   subscribeSc2Session(listener: (session: Sc2Session) => void): Promise<() => void>;
   configureDetection(enabled: boolean, profileInput: string, playerName?: string): Promise<void>;

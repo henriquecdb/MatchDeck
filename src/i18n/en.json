@@ -594,5 +594,16 @@
   "Histórico indisponível.": "Match history unavailable.",
   "Gráfico indisponível.": "Rating chart unavailable.",
   "Partida em andamento · dados locais": "Game in progress · local data",
-  "SC2 Pulse ocupado; tente novamente em instantes.": "SC2 Pulse busy; please try again shortly."
+  "SC2 Pulse ocupado; tente novamente em instantes.": "SC2 Pulse busy; please try again shortly.",
+  "Pós-partida (s) · 0 desativa": "Post-game (s) · 0 disables",
+  "Resumo pós-partida": "Post-game summary",
+  "Confrontos": "Head-to-head",
+  "Histórico local indexado": "Indexed local history",
+  "Nenhum confronto indexado.": "No indexed encounters.",
+  "partidas": "games",
+  "Por mapa": "By map",
+  "MMR da sessão": "Session MMR",
+  "Temporada": "Season",
+  "Consulta": "Queried",
+  "MMR indisponível.": "MMR unavailable."
 }

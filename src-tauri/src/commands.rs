@@ -45,6 +45,8 @@ pub fn select_game(
         state.last_synced = storage::load_last_match(&app, &game_id);
         state.detection = Default::default();
         state.detection.config = config;
+        state.post_game = None;
+        state.observed_sc2_match_id = None;
         state.hidden_match_id = None;
         state.clone()
     };
@@ -91,6 +93,7 @@ pub fn start_match(
     if incoming.players.is_empty() || incoming.players.len() > 8 {
         return Err("A partida deve ter entre 1 e 8 jogadores".into());
     }
+    state.post_game = None;
     state.current_match = Some(incoming);
     overlay::synchronize(&app, &state, true)
 }
@@ -191,9 +194,7 @@ pub fn toggle_overlay_visibility(
     state: State<'_, SharedState>,
 ) -> Result<(), String> {
     let mut state = state.lock().map_err(|error| error.to_string())?;
-    let id = state
-        .current_match
-        .as_ref()
+    let id = overlay::displayed_match(&state)
         .map(|current| current.id.clone())
         .ok_or("Não há partida em andamento")?;
     state.hidden_match_id = if state.hidden_match_id.as_ref() == Some(&id) {
@@ -373,6 +374,8 @@ pub async fn configure_detection(
             },
         );
         state.current_match = None;
+        state.post_game = None;
+        state.observed_sc2_match_id = None;
         state.clone()
     };
     controller.updates.send_replace(config);

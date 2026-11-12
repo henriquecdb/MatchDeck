@@ -16,9 +16,10 @@ export interface OverlaySettings {
   showWinRate: boolean;
   highlightSelf: boolean;
   showSession: boolean;
+  postGameSeconds: number;
 }
 
-export const defaultSettings: OverlaySettings = { opacity: 0.9, x: 40, y: 80, locked: false, layout: 'detailed', autoUpdate: false, scale: 1, focusOnly: true, showProjection: true, monitorId: null, anchor: 'manual', margin: 16, showRating: true, showRecord: true, showWinRate: true, highlightSelf: true, showSession: true };
+export const defaultSettings: OverlaySettings = { opacity: 0.9, x: 40, y: 80, locked: false, layout: 'detailed', autoUpdate: false, scale: 1, focusOnly: true, showProjection: true, monitorId: null, anchor: 'manual', margin: 16, showRating: true, showRecord: true, showWinRate: true, highlightSelf: true, showSession: true, postGameSeconds: 8 };
 
 export const anchorLabels: Record<OverlaySettings['anchor'], string> = {
   manual: 'Manual · arrastar ou informar X/Y', 'top-left': 'Superior esquerdo', 'top-center': 'Superior central', 'top-right': 'Superior direito',
@@ -51,5 +52,6 @@ export function parseSettings(value: unknown): OverlaySettings {
     showWinRate: candidate.showWinRate !== false,
     highlightSelf: candidate.highlightSelf !== false,
     showSession: candidate.showSession !== false,
+    postGameSeconds: typeof candidate.postGameSeconds === 'number' && Number.isFinite(candidate.postGameSeconds) ? Math.round(Math.max(0, Math.min(30, candidate.postGameSeconds))) : 8,
   };
 }

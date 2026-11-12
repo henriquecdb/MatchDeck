@@ -81,6 +81,7 @@ impl ReplayRecord {
             })
             .collect();
         MatchSnapshot {
+            duration_seconds: Some((self.finished_at - self.started_at).num_seconds().max(0) as u64),
             id: self.id.clone(),
             game_id: "sc2".into(),
             mode: MatchMode::Unknown,

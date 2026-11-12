@@ -98,3 +98,25 @@ O replay confirma mapa, raça e resultado. O campo competitivo do protocolo mode
 Dados são processados localmente, sem upload. O decoder tem limites de tamanho, profundidade e saída descomprimida; arquivos incompletos e formatos não suportados são ignorados sem encerrar a detecção ao vivo. O esquema inicial Base98310 deriva do s2protocol oficial da Blizzard sob MIT, com licença preservada em src-tauri/src/games/sc2/replay/LICENSE-Blizzard.txt.
 
 Teste local: abrir o SC2 no MatchDeck, conferir as partidas na aba Perfil, jogar um 1v1 e voltar ao menu. O resultado deve ser confirmado poucos segundos após a gravação do replay. Para atualizar uma aba Perfil já aberta, use Atualizar perfil (cache de um minuto).
+
+## Resumo e retrospecto
+
+Ao terminar um 1v1 acompanhado pelo MatchDeck, o replay confirma o resultado e pode exibir
+um resumo com adversário, mapa, duração real, confrontos e placar da sessão. Em Overlay,
+**Pós-partida (s)** controla a duração (padrão: 8; 0 desativa; máximo: 30).
+O resumo respeita foco, posição, escala e ocultação manual. Replays antigos lidos ao abrir
+o aplicativo não acionam esse resumo. Uma nova partida substitui o cartão.
+
+**Confrontos** conserva os replays indexados por perfil, independentemente da sessão.
+A identidade vem do personagem no replay (região, reino e ID), sem juntar homônimos.
+A primeira leitura considera os 32 arquivos mais recentes; novos resultados são acumulados.
+Isso não representa todo o histórico da conta. **Por mapa** mostra apenas a sessão selecionada,
+com tamanho da amostra, vitórias, derrotas, empates e aproveitamento.
+
+**MMR da sessão** consulta o SC2 Pulse ao iniciar a sessão e, após um resultado recente,
+faz uma nova consulta com cinco segundos de espera. Cada linha separa raça e temporada,
+com valor inicial, última consulta e variação. O horário identifica a consulta, não uma
+confirmação de atualização do MMR no servidor. A fonte pode atrasar. Cache de contingência
+não conta como nova amostra. Se não houver consulta inicial válida antes de jogar, a base e
+a variação ficam com —; o app não estima ganhos por partida. Sessões encerradas não recebem
+novas consultas de MMR. Sessões antigas continuam legíveis, sem uma base retroativa.
