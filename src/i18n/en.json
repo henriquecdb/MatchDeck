@@ -617,5 +617,7 @@
   "MMR atualizado.": "MMR updated.",
   "Atualizar MMR": "Refresh MMR",
   "Inicie uma sessão antes de consultar o MMR.": "Start a session before querying MMR.",
-  "A sessão já foi encerrada.": "The session has already ended."
+  "A sessão já foi encerrada.": "The session has already ended.",
+  "Confrontos confirmados por replay": "Replay-confirmed encounters",
+  "Encontros anteriores": "Previous encounters"
 }

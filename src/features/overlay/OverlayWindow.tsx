@@ -1,3 +1,4 @@
+import { useSc2Encounter } from '../../games/sc2/use-sc2-encounter';
 import { usePostGame } from './use-post-game';
 import { Sc2PostGameCard } from '../../games/sc2/Sc2PostGameCard';
 import { LanguageProvider, useI18n } from '../../i18n/LanguageProvider';
@@ -18,6 +19,7 @@ function OverlayContent({ runtime, state, error }: { runtime: OverlayRuntime; st
   const profileId = state.detection.config.profile?.profileId ?? null;
   const session = useSc2Session(runtime, profileId, state.detection.config.gameId === 'sc2' && state.settings.showSession);
   const card = usePostGame(state);
+  const encounter = useSc2Encounter(runtime, card);
   if (error) return <p role="alert">{t(error)}</p>;
   if (!state.match && !card) return null;
   return <div style={{ opacity: state.settings.opacity, zoom: state.settings.scale }} onPointerDown={event => {
@@ -28,5 +30,5 @@ function OverlayContent({ runtime, state, error }: { runtime: OverlayRuntime; st
       }
       await getCurrentWindow().startDragging();
     })().catch(console.error);
-  }}>{card ? <Sc2PostGameCard game={card.game} session={state.settings.showSession ? card.game.source === 'demo' ? sc2DemoSession : session : null} /> : state.match && <MatchOverlay match={state.match} layout={state.settings.layout} showProjection={state.settings.showProjection} display={state.settings} session={session} />}</div>;
+  }}>{card ? <Sc2PostGameCard encounter={encounter} game={card.game} session={state.settings.showSession ? card.game.source === 'demo' ? sc2DemoSession : session : null} /> : state.match && <MatchOverlay match={state.match} layout={state.settings.layout} showProjection={state.settings.showProjection} display={state.settings} session={session} />}</div>;
 }

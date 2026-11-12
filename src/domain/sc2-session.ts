@@ -66,3 +66,11 @@ export function opponentRecords(history: Sc2History) {
     return { id, name: latest.opponent, lastPlayed: latest.finishedAt, total: matches.length, ...sessionRecord({ matches }) };
   }).sort((a, b) => b.lastPlayed.localeCompare(a.lastPlayed));
 }
+
+export function previousEncounter(history: Sc2History, opponentId: string, result: { id: string; finishedAt?: string | null }) {
+  if (!result.finishedAt) return null;
+  const cutoff = Date.parse(result.finishedAt);
+  const matches = history.matches.filter(match => match.opponentId === opponentId && match.id !== result.id && Date.parse(match.finishedAt) < cutoff);
+  return opponentRecords({ ...history, matches })[0] ?? null;
+}
+export type Sc2Encounter = NonNullable<ReturnType<typeof previousEncounter>>;

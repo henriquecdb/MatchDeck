@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { opponentRecords, sessionMapRecords, sessionRaceRecords, sessionRecord } from './sc2-session';
+import { previousEncounter, opponentRecords, sessionMapRecords, sessionRaceRecords, sessionRecord } from './sc2-session';
 import { sc2DemoSession } from '../games/sc2/demo';
 
 it('groups session results by opponent race and preserves draws and missing races', () => {
@@ -45,4 +45,17 @@ it('shows map sample size and includes draws without merging map editions', () =
   ] });
   expect(rows[0]).toMatchObject({ map: 'Arena', total: 2, wins: 1, draws: 1, winRate: 50 });
   expect(rows[1]).toMatchObject({ map: 'Arena LE', total: 1, losses: 1, winRate: 0 });
+});
+
+it('counts only prior replays of the confirmed opponent, excluding the current game and homonyms', () => {
+  const sample = sc2DemoSession.matches[0];
+  const result = { id: 'current', finishedAt: '2026-11-12T12:00:00Z' };
+  const history = { profileId: 42, matches: [
+    { ...sample, id: 'prior', opponentId: '1-S2-1-99', won: true, finishedAt: '2026-11-11T12:00:00Z' },
+    { ...sample, id: 'current', opponentId: '1-S2-1-99', won: false, finishedAt: result.finishedAt },
+    { ...sample, id: 'homonym', opponentId: '1-S2-2-99', won: false, finishedAt: '2026-11-11T12:00:00Z' },
+    { ...sample, id: 'later', opponentId: '1-S2-1-99', won: false, finishedAt: '2026-11-13T12:00:00Z' },
+  ] };
+  expect(previousEncounter(history, '1-S2-1-99', result)).toMatchObject({ wins: 1, losses: 0, total: 1, lastPlayed: '2026-11-11T12:00:00Z' });
+  expect(previousEncounter(history, 'unknown', result)).toBeNull();
 });
