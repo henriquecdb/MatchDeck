@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.8.0] - 2026-11-12
+
+### Added
+
+- SC2 post-game overlay summary with replay-confirmed result, opponent, map, duration and session record. Configurable duration from 0 to 30 seconds.
+- Post-game demo with fictional win, loss and draw results.
+- Local character-identity history with previous encounter record and last meeting shown when a replay confirms a returning opponent.
+- Session records by opponent race and on-demand map statistics.
+- Initial MMR, latest query and session change by race and season, with query, failure and missing-baseline states plus manual refresh.
+- Per-game layout profiles to save and restore position, monitor, scale, opacity and display options.
+
+### Improved
+
+- Persistent SC2 Pulse caching, shared concurrent queries, failure backoff and Retry-After handling.
+- The overlay shows players as soon as the local API responds, enriching statistics in the background while preserving match state and manual hiding.
+- Fallback data shows its cache timestamp; history or chart failures preserve available statistics.
+
+### Fixed
+
+- Late responses cannot revive a finished match or leak across profile changes.
+- Invalid cache files are preserved for recovery instead of overwritten at startup.
+- Interrupted MMR queries recover correctly; concurrent retries and retroactive baselines are prevented.
+- Post-game demo button proportions match the other actions.
+
 ## [0.7.0] - 2026-11-11
 
 ### Added

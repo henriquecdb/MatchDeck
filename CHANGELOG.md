@@ -2,6 +2,30 @@
 
 As mudanças relevantes são registradas por versão. O projeto usa Semantic Versioning e Conventional Commits.
 
+## [0.8.0] - 2026-11-12
+
+### Adicionado
+
+- Resumo pós-partida no overlay do SC2 com resultado confirmado por replay, adversário, mapa, duração e placar da sessão. Tempo configurável de 0 a 30 segundos.
+- Demonstração do pós-partida com vitória, derrota ou empate e dados fictícios.
+- Histórico local por identidade do personagem, com retrospecto e último encontro no resumo quando o replay confirma um adversário já registrado.
+- Placar da sessão por raça adversária e consulta de resultados por mapa sob demanda.
+- MMR inicial, última consulta e variação da sessão por raça e temporada, com estados de consulta, falha e ausência de registro inicial, além de atualização manual.
+- Perfis de layout por jogo para salvar e restaurar posição, monitor, escala, opacidade e opções de exibição.
+
+### Melhorado
+
+- Cache persistente do SC2 Pulse, reaproveitamento de consultas simultâneas, espera após falhas e respeito ao Retry-After.
+- Overlay exibe os jogadores assim que a API local responde e carrega as estatísticas em segundo plano, preservando o estado da partida e a ocultação manual.
+- Dados de contingência indicam cache e horário da consulta; falhas no histórico ou gráfico não apagam as estatísticas disponíveis.
+
+### Corrigido
+
+- Proteção contra respostas atrasadas após fim da partida ou troca de perfil.
+- Preservação de cache inválido para recuperação, sem sobrescrita ao iniciar.
+- Recuperação de consultas de MMR interrompidas e proteção contra tentativas simultâneas e valores iniciais retroativos.
+- Proporção do botão de teste pós-partida alinhada aos demais botões.
+
 ## [0.7.0] - 2026-11-11
 
 ### Adicionado
