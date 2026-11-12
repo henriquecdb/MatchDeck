@@ -33,6 +33,12 @@ pub struct OverlaySettings {
     pub highlight_self: bool,
     #[serde(default = "enabled")]
     pub show_session: bool,
+    #[serde(default = "default_post_game_seconds")]
+    pub post_game_seconds: u32,
+}
+
+fn default_post_game_seconds() -> u32 {
+    8
 }
 
 fn default_scale() -> f64 {
@@ -90,6 +96,7 @@ impl Default for OverlaySettings {
             show_win_rate: true,
             highlight_self: true,
             show_session: true,
+            post_game_seconds: 8,
         }
     }
 }
@@ -109,6 +116,7 @@ impl OverlaySettings {
             1.0
         };
         self.margin = self.margin.min(200);
+        self.post_game_seconds = self.post_game_seconds.min(30);
         self
     }
 }
@@ -179,6 +187,8 @@ pub struct Player {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MatchSnapshot {
+    #[serde(default)]
+    pub duration_seconds: Option<u64>,
     pub id: String,
     pub game_id: String,
     pub mode: MatchMode,
@@ -224,11 +234,22 @@ impl MatchSnapshot {
     }
 }
 
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PostGame {
+    pub game: MatchSnapshot,
+    pub expires_at: chrono::DateTime<chrono::Utc>,
+    pub opponent_id: Option<String>,
+}
+
 #[derive(Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AppState {
     #[serde(rename = "match")]
     pub current_match: Option<MatchSnapshot>,
+    pub post_game: Option<PostGame>,
+    #[serde(skip)]
+    pub observed_sc2_match_id: Option<String>,
     pub settings: OverlaySettings,
     pub detection: crate::detection::model::DetectionStatus,
     pub shortcut_available: bool,
@@ -256,6 +277,7 @@ mod tests {
         assert_eq!(settings.scale, 1.0);
         assert!(settings.focus_only && settings.show_projection);
         assert!(settings.show_session);
+        assert_eq!(settings.post_game_seconds, 8);
         assert!(settings.monitor_id.is_none());
         assert!(settings.anchor == Anchor::Manual);
         let settings = OverlaySettings {
@@ -266,6 +288,15 @@ mod tests {
         .normalize();
         assert_eq!(settings.scale, 1.5);
         assert_eq!(settings.margin, 200);
+        assert_eq!(
+            OverlaySettings {
+                post_game_seconds: 100,
+                ..Default::default()
+            }
+            .normalize()
+            .post_game_seconds,
+            30
+        );
     }
 
     #[test]

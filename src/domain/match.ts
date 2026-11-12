@@ -38,6 +38,7 @@ export interface Player {
 }
 
 export interface MatchSnapshot {
+  durationSeconds?: number | null;
   id: string;
   gameId: string;
   mode: MatchMode;

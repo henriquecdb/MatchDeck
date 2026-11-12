@@ -145,6 +145,7 @@ impl RemoteGame {
             })
             .collect();
         MatchSnapshot {
+            duration_seconds: None,
             id: self.id(),
             game_id: "aoe4".into(),
             mode: if self.kind == "rm_1v1" {

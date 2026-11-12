@@ -228,6 +228,7 @@ impl Aoe2Provider {
         .await;
         let (players, warnings): (Vec<_>, Vec<_>) = results.into_iter().unzip();
         MatchSnapshot {
+            duration_seconds: None,
             id: format!("aoe2-{}", remote.match_id),
             game_id: "aoe2-de".into(),
             mode: if queue.is_some_and(|queue| {

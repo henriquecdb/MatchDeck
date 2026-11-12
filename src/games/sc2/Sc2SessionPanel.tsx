@@ -1,3 +1,4 @@
+import { Sc2MapStats } from './Sc2MapStats';
 import { useEffect, useRef, useState } from 'react';
 import type { OverlayRuntime } from '../../application/runtime';
 import { sessionRaceRecords, sessionRecord, type Sc2Session, type Sc2SessionAction } from '../../domain/sc2-session';
@@ -97,6 +98,18 @@ export function Sc2SessionPanel({ runtime, profileId, active, matchActive }: {
           </li>;
         })}</ul>
       </section>
+      <div className="profile-heading">
+        <p role="status">{t(session.mmrStatus === 'loading' ? 'Consultando MMR…' : session.mmrStatus === 'interrupted' ? 'Consulta de MMR interrompida.' : session.mmrStatus === 'error' ? 'Falha na consulta do MMR.' : session.mmrStatus === 'stale' ? 'Fonte indisponível. Tente novamente.' : session.mmrStatus === 'unavailable' ? 'Sem MMR ranqueado disponível.' : (!session.mmr?.length || session.mmr.some(row => row.initial == null)) ? 'Sem registro inicial de MMR.' : 'MMR atualizado.')}</p>
+        {running && <button disabled={busy || matchActive} onClick={() => void changeSession('refresh')}>{t(session.mmrStatus === 'error' || session.mmrStatus === 'stale' ? 'Tentar novamente' : 'Atualizar MMR')}</button>}
+      </div>
+      {session.mmr && session.mmr.length > 0 && <section aria-label={t('MMR da sessão')}><h4>{t('MMR da sessão')}</h4>
+        <ul className="sc2-opponents">{session.mmr.map(row => <li key={row.race + row.season}>
+          <strong>{raceArtwork({ civilization: row.race }, gameLanguage).name} · {t('Temporada')} {row.season}</strong>
+          <span>{row.initial ?? '—'} → {row.latest} · {row.initial == null ? '—' : (row.latest - row.initial >= 0 ? '+' : '') + (row.latest - row.initial)}</span>
+          <small>SC2 Pulse · {t('Consulta')} {new Date(row.queriedAt).toLocaleString(language, { dateStyle: 'short', timeStyle: 'short' })}</small>
+        </li>)}</ul>
+      </section>}
+      {matches.length > 0 && <Sc2MapStats key={session.profileId + ':' + session.startedAt} session={session} />}
       {matches.length > 0 ? <>
         <h4>{t('Últimos resultados')}</h4>
         <ol className="profile-history" aria-label={t('Últimos resultados')}>{matches.slice(0, 10).map(match => {

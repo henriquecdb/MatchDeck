@@ -36,11 +36,35 @@ fn refresh_geometry(window: &tauri::WebviewWindow, state: &AppState) -> Result<(
             )
         })
         .unwrap_or((480.0, 436.0));
+    let size = if state.current_match.is_none() && displayed_match(state).is_some() {
+        (400.0, 164.0)
+    } else {
+        size
+    };
     crate::displays::apply(window, &state.settings, size)
 }
 
+pub fn displayed_match(state: &AppState) -> Option<&crate::model::MatchSnapshot> {
+    state.current_match.as_ref().or_else(|| {
+        state
+            .post_game
+            .as_ref()
+            .filter(|card| {
+                ((matches!(card.game.source, MatchSource::Demo)
+                    && !state.detection.config.enabled
+                    && card.game.game_id == state.detection.config.game_id)
+                    || (!matches!(card.game.source, MatchSource::Demo)
+                        && state.detection.config.enabled
+                        && card.game.belongs_to(&state.detection.config)))
+                    && state.settings.post_game_seconds > 0
+                    && card.expires_at > chrono::Utc::now()
+            })
+            .map(|card| &card.game)
+    })
+}
+
 pub fn should_show(state: &AppState, game_focused: bool) -> bool {
-    state.current_match.as_ref().is_some_and(|current| {
+    displayed_match(state).is_some_and(|current| {
         state.hidden_match_id.as_ref() != Some(&current.id)
             && (matches!(current.source, MatchSource::Demo)
                 || !state.settings.focus_only
@@ -53,9 +77,7 @@ fn refresh_visibility(
     state: &AppState,
     raise: bool,
 ) -> Result<Option<&'static str>, String> {
-    let needs_focus = state
-        .current_match
-        .as_ref()
+    let needs_focus = displayed_match(state)
         .is_some_and(|current| matches!(current.source, MatchSource::Live))
         && state.settings.focus_only;
     let visible = should_show(
@@ -176,6 +198,61 @@ mod tests {
         state.current_match.as_mut().unwrap().source = MatchSource::Demo;
         assert!(should_show(&state, false));
         state.current_match = None;
+        assert!(!should_show(&state, true));
+    }
+
+    #[test]
+    fn post_game_expires_and_respects_profile_focus_hiding_and_next_game() {
+        let mut state = AppState::default();
+        state.detection.config = crate::detection::model::DetectionConfig {
+            game_id: "sc2".into(),
+            enabled: true,
+            profile: Some(crate::detection::model::Profile {
+                profile_id: 42,
+                name: "Nova".into(),
+            }),
+        };
+        let game = serde_json::from_value(serde_json::json!({"id":"result","gameId":"sc2","mode":"unknown","map":"Arena","source":"live","selfPlayerId":"42","players":[{"id":"42","name":"Nova","civilization":"TERRAN","uniqueUnits":[],"symbol":""}]})).unwrap();
+        state.post_game = Some(crate::model::PostGame {
+            game,
+            opponent_id: None,
+            expires_at: chrono::Utc::now() + chrono::Duration::seconds(8),
+        });
+        assert!(should_show(&state, true));
+        assert!(!should_show(&state, false));
+        state.hidden_match_id = Some("result".into());
+        assert!(!should_show(&state, true));
+        state.hidden_match_id = None;
+        state.settings.post_game_seconds = 0;
+        assert!(!should_show(&state, true));
+        state.settings.post_game_seconds = 8;
+        state.detection.config.profile.as_mut().unwrap().profile_id = 99;
+        assert!(!should_show(&state, true));
+        state.detection.config.profile.as_mut().unwrap().profile_id = 42;
+        state.post_game.as_mut().unwrap().expires_at =
+            chrono::Utc::now() - chrono::Duration::seconds(1);
+        assert!(!should_show(&state, true));
+        let mut next = state.post_game.as_ref().unwrap().game.clone();
+        next.id = "next".into();
+        state.current_match = Some(next);
+        assert_eq!(displayed_match(&state).unwrap().id, "next");
+    }
+
+    #[test]
+    fn post_game_demo_needs_no_profile_or_focus_but_cannot_cross_game_or_detection_scope() {
+        let mut state = AppState::default();
+        state.detection.config.game_id = "sc2".into();
+        let game = serde_json::from_value(serde_json::json!({"id":"demo-sc2-result-one","gameId":"sc2","mode":"ranked","map":"Arena","source":"demo","players":[]})).unwrap();
+        state.post_game = Some(crate::model::PostGame {
+            game,
+            opponent_id: None,
+            expires_at: chrono::Utc::now() + chrono::Duration::seconds(8),
+        });
+        assert!(should_show(&state, false));
+        state.detection.config.enabled = true;
+        assert!(!should_show(&state, true));
+        state.detection.config.enabled = false;
+        state.detection.config.game_id = "aoe4".into();
         assert!(!should_show(&state, true));
     }
 }

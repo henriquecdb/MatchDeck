@@ -45,6 +45,8 @@ pub fn select_game(
         state.last_synced = storage::load_last_match(&app, &game_id);
         state.detection = Default::default();
         state.detection.config = config;
+        state.post_game = None;
+        state.observed_sc2_match_id = None;
         state.hidden_match_id = None;
         state.clone()
     };
@@ -91,7 +93,28 @@ pub fn start_match(
     if incoming.players.is_empty() || incoming.players.len() > 8 {
         return Err("A partida deve ter entre 1 e 8 jogadores".into());
     }
-    state.current_match = Some(incoming);
+    if incoming.id.starts_with("demo-sc2-result-")
+        && incoming.game_id == "sc2"
+        && matches!(incoming.source, crate::model::MatchSource::Demo)
+        && incoming.finished_at.is_some()
+    {
+        if state.current_match.is_some() {
+            return Err("Encerre a demonstração antes de testar o pós-partida.".into());
+        }
+        if state.settings.post_game_seconds == 0 {
+            return Err("Ative o resumo na aba Overlay.".into());
+        }
+        state.hidden_match_id = None;
+        state.post_game = Some(crate::model::PostGame {
+            game: incoming,
+            opponent_id: None,
+            expires_at: chrono::Utc::now()
+                + chrono::Duration::seconds(state.settings.post_game_seconds as i64),
+        });
+    } else {
+        state.post_game = None;
+        state.current_match = Some(incoming);
+    }
     overlay::synchronize(&app, &state, true)
 }
 
@@ -181,6 +204,7 @@ pub fn finish_match(app: tauri::AppHandle, state: State<'_, SharedState>) -> Res
         return Err("Desative a detecção para esconder a partida real".into());
     }
     state.current_match = None;
+    state.post_game = None;
     state.hidden_match_id = None;
     overlay::synchronize(&app, &state, false)
 }
@@ -191,9 +215,7 @@ pub fn toggle_overlay_visibility(
     state: State<'_, SharedState>,
 ) -> Result<(), String> {
     let mut state = state.lock().map_err(|error| error.to_string())?;
-    let id = state
-        .current_match
-        .as_ref()
+    let id = overlay::displayed_match(&state)
         .map(|current| current.id.clone())
         .ok_or("Não há partida em andamento")?;
     state.hidden_match_id = if state.hidden_match_id.as_ref() == Some(&id) {
@@ -373,6 +395,8 @@ pub async fn configure_detection(
             },
         );
         state.current_match = None;
+        state.post_game = None;
+        state.observed_sc2_match_id = None;
         state.clone()
     };
     controller.updates.send_replace(config);

@@ -148,6 +148,7 @@ async fn cycle(
                 ));
             }
             state.last_synced = Some(new_match.clone());
+            state.post_game = None;
             state.current_match = Some(new_match);
         }
         if matches!(action, MatchAction::Finish) {

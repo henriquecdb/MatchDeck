@@ -82,7 +82,7 @@ fn local_player(player: &ClientPlayer, data: Option<&PlayerData>, team: usize) -
 }
 
 fn snapshot(players: Vec<Player>, profile_id: u64, id: String, map: String) -> MatchSnapshot {
-    MatchSnapshot { id, game_id: "sc2".into(), mode: MatchMode::Unknown, map, source: MatchSource::Live, players,
+    MatchSnapshot { duration_seconds: None, id, game_id: "sc2".into(), mode: MatchMode::Unknown, map, source: MatchSource::Live, players,
         queue: Some("1v1 · fila não informada".into()), queue_id: Some("sc2_1v1".into()), warnings: vec!["SC2: MMR e estatísticas são ranqueados por raça; a fila da partida atual não é informada pelo cliente.".into()],
         synced_at: Some(chrono::Utc::now().to_rfc3339()), replay_of: None, finished_at: None, self_player_id: Some(profile_id.to_string()) }
 }
@@ -446,12 +446,24 @@ fn publish(
                     .warnings
                     .push("Não foi possível salvar a partida para demonstração".into());
             }
+            if !finish {
+                state.observed_sc2_match_id = Some(snapshot.id.clone());
+            }
             state.last_synced = Some(snapshot.clone());
+            if !finish
+                && state
+                    .current_match
+                    .as_ref()
+                    .is_none_or(|old| old.id != snapshot.id)
+            {
+                state.post_game = None;
+            }
             state.current_match = if finish { None } else { Some(snapshot) };
-            state.hidden_match_id = None;
+            if !finish {
+                state.hidden_match_id = None;
+            }
         } else if finish {
             state.current_match = None;
-            state.hidden_match_id = None;
         }
         state.detection.phase = if state.current_match.is_some() {
             "in-match"

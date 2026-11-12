@@ -1,13 +1,13 @@
 import { hotkeyError } from '../domain/hotkeys';
 import type { AppState, OverlayRuntime } from '../application/runtime';
 import { captureMatch, type MatchSnapshot } from '../domain/match';
-import { defaultSettings, parseSettings, type OverlaySettings } from '../domain/settings';
+import { defaultSettings, parseSettings, type LayoutProfile, type LayoutProfileAction, type LayoutProfileInput, type OverlaySettings } from '../domain/settings';
 import { defaultDetection, type PlayerProfile } from '../domain/detection';
 import { defaultPreferences, parsePreferences, type AppPreferences } from '../domain/preferences';
 import { gameIntegration } from '../games/registry';
 import metadata from '../../package.json';
 import type { ProfileOverview } from '../domain/profile';
-import type { Sc2Session, Sc2SessionAction } from '../domain/sc2-session';
+import type { Sc2History, Sc2Session, Sc2SessionAction } from '../domain/sc2-session';
 
 export class BrowserRuntime implements OverlayRuntime {
   private state: AppState = { match: null, settings: { ...defaultSettings }, detection: structuredClone(defaultDetection), shortcutAvailable: false, visibilityShortcutAvailable: false, hiddenMatchId: null, lastSynced: null, preferences: { ...defaultPreferences }, autostart: false, trayAvailable: false, closeRequested: false, startupMs: null, appError: null };
@@ -22,6 +22,28 @@ export class BrowserRuntime implements OverlayRuntime {
       this.state.settings = { ...defaultSettings };
     }
     try { const saved = localStorage.getItem('matchdeck.preferences'); this.state.preferences = saved ? parsePreferences(JSON.parse(saved)) : { ...defaultPreferences, autoUpdate: this.state.settings.autoUpdate }; } catch { this.state.preferences = { ...defaultPreferences }; }
+  }
+
+  async layoutProfiles(gameId: string, action: LayoutProfileAction, input: LayoutProfileInput = {}): Promise<LayoutProfile[]> {
+    if (gameId !== this.state.detection.config.gameId) throw new Error('O jogo foi alterado; tente novamente');
+    const key = 'matchdeck.games.' + gameId + '.layoutProfiles';
+    let profiles: LayoutProfile[] = JSON.parse(localStorage.getItem(key) ?? '[]');
+    if (action === 'save') {
+      const name = input.name?.trim() ?? '';
+      if (!name || [...name].length > 32) throw new Error('Use um nome de 1 a 32 caracteres.');
+      if (profiles.some(p => p.name.toLowerCase() === name.toLowerCase() && p.id !== input.id)) throw new Error('Já existe um perfil com esse nome.');
+      if (!input.settings) throw new Error('Configuração de layout ausente.');
+      const saved = profiles.find(p => p.id === input.id);
+      if (input.id && !saved) throw new Error('Perfil de layout não encontrado.');
+      if (!saved && profiles.length >= 12) throw new Error('Limite de 12 perfis por jogo.');
+      const profile = { id: saved?.id ?? crypto.randomUUID(), name, settings: parseSettings(input.settings) };
+      profiles = saved ? profiles.map(p => p.id === saved.id ? profile : p) : [...profiles, profile];
+    } else if (action === 'delete') {
+      if (!profiles.some(p => p.id === input.id)) throw new Error('Perfil de layout não encontrado.');
+      profiles = profiles.filter(p => p.id !== input.id);
+    }
+    if (action !== 'read') localStorage.setItem(key, JSON.stringify(profiles));
+    return structuredClone(profiles);
   }
 
   async read() { return structuredClone(this.state); }
@@ -41,6 +63,8 @@ export class BrowserRuntime implements OverlayRuntime {
     throw new Error('Estatísticas disponíveis no aplicativo Windows.');
   }
 
+  async sc2History(_profileId: number): Promise<Sc2History> { throw new Error('Histórico disponível no aplicativo Windows.'); }
+  async subscribeSc2History(_listener: (history: Sc2History) => void) { return () => {}; }
   async sc2Session(_profileId: number, _action: Sc2SessionAction): Promise<Sc2Session | null> {
     throw new Error('Sessões disponíveis no aplicativo Windows.');
   }
@@ -66,18 +90,28 @@ export class BrowserRuntime implements OverlayRuntime {
     catch { this.state.settings = { ...defaultSettings }; }
     this.state.detection = structuredClone(defaultDetection);
     this.state.detection.config.gameId = gameId;
-    this.state.lastSynced = null; this.state.hiddenMatchId = null;
+    this.state.lastSynced = null; this.state.hiddenMatchId = null; this.state.postGame = null;
     this.publish();
   }
 
   async start(match: MatchSnapshot) {
     if (match.gameId !== this.state.detection.config.gameId) throw new Error('A demonstração deve corresponder ao jogo selecionado');
-    this.state.match = captureMatch(this.state.match, match);
+    if (this.state.detection.config.enabled) throw new Error('Desative a detecção real antes de iniciar uma demonstração');
+    if (match.id.startsWith('demo-sc2-result-') && match.gameId === 'sc2' && match.source === 'demo' && match.finishedAt) {
+      if (this.state.match) throw new Error('Encerre a demonstração antes de testar o pós-partida.');
+      if (this.state.settings.postGameSeconds === 0) throw new Error('Ative o resumo na aba Overlay.');
+      this.state.postGame = { game: match, expiresAt: new Date(Date.now() + this.state.settings.postGameSeconds * 1000).toISOString() };
+    } else {
+      this.state.match = captureMatch(this.state.match, match);
+      this.state.postGame = null;
+    }
+    this.state.hiddenMatchId = null;
     this.publish();
   }
 
   async finish() {
     this.state.match = null;
+    this.state.postGame = null;
     this.state.hiddenMatchId = null;
     this.publish();
   }
@@ -85,7 +119,7 @@ export class BrowserRuntime implements OverlayRuntime {
   async listMonitors() { return []; }
 
   async toggleVisibility() {
-    const id = this.state.match?.id ?? null;
+    const id = this.state.match?.id ?? this.state.postGame?.game.id ?? null;
     this.state.hiddenMatchId = this.state.hiddenMatchId === id ? null : id;
     this.publish();
   }

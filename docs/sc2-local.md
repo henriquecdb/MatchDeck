@@ -98,3 +98,52 @@ O replay confirma mapa, raça e resultado. O campo competitivo do protocolo mode
 Dados são processados localmente, sem upload. O decoder tem limites de tamanho, profundidade e saída descomprimida; arquivos incompletos e formatos não suportados são ignorados sem encerrar a detecção ao vivo. O esquema inicial Base98310 deriva do s2protocol oficial da Blizzard sob MIT, com licença preservada em src-tauri/src/games/sc2/replay/LICENSE-Blizzard.txt.
 
 Teste local: abrir o SC2 no MatchDeck, conferir as partidas na aba Perfil, jogar um 1v1 e voltar ao menu. O resultado deve ser confirmado poucos segundos após a gravação do replay. Para atualizar uma aba Perfil já aberta, use Atualizar perfil (cache de um minuto).
+
+## Resumo e retrospecto
+
+Ao terminar um 1v1 acompanhado pelo MatchDeck, o replay confirma o resultado e pode exibir
+um resumo com adversário, mapa, duração real e placar da sessão. Em Overlay,
+**Pós-partida (s)** controla a duração (padrão: 8; 0 desativa; máximo: 30).
+O resumo respeita foco, posição, escala e ocultação manual. Replays antigos lidos ao abrir
+o aplicativo não acionam esse resumo. Uma nova partida substitui o cartão.
+
+O histórico de confrontos é armazenado por perfil, independentemente da sessão, sem listagem
+no app. O resumo pós-partida exibe encontros anteriores quando o replay confirma o adversário.
+A identidade vem do personagem no replay (região, reino e ID), sem juntar homônimos.
+A primeira leitura considera os 32 arquivos mais recentes; novos resultados são acumulados.
+Isso não representa todo o histórico da conta. **Consultar mapa** permite selecionar um mapa da sessão e ver seus resultados sob demanda,
+com tamanho da amostra, vitórias, derrotas, empates e aproveitamento.
+
+**MMR da sessão** consulta o SC2 Pulse ao iniciar a sessão e, após um resultado recente,
+faz uma nova consulta com cinco segundos de espera. Cada linha separa raça e temporada,
+com valor inicial, última consulta e variação. O horário identifica a consulta, não uma
+confirmação de atualização do MMR no servidor. A fonte pode atrasar. Cache de contingência
+não conta como nova amostra. Se não houver consulta inicial válida antes de jogar, a base e
+a variação ficam com —; o app não estima ganhos por partida. Sessões encerradas não recebem
+novas consultas de MMR. Sessões antigas continuam legíveis, sem uma base retroativa.
+
+Na aba **Demonstração**, selecione um **Resultado de teste** e clique em **Testar pós-partida**.
+A prévia e o overlay usam dados fictícios e o tempo configurado, sem alterar sessão ou histórico.
+Desative a detecção e encerre a demonstração em andamento antes do teste.
+
+## Consultas de MMR e reencontros
+
+A sessão diferencia consulta em andamento, falha na fonte, ausência de MMR ranqueado e
+falta de registro inicial. **Atualizar MMR** consulta novamente sem reiniciar a sessão;
+repetições simultâneas compartilham a consulta. Uma atualização tardia não cria um MMR
+inicial retroativo. Sessões encerradas não recebem novas amostras.
+
+Quando um replay confirma um adversário já registrado, o resumo pós-partida mostra o
+placar dos **encontros anteriores** e a data do último. A partida recém-encerrada fica fora
+desse retrospecto. Homônimos não são agrupados. Durante a partida, nomes não confirmam
+identidades: sugestões de perfil não são usadas para afirmar um reencontro.
+A demonstração inclui um retrospecto fictício.
+
+## Perfis de layout
+
+Em **Overlay → Perfis de layout**, escolha **Novo perfil**, informe um nome e salve a
+configuração atual. Depois, **Aplicar perfil** restaura posição, monitor, escala, opacidade,
+trava e opções de exibição. **Atualizar perfil** substitui o perfil selecionado pela
+configuração atual; **Excluir perfil** remove apenas essa configuração salva.
+São permitidos até 12 perfis por jogo, com nomes de até 32 caracteres. O arquivo local
+fica em games/<jogo>/layout-profiles.json, separado dos resultados e das sessões.

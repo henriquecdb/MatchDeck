@@ -4,8 +4,41 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { BrowserRuntime } from '../../infrastructure/browser-runtime';
 import { createDemoMatch } from '../../games/aoe2/demo';
 import { DemoPanel } from './DemoPanel';
+import { createSc2PostGameDemo } from '../../games/sc2/demo';
 
 afterEach(() => { cleanup(); localStorage.clear(); });
+
+it('previews a fictional post-game result, preserves saved data and allows closing it', async () => {
+  const runtime = new BrowserRuntime();
+  await runtime.selectGame('sc2');
+  const state = await runtime.read();
+  const view = render(<DemoPanel runtime={runtime} state={state} desktop={false} perform={action => action()} />);
+  fireEvent.change(screen.getByRole('combobox', { name: 'Resultado de teste' }), { target: { value: 'loss' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Testar pós-partida' }));
+  await waitFor(async () => expect((await runtime.read()).postGame?.game.players[0].won).toBe(false));
+  const next = await runtime.read();
+  expect(next.match).toBeNull();
+  expect(next.lastSynced).toEqual(state.lastSynced);
+  expect(next.detection).toEqual(state.detection);
+  expect(Date.parse(next.postGame!.expiresAt) - Date.now()).toBeGreaterThan(6000);
+  view.rerender(<DemoPanel runtime={runtime} state={next} desktop={false} perform={action => action()} />);
+  expect(screen.getByRole('region', { name: 'Resumo pós-partida' }).textContent).toContain('Derrota');
+  fireEvent.click(screen.getByRole('button', { name: 'Encerrar demonstração' }));
+  await waitFor(async () => expect((await runtime.read()).postGame).toBeNull());
+});
+
+it('blocks post-game demos when the summary is disabled or a match is active', async () => {
+  const runtime = new BrowserRuntime();
+  await runtime.selectGame('sc2');
+  const state = await runtime.read();
+  await runtime.configure({ ...state.settings, postGameSeconds: 0 });
+  await expect(runtime.start(createSc2PostGameDemo('draw'))).rejects.toThrow('Ative o resumo');
+  await runtime.configure(state.settings);
+  const normal = { ...createSc2PostGameDemo('win'), id: 'normal-demo' };
+  await runtime.start(normal);
+  expect((await runtime.read()).match?.id).toBe('normal-demo');
+  await expect(runtime.start(createSc2PostGameDemo('win'))).rejects.toThrow('Encerre a demonstração');
+});
 
 it('starts an eight-player team demo from the format selector', async () => {
   const runtime = new BrowserRuntime();
