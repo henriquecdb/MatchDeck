@@ -43,6 +43,7 @@ pub struct RemoteGame {
     pub game_id: u64,
     pub started_at: DateTime<Utc>,
     pub updated_at: Option<String>,
+    pub duration: Option<u64>,
     pub ongoing: bool,
     pub state: String,
     pub kind: String,
@@ -145,7 +146,7 @@ impl RemoteGame {
             })
             .collect();
         MatchSnapshot {
-            duration_seconds: None,
+            duration_seconds: self.duration.filter(|d| *d <= 86400),
             id: self.id(),
             game_id: "aoe4".into(),
             mode: if self.kind == "rm_1v1" {
@@ -179,6 +180,7 @@ impl RemoteGame {
 
     pub fn record_outcome(&self, current: &MatchSnapshot) -> MatchSnapshot {
         let mut snapshot = current.clone();
+        snapshot.duration_seconds = self.duration.filter(|d| *d <= 86400);
         snapshot.finished_at = Some(
             self.updated_at
                 .clone()
@@ -192,6 +194,7 @@ impl RemoteGame {
                 .find(|remote| remote.profile_id.to_string() == player.id)
             {
                 player.won = result(remote.result.as_deref());
+                player.draw = Some(matches!(remote.result.as_deref(), Some("draw" | "tie")));
                 player.rating_change = remote.rating_diff;
             }
         }
@@ -222,7 +225,7 @@ where
         .collect())
 }
 
-pub(super) fn result(value: Option<&str>) -> Option<bool> {
+pub(crate) fn result(value: Option<&str>) -> Option<bool> {
     match value {
         Some("win") => Some(true),
         Some("loss") => Some(false),

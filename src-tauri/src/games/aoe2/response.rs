@@ -51,7 +51,7 @@ impl RemoteMatch {
     }
 
     pub fn is_finished(&self) -> bool {
-        !self.finished.is_null()
+        (!self.finished.is_null() && self.finished != false)
             || self
                 .abandoned
                 .as_ref()

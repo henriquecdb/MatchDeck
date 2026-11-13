@@ -6,7 +6,7 @@ import { civilizationArtwork, leagueBadge } from './catalog';
 
 export function Aoe4Overlay({ match, display }: { match: MatchSnapshot; display: OverlaySettings }) {
   const { t, gameLanguage } = useI18n();
-  return <section className="aoe4-overlay" aria-label={t('Overlay Age of Empires IV')}>
+  return <section className={'aoe4-overlay' + (display.layout === 'stacked' ? ' is-stacked' : '')} aria-label={t('Overlay Age of Empires IV')}>
     {match.players.map((player, index) => {
       const civ = civilizationArtwork(player, gameLanguage);
       return <article key={player.id} className={`aoe4-player player-${index}${display.highlightSelf && player.id === match.selfPlayerId ? ' aoe4-self' : ''}`}>

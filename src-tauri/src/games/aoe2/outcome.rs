@@ -19,6 +19,17 @@ pub fn record_outcome(snapshot: &MatchSnapshot, remote: &RemoteMatch) -> MatchSn
             .map(str::to_owned)
             .unwrap_or_else(|| now().to_rfc3339()),
     );
+    result.duration_seconds = remote
+        .finished
+        .as_str()
+        .or_else(|| remote.abandoned.as_ref().and_then(|v| v.as_str()))
+        .and_then(|end| chrono::DateTime::parse_from_rfc3339(end).ok())
+        .and_then(|end| {
+            (end.with_timezone(&chrono::Utc) - remote.started)
+                .to_std()
+                .ok()
+        })
+        .map(|d| d.as_secs());
     result.synced_at = Some(now().to_rfc3339());
     for player in &mut result.players {
         let outcome = remote

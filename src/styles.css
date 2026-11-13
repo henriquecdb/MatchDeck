@@ -333,3 +333,12 @@ input[type=number] { width: 110px; }
 .sc2-opponents li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 12px; padding: 8px; border-radius: 4px; background: #17232d; font-variant-numeric: tabular-nums; }
 .sc2-opponents strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sc2-opponents small { grid-column: 1 / -1; color: #9ab0c0; }
+
+.aoe4-overlay.is-stacked { width: 360px; min-width: 360px; height: 156px; grid-template-columns: minmax(0, 1fr); grid-template-rows: 28px 48px 48px; gap: 8px; }
+.aoe4-overlay.is-stacked .aoe4-context { grid-column: 1; grid-row: 1; display: flex; align-items: center; justify-content: space-between; gap: 8px; text-align: left; }
+.aoe4-overlay.is-stacked .aoe4-context span { margin: 0; flex: none; }
+.aoe4-overlay.is-stacked .aoe4-player.player-0 { grid-column: 1; grid-row: 2; }
+.aoe4-overlay.is-stacked .aoe4-player.player-1 { grid-column: 1; grid-row: 3; flex-direction: row; text-align: left; }
+
+.age-session-overlay { display: flex; flex-direction: column; width: max-content; }
+.age-session-overlay > .sc2-session-bar { box-sizing: border-box; height: 32px; flex-basis: 32px; margin: 0; padding: 4px 8px 0; border: 1px solid #345066; border-top: 0; border-radius: 0 0 6px 6px; background: #101820; color: #e8edf3; }

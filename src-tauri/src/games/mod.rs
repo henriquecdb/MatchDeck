@@ -3,6 +3,7 @@ pub mod aoe4;
 pub mod local_profile;
 pub mod profile;
 pub mod sc2;
+pub mod session;
 
 pub const AOE2_ID: &str = "aoe2-de";
 

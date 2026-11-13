@@ -83,6 +83,14 @@ async fn cycle(
 ) -> Result<(), String> {
     let profile = config.profile.as_ref().ok_or("Selecione um perfil AoE2")?;
     let feed = provider.matches(profile.profile_id).await?;
+    let records: Vec<_> = feed
+        .matches
+        .iter()
+        .filter_map(|game| crate::games::session::aoe2(game, profile.profile_id))
+        .collect();
+    if let Err(error) = crate::games::session::record(app, config, &records) {
+        eprintln!("Sessão Age 2: {error}");
+    }
     let current_id = {
         let shared = app.state::<SharedState>();
         let state = shared.lock().map_err(|error| error.to_string())?;
@@ -129,7 +137,7 @@ async fn cycle(
     } else {
         None
     };
-    let changed = new_match.is_some() || matches!(action, MatchAction::Finish);
+    let mut changed = new_match.is_some() || matches!(action, MatchAction::Finish);
     let snapshot = {
         let shared = app.state::<SharedState>();
         let mut state = shared.lock().map_err(|error| error.to_string())?;
@@ -149,6 +157,8 @@ async fn cycle(
             }
             state.last_synced = Some(new_match.clone());
             state.post_game = None;
+            state.observed_age_match_id = Some(new_match.id.clone());
+            state.hidden_match_id = None;
             state.current_match = Some(new_match);
         }
         if matches!(action, MatchAction::Finish) {
@@ -165,17 +175,21 @@ async fn cycle(
                             .warnings
                             .push(format!("Não foi possível salvar o resultado: {error}"));
                     }
+                    crate::games::session::post_game(&mut state, &result);
                     state.last_synced = Some(result);
                 }
             }
             state.current_match = None;
         }
         if state.current_match.is_none() {
-            if let Some(cached) = state
-                .last_synced
-                .as_ref()
-                .filter(|cached| cached.finished_at.is_none())
-            {
+            if let Some(cached) = state.last_synced.as_ref().filter(|cached| {
+                cached.finished_at.is_none()
+                    || cached
+                        .players
+                        .iter()
+                        .find(|p| Some(&p.id) == cached.self_player_id.as_ref())
+                        .is_some_and(|p| p.won.is_none() && p.draw != Some(true))
+            }) {
                 if let Some(remote) = feed.matches.iter().find(|remote| {
                     cached.id == format!("aoe2-{}", remote.match_id)
                         && remote.includes(profile.profile_id)
@@ -183,6 +197,8 @@ async fn cycle(
                 }) {
                     let result = crate::games::aoe2::outcome::record_outcome(cached, remote);
                     storage::save_last_match(app, &result)?;
+                    crate::games::session::post_game(&mut state, &result);
+                    changed = true;
                     state.last_synced = Some(result);
                     crate::diagnostics::record(
                         &mut state,

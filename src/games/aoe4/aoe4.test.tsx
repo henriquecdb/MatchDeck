@@ -66,3 +66,11 @@ it('renders the reference strip with local assets and never applies the AoE2 Elo
 });
 
 beforeEach(() => { localStorage.setItem('matchdeck.preferences', JSON.stringify({ openLastGame: true })); });
+
+it('allows switching the Age 4 preview between horizontal and vertical layouts', () => {
+  const match = createAoe4Demo();
+  const view = render(<MatchOverlay match={match} layout="stacked" display={{ ...defaultSettings, showSession: false }} />);
+  expect(screen.getByRole('region', { name: 'Overlay Age of Empires IV' }).classList.contains('is-stacked')).toBe(true);
+  view.rerender(<MatchOverlay match={match} layout="compact" display={{ ...defaultSettings, showSession: false }} />);
+  expect(screen.getByRole('region', { name: 'Overlay Age of Empires IV' }).classList.contains('is-stacked')).toBe(false);
+});

@@ -47,6 +47,7 @@ pub fn select_game(
         state.detection.config = config;
         state.post_game = None;
         state.observed_sc2_match_id = None;
+        state.observed_age_match_id = None;
         state.hidden_match_id = None;
         state.clone()
     };
@@ -93,8 +94,9 @@ pub fn start_match(
     if incoming.players.is_empty() || incoming.players.len() > 8 {
         return Err("A partida deve ter entre 1 e 8 jogadores".into());
     }
-    if incoming.id.starts_with("demo-sc2-result-")
-        && incoming.game_id == "sc2"
+    if incoming
+        .id
+        .starts_with(&format!("demo-{}-result-", incoming.game_id))
         && matches!(incoming.source, crate::model::MatchSource::Demo)
         && incoming.finished_at.is_some()
     {

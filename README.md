@@ -29,7 +29,7 @@ Quer experimentar antes? Na aba **Demonstração**, use jogadores fictícios ou 
 | Jogo | Disponível |
 | --- | --- |
 | **Age of Empires II: DE** | Multiplayer ranqueado e rápido, rating por modalidade, vitórias, derrotas, civilizações e unidades únicas. A aba Perfil reúne estatísticas, últimas cinco partidas disponíveis e gráfico de rating para filas 1v1. |
-| **Age of Empires IV** · experimental | Multiplayer ranqueado e rápido de PC em 1v1. Faixa compacta com civilizações, liga, posição no ranking, rating/pontos e resultados. Perfil com estatísticas, últimas cinco partidas disponíveis e gráfico recente de rating/MMR. |
+| **Age of Empires IV** · experimental | Multiplayer ranqueado e rápido de PC em 1v1. Overlay horizontal ou vertical com civilizações, liga, posição no ranking, rating/pontos e resultados. Perfil com estatísticas, últimas cinco partidas disponíveis e gráfico recente de rating/MMR. |
 | **StarCraft II** · experimental | Overlay compacto para duas pessoas, perfil com MMR por raça e temporada, últimas cinco partidas e gráfico. Estatísticas via SC2 Pulse. |
 
 Campanhas e skirmish offline não têm detecção. Lobbies personalizados do Age 2 dependem da cobertura da fonte e ainda precisam de validação; equipes e partidas personalizadas do Age 4 ainda não são suportadas.
@@ -37,6 +37,9 @@ Campanhas e skirmish offline não têm detecção. Lobbies personalizados do Age
 Os dados vêm do [AoE II Companion](https://www.aoe2companion.com/) e do [AoE4 World](https://aoe4world.com/). Valores indisponíveis aparecem como **—**. Pontos ranqueados e MMR são medidas diferentes; a projeção de ganho/perda do Age 2 é opcional e não oficial.
 
 No SC2, a detecção usa o cliente local; mapa e fila não são informados. Veja [como testar o SC2](docs/sc2-local.md).
+
+Sessão, faixa de placar e resumo pós-partida também estão disponíveis no Age 2 e Age 4.
+Veja [como usar e testar](docs/age-sessions.md).
 
 ## Do seu jeito
 

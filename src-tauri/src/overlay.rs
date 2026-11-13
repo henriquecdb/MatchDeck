@@ -32,7 +32,11 @@ fn refresh_geometry(window: &tauri::WebviewWindow, state: &AppState) -> Result<(
                 current,
                 &state.settings,
                 state.settings.show_session
-                    && crate::games::sc2::session::active_for(window.app_handle(), current),
+                    && if current.game_id == "sc2" {
+                        crate::games::sc2::session::active_for(window.app_handle(), current)
+                    } else {
+                        crate::games::session::active_for(window.app_handle(), current)
+                    },
             )
         })
         .unwrap_or((480.0, 436.0));

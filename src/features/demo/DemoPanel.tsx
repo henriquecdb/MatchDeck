@@ -1,5 +1,5 @@
 import { usePostGame } from '../overlay/use-post-game';
-import { createSc2PostGameDemo } from '../../games/sc2/demo';
+import { createPostGameDemo } from './post-game-demo';
 import { useI18n } from '../../i18n/LanguageProvider';
 import { useState } from 'react';
 import type { AppState, OverlayRuntime } from '../../application/runtime';
@@ -47,7 +47,7 @@ export function DemoPanel({ runtime, state, desktop, perform }: Props) {
       {source === 'fictional' && gameId === 'aoe2-de' && <label>{t('Formato da demonstração')} <select disabled={!!match} value={teamSize} onChange={event => setTeamSize(Number(event.target.value) as DemoTeamSize)}>
         {[1, 2, 3, 4].map(size => <option key={size} value={size}>{size}v{size}</option>)}
       </select></label>}
-      {gameId === 'sc2' && <label>{t('Resultado de teste')} <select value={result} onChange={event => setResult(event.target.value as typeof result)}>
+      {<label>{t('Resultado de teste')} <select value={result} onChange={event => setResult(event.target.value as typeof result)}>
           <option value="win">{t('Vitória')}</option><option value="loss">{t('Derrota')}</option><option value="draw">{t('Empate')}</option>
         </select></label>}
       <div className="actions">
@@ -58,12 +58,12 @@ export function DemoPanel({ runtime, state, desktop, perform }: Props) {
           if (!latest) throw new Error('Nenhuma partida sincronizada disponível. Selecione jogadores fictícios ou sincronize seu perfil.');
           await runtime.start(replayMatch(latest));
         })}>{busy ? t('Carregando…') : t('Iniciar demonstração')}</button>
-        {gameId === 'sc2' && <button disabled={!!match || settings.postGameSeconds === 0} onClick={() => run(() => runtime.start(createSc2PostGameDemo(result)))}>{t('Testar pós-partida')}</button>}
+        {<button disabled={!!match || settings.postGameSeconds === 0} onClick={() => run(() => runtime.start(createPostGameDemo(gameId, result, mode, teamSize)))}>{t('Testar pós-partida')}</button>}
         <button disabled={!match && !card} onClick={() => run(() => runtime.finish())}>{t('Encerrar demonstração')}</button>
         <button disabled={!!match || !desktop || !detection.config.profile} onClick={() => run(() => runtime.syncLatest())}>{t('Atualizar últimos dados')}</button>
       </div>
 
-      {gameId === 'sc2' && settings.postGameSeconds === 0 && <p>{t('Ative o resumo na aba Overlay.')}</p>}
+      {settings.postGameSeconds === 0 && <p>{t('Ative o resumo na aba Overlay.')}</p>}
     </fieldset>
     <p role="status">{detection.config.enabled ? t('Desative a detecção na aba Partida para iniciar um teste.') : match || card ? t('Demonstração ativa. Trocar de aba mantém o overlay.') : t('Pronto para testar o overlay.')}</p>
     <p>{source === 'fictional' ? t('Dados fictícios; seus dados salvos são preservados.') : lastSynced ? t('Usando dados salvos, sem nova consulta.') : desktop && detection.config.profile ? t('O primeiro teste busca sua última partida.') : t('Configure um perfil no aplicativo Windows e sincronize uma partida, ou selecione jogadores fictícios.')}</p>

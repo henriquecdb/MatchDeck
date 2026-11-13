@@ -640,5 +640,11 @@
   "Falha ao criar perfil.": "Failed to create profile.",
   "Consulta de MMR interrompida.": "MMR query interrupted.",
   "Fonte indisponível. Tente novamente.": "Source unavailable. Try again.",
-  "Arquivo de perfis de layout inválido. O original foi preservado.": "Invalid layout profiles file. The original was preserved."
+  "Arquivo de perfis de layout inválido. O original foi preservado.": "Invalid layout profiles file. The original was preserved.",
+  "Arquivo de sessão inválido. O original foi preservado.": "Invalid session file. The original was preserved.",
+  "O perfil da sessão não corresponde ao selecionado.": "The session profile does not match the selected profile.",
+  "Resultados confirmados pela fonte. Salva por jogo e perfil.": "Source-confirmed results. Saved per game and profile.",
+  "Nova sessão substitui o placar anterior.": "A new session replaces the previous record.",
+  "Variação de pontos": "Points change",
+  "Partida em equipe": "Team game"
 }
