@@ -2,6 +2,28 @@
 
 As mudanças relevantes são registradas por versão. O projeto usa Semantic Versioning e Conventional Commits.
 
+## [0.9.0] - 2026-11-13
+
+### Adicionado
+
+- Sessões locais no Age of Empires II: DE e Age of Empires IV, com início e encerramento manuais, placar, aproveitamento e dez últimos resultados salvos por jogo e perfil.
+- Faixa opcional da sessão nos overlays dos dois jogos, com vitórias, derrotas, empates e sequência de resultados.
+- Resumo pós-partida com resultado confirmado pela fonte, adversário ou equipe, mapa, duração e variação publicada quando disponíveis. Tempo de exibição configurável.
+- Demonstração de vitória, derrota e empate no pós-partida dos dois jogos, sem alterar sessões reais; no Age 2, acompanha o formato de 1v1 a 4v4.
+- Layout compacto vertical no Age 4, selecionável na aba Overlay e compatível com os perfis de layout.
+
+### Corrigido
+
+- Resultados atrasados enriquecem a mesma partida sem duplicar a contagem da sessão; partidas sem decisão confirmada não viram derrotas.
+- O resumo respeita perfil, jogo, foco e ocultação manual, sem abrir partidas antigas ao iniciar ou substituir uma nova partida em andamento.
+- A duração do Age 4 usa o valor informado pela fonte, sem confundir o horário de atualização do registro com o encerramento da partida.
+- O valor false no campo de encerramento do Age 2 não é tratado como fim de partida.
+
+### Cobertura
+
+- Age 2 acompanha as modalidades já detectadas pelo aplicativo, incluindo equipes. Age 4 continua restrito a ranqueadas e rápidas de PC em 1v1.
+- A contagem depende dos resultados publicados nas consultas recentes das fontes; não representa um histórico integral de jogos realizados com o aplicativo fechado.
+
 ## [0.8.0] - 2026-11-12
 
 ### Adicionado

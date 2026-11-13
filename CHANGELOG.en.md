@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.9.0] - 2026-11-13
+
+### Added
+
+- Local Age of Empires II: DE and Age of Empires IV sessions with manual start/end controls, record, win rate and ten latest results saved per game and profile.
+- Optional session bars in both overlays, showing wins, losses, draws and recent results.
+- Post-game summaries with source-confirmed result, opponent or team, map, duration and published rating change when available. Configurable display duration.
+- Fictional win, loss and draw post-game demos for both games without changing real sessions; Age 2 follows the selected 1v1 to 4v4 format.
+- Compact vertical Age 4 layout, selectable in the Overlay tab and supported by saved layout profiles.
+
+### Fixed
+
+- Late results enrich the same game without double-counting; unconfirmed results are not counted as losses.
+- Summaries respect profile, game, focus and manual hiding without opening old games at startup or replacing a new active match.
+- Age 4 duration uses the source duration rather than treating the record update timestamp as the match ending.
+- A false value in the Age 2 finished field is no longer treated as a completed game.
+
+### Coverage
+
+- Age 2 follows the modes already detected by the app, including teams. Age 4 remains limited to ranked and quick-play PC 1v1.
+- Counts depend on results published in recent source queries; this is not a complete history of games played while the app was closed.
+
 ## [0.8.0] - 2026-11-12
 
 ### Added
